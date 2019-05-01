@@ -1,10 +1,14 @@
+#ifndef RETURN
+#define RETURN
+
+
 #incldue <iostream>
+#include <cstring>
 #include "bptree.hpp"
 #include "flow.hpp"
 
 /*
 struct time{
-
     short data;
 
     time():data(0){}
@@ -40,7 +44,7 @@ struct query_profile_return {
 
     query_profile_return (wchar_t _name[], char _email[], char _phone[],
                          short _privilege){
-        memcpy(name, _name, 20);
+        memcpy(name, _name, 20 * sizeof(wchar_t));
         memcpy(email, _email, 20);
         memcpy(phone, _phone, 20);
         privilege = _privilege;
@@ -62,7 +66,7 @@ struct query_ticket_return{
     query_ticket_return(int _listnum, const info_ticket& _data[]){
         listnum = _listnum;
         data = new info_ticket[listnum];
-        memcpy(data, _data, listnum);
+        memcpy(data, _data, listnum * sizeof(info_ticket));
     }
 
     ~query_order_return(){
@@ -76,7 +80,7 @@ struct query_transfer_return{
 
     query_transfer_return(bool _success, info_ticket _data[]){
         success = _success;
-        memcpy(data, _data, 2);
+        memcpy(data, _data, 2 * sizeof(info_ticket));
     }
 };
 
@@ -89,7 +93,7 @@ struct query_order_return{
         success = _success;
         listnum = _listnum;
         data = new info_ticket[listnum];
-        memcpy(data, _data, listnum);
+        memcpy(data, _data, listnum * sizeof(info_ticket));
     }
 
     ~query_order_return(){
@@ -114,17 +118,19 @@ struct query_train_return{
                        short _num_price, info_station _data[]){
         num_price = _num_price;
         num_station = _numstation;
-        memcpy(name, _name, 20);
+        memcpy(name, _name, 20 * sizeof(wchar_t));
         for (int i = 0; i < num_price; ++i){
-            memcpy(name_price[i], _name_price[i], 20);
+            memcpy(name_price[i], _name_price[i], 20 * sizeof(wchar_t));
         }
         memcpy(train_id, _train_id, 20);
         memcpy(catalog, _catalog, 10);
         data = new info_station[listnum];
-        memcpy(data, _data, listnum);
+        memcpy(data, _data, listnum * sizeof(info_station));
     }
 
     ~query_train_return(){
         delete [] data;
     }
 };
+
+#endif // RETURN
