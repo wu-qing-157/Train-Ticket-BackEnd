@@ -4,51 +4,22 @@
 #include <iostream>
 #include <cstring>
 #include "bptree.hpp"
-#include "operation.hpp"
+#include "structs.hpp"
+#include "info.hpp"
 
-/*
-struct time{
-    short data;
-
-    time():data(0){}
-    time(char[] s){
-        if (char[0] == 'x') data = -1;
-        else data = (((s[0]-'0')*10 + s[1]-'0')*10 + s[3]-'0')*10 + s[4]-'0';
-    }
-
-    short hour(){return (data / 100);}
-    short minute(){return (data % 100);}
-};
-
-struct date{
-    short year;
-    short month;
-    short day;
-
-    date() = default;
-    date(char[] s){
-        year = (((s[0]-'0')*10 + s[1]-'0')*10 + s[3]-'0')*10 + s[4]-'0';
-        month = (s[5]-'0')*10 + s[6]-'0';
-        day = (s[8]-'0')*10 + s[9]-'0';
-    }
-};
-
-These above are written in operation.hpp
-*/
-
-struct query_profile_info {
+struct info_query_profile {  //It's very similar with info_user, except that it does not contain passward.
     wchar_t name[20];
     char email[20];
 	long long phone;
     short previlege;
 
-	query_profile_info(info_user data) {
+	info_query_profile(info_user data) {
 		memcpy(name, data.name, 20 * sizeof(wchar_t));
 		memcpy(email, data.email, 20);
 		phone = data.phone;
 		previlege = data.previlege;
 	}
-	query_profile_info (wchar_t _name[], char _email[], long long _phone,
+	info_query_profile (wchar_t _name[], char _email[], long long _phone,
                          short _previlege){
         memcpy(name, _name, 20 * sizeof(wchar_t));
         memcpy(email, _email, 20);
@@ -125,10 +96,10 @@ struct query_train_return{
         num_price = _num_price;
         num_station = _num_station;
         memcpy(name, _name, 20 * sizeof(wchar_t));
-        for (int i = 0; i < num_price; ++i){
+		//memcpy(name_price, _name_price, num_price * 4);  It seems that this sentence should be deleted, but I'm not sure.
+		for (int i = 0; i < num_price; ++i){
             memcpy(name_price[i], _name_price[i], 20 * sizeof(wchar_t));
         }
-		memcpy(name_price, _name_price, num_price * 4);  //sizeof a pointer is 4
         memcpy(train_id, _train_id, 20);
         memcpy(catalog, _catalog, 10);
         data = new info_station[num_station];
