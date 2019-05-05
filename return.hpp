@@ -94,15 +94,15 @@ struct query_train_return{
                        short _num_price, info_station* _data){
         num_price = _num_price;
         num_station = _num_station;
-        memcpy(name, _name, 20 * sizeof(wchar_t));
+        memcpy(name, _name, 20 * sizeof wchar_t);
 		//memcpy(name_price, _name_price, num_price * 4);  It seems that this sentence should be deleted, but I'm not sure.
-		for (int i = 0; i < num_price; ++i){
-            memcpy(name_price[i], _name_price[i], 20 * sizeof(wchar_t));
+		for (int i = 0; i < num_price; ++i) {
+            memcpy(name_price[i], _name_price[i], 20 * sizeof wchar_t);
         }
         memcpy(train_id, _train_id, 20);
         memcpy(catalog, _catalog, 10);
         data = new info_station[num_station];
-        memcpy(data, _data, num_station * sizeof(info_station));
+        memcpy(data, _data, num_station * sizeof info_station);
     }
 
     ~query_train_return(){

@@ -10,18 +10,32 @@
 	#include "structs.hpp"
 #endif
 
+typedef wchar_t name[40];
+typedef char password[32];
+typedef char email[20];
+typedef char phone[20];
+typedef wchar_t log[20];
+typedef char date[20];
+typedef char catalog[10];
+typedef wchar_t ticket_kind[20];
+typedef char train_id[20];
+typedef char time[10];
+
 // ======= User BEGIN =======
 user user_system;
 void user_register()
 {
-	wchar_t name[40];
-	char pwd[32], email[20], phone[20];
-	scanf("%s%s%s%lld", name, pwd, email, phone);
-	printf("%d\n", user_system.regist(name, pwd, email, phone));
+	name _name;
+	password pwd;
+	email _email;
+	phone _phone;
+	scanf("%s%s%s%lld", _name, pwd, _email, _phone);
+	printf("%d\n", user_system.regist(_name, pwd, _email, _phone));
 }
 void user_login()
 {
-	int id; char pwd[32];
+	int id;
+	password pwd;
 	scanf("%d%s", &id, pwd);
 	printf("%d\n", user_system.login(id, pwd));
 }
@@ -35,29 +49,72 @@ void user_query_profile()
 void user_modify_profile()
 {
 	int id; scanf("%d", &id);
-	wchar_t name[40]; char pwd[32], email[20], phone[20];
-	scanf("%s%s%s%s", name, pwd, email, phone);
-	printf("%d\n", user_system.modify_profile(id, name, pwd, email, phone));
+	name _name; password pwd; email _email; phone _phone;
+	scanf("%s%s%s%s", _name, pwd, _email, _phone);
+	printf("%d\n", user_system.modify_profile(id, _name, pwd, _email, _phone));
 }
 void user_modify_privilege()
 {
 	int id1, id2; short privilege;
-	user_system.modify_privilege(id1, id2, privilege);
+	printf("%d\n", user_system.modify_privilege(id1, id2, privilege));
 }
 // ======= User END =======
 
 // ======= Ticket BEGIN =======
-void ticket_query_ticket();
-void ticket_query_transfer();
-void ticket_buy_ticket();
+ticket ticket_system;
+void ticket_query_ticket()
+{
+	loc loc1, loc2;
+	date _date; catalog _catalog;
+	scanf("%s%s%s%s", loc1, loc2, _data, _catalog);
+
+}
+void ticket_query_transfer()
+{
+	loc loc1, loc2;
+	date _date;
+	catalog _catalog;
+	scanf("%s%s%s%s", loc1, loc2, _data, _catalog);
+	
+}
+void ticket_buy_ticket()
+{
+	int uid, num;
+	train_id t_id;
+	loc loc1, loc2;
+	date _date;
+	ticket_kind _kind;
+	scanf("%d%d%s%s%s%s%s", &uid, &num, tid, loc1, loc2, _date, _kind);
+	
+}
 void ticket_query_order();
 void ticket_refund_ticket();
 // ======= Ticket END =======
 
 // ======= Train BEGIN =======
+train train_system;
 void train_add_train();
 void train_sale_train();
-void train_query_train();
+void train_query_train()
+{
+	try {
+		char train_id[20];
+		info_train ans = train_system.query_train(train_id);
+		printf("%s %s %s %hd %hd", train_id, ans._name, ans.catalog, ans.num_station, ans.num_price);
+		for (int i = 0; i < ans.num_price; ++i) printf(" %s", ans.name_price[i]);
+		puts("");
+		for (int i = 0; i < ans.num_station; ++i)
+		{
+			printf("%s ", ans.data[i]._name);
+			ans.data[i].arriv.print(" ");
+			ans.data[i].start.print(" ");
+			ans.data[i].stopover.print();
+			for (int j = 0; j < ans.num_price; ++j)
+				printf(" ￥%f", ans.data[i].price[j]);
+			puts("");
+		}
+	} catch(index_out_of_bound) {puts("0");}
+}
 void train_delete_train();
 void train_modify_train();
 // ======= Train END =======

@@ -42,11 +42,17 @@ struct time {
 	time() :data(0) {}
 	time(char s[]) {
 		if (s[0] == 'x') data = -1;
-		else data = (((s[0] - '0') * 10 + s[1] - '0') * 10 + s[3] - '0') * 10 + s[4] - '0';
+		else data = (((s[0] - '0') * 10 + s[1] - '0') * 100 + s[3] - '0') * 10 + s[4] - '0';
 	}
 
 	short hour() { return (data / 100); }
 	short minute() { return (data % 100); }
+	void print(char end = 0)
+	{
+		if (data == -1) printf("xx:xx");
+		else printf("%hd:%hd", hour(), minute());
+		if (end) printf("%c", end);
+	}
 };
 
 struct date {

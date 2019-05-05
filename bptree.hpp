@@ -341,7 +341,7 @@ namespace sjtu {
                 if(pos < tmp->curSize&&tmp->mainKey[pos] == key) ++pos;
                 tmp = tmp->son[pos];
             }
-            if(Pos == tmp->curSize || tmp->key[Pos] != key) throw(index_out_of_bound());
+            if(Pos == tmp->curSize || tmp->key[Pos] != key) throw index_out_of_bound();
             return tmp->data[Pos];
         }
 
