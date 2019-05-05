@@ -9,22 +9,21 @@
 
 struct info_query_profile {  //It's very similar with info_user, except that it does not contain passward.
     wchar_t name[20];
-    char email[20];
-	long long phone;
-    short previlege;
+    char email[20], phone[20];
+    short privilege;
 
 	info_query_profile(info_user data) {
-		memcpy(name, data.name, 20 * sizeof(wchar_t));
+		memcpy(name, data.name, 20 * sizeof wchar_t );
 		memcpy(email, data.email, 20);
-		phone = data.phone;
-		previlege = data.previlege;
+		memcpy(phone, data.phone, 20);
+		privilege = data.privilege;
 	}
-	info_query_profile (wchar_t _name[], char _email[], long long _phone,
-                         short _previlege){
-        memcpy(name, _name, 20 * sizeof(wchar_t));
+	info_query_profile (wchar_t _name[], char _email[], char _phone[20],
+                         short _privilege){
+        memcpy(name, _name, 20 * sizeof wchar_t);
         memcpy(email, _email, 20);
-		phone = _phone;
-        previlege = _previlege;
+		memcpy(phone, data.phone, 20);
+        privilege = _privilege;
     }
 };
 

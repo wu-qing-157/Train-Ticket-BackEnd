@@ -6,42 +6,47 @@
 #include "return.hpp"
 #include "structs.hpp"
 #include "info.hpp"
+#include "exceptions.hpp"
 #include "./vector/vector.hpp"
 
 class user {
 private:
 	sjtu::vector<info_user> data;
-	long long cur;
-
+	int cur;
 public:
 	user() {
 		cur = 2018;
 	}
-	bool regist(wchar_t name[], char passward[], char email[], long long phone) {
+	int counter() {return cur;}
+	int regist(wchar_t name[], char passward[], char email[], char phone[]) {
 		info_user tmp(name, passward, email, phone, ++cur, 0);
-		if (cur == 2019) tmp.previlege = 1;
+		if (cur == 2019) tmp.privilege = 1;
 		data.push_back(tmp);
-		return true;  //I don't quite know when I should return false.
+		return cur;  // I don't quite know when I should return false.
+		// You should return an int instead bool... --ct
 	}
-	bool login(long long id, char passward[]) {
+	bool login(int id, char passward[]) {
 		if (strncmp(data[id - 2019].passward, passward, 20)) return true;
 		return false;
 	}
-	info_query_profile query_profile(long long id){
+	info_query_profile query_profile(int id){
 		return info_query_profile(data[id - 2019]);
 	}
-	bool modify_profile(long long id, wchar_t name[], char passward[], char email[], long long phone) {
+	bool modify_profile(int id, wchar_t name[], char passward[], char email[], char phone[]) {
 		if (id > cur || id < 2019) return false;
 		else {
-			info_user tmp(name, passward, email, phone, id, data[id - 2019].previlege);
+			info_user tmp(name, passward, email, phone, id, data[id - 2019].privilege);
 			data[id - 2019] = tmp;
 			return true;
 		}
 	}
-	bool modify_previledge(long long id1, long long id2, short previlege) {
+	bool modify_priviledge(int id1, int id2, short privilege) {
 		if (id1 > cur || id2 > cur || id1 < 2019 || id2 < 2019) return false;
-		if (data[id1 - 2019].previlege < previlege) return false;
-		data[id2 - 2019].previlege = previlege;
+		if (privilege < 0 || privilege > 2) return false;
+		if (!data[id1 - 2019].privilege) return false;
+		if (data[id2 - 2019].privilege && !privilege) return false;
+//		if (data[id1 - 2019].privilege < privilege) return false;
+		data[id2 - 2019].privilege = privilege;
 		return true;
 	}
 };

@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 
 #ifndef CT
 	#include "return.hpp"
@@ -10,15 +11,39 @@
 #endif
 
 // ======= User BEGIN =======
+user user_system;
 void user_register()
 {
-	wchar_t name[40], pwd[40], email[40], phone[40];
-
+	wchar_t name[40];
+	char pwd[32], email[20], phone[20];
+	scanf("%s%s%s%lld", name, pwd, email, phone);
+	printf("%d\n", user_system.regist(name, pwd, email, phone));
 }
-void user_login();
-void user_query_profile();
-void user_modify_profile();
-void user_modify_privilege();
+void user_login()
+{
+	int id; char pwd[32];
+	scanf("%d%s", &id, pwd);
+	printf("%d\n", user_system.login(id, pwd));
+}
+void user_query_profile()
+{
+	int id; scanf("%d", &id);
+	if (id < 2019 || id > user_system.counter()) {puts("0"); return ;}
+	info_query_profile ans = user_system.query_profile(id);
+	printf("%s %s %s %hd\n", ans.name, ans.email, ans.phone, ans.privilege);
+}
+void user_modify_profile()
+{
+	int id; scanf("%d", &id);
+	wchar_t name[40]; char pwd[32], email[20], phone[20];
+	scanf("%s%s%s%s", name, pwd, email, phone);
+	printf("%d\n", user_system.modify_profile(id, name, pwd, email, phone));
+}
+void user_modify_privilege()
+{
+	int id1, id2; short privilege;
+	user_system.modify_privilege(id1, id2, privilege);
+}
 // ======= User END =======
 
 // ======= Ticket BEGIN =======
