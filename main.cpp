@@ -67,7 +67,7 @@ void ticket_query_ticket()
 	loc loc1, loc2;
 	date _date; catalog _catalog;
 	scanf("%s%s%s%s", loc1, loc2, _data, _catalog);
-
+	// ...
 }
 void ticket_query_transfer()
 {
@@ -75,7 +75,7 @@ void ticket_query_transfer()
 	date _date;
 	catalog _catalog;
 	scanf("%s%s%s%s", loc1, loc2, _data, _catalog);
-	
+	// ...
 }
 void ticket_buy_ticket()
 {
@@ -85,16 +85,35 @@ void ticket_buy_ticket()
 	date _date;
 	ticket_kind _kind;
 	scanf("%d%d%s%s%s%s%s", &uid, &num, tid, loc1, loc2, _date, _kind);
-	
+	// ...
 }
-void ticket_query_order();
-void ticket_refund_ticket();
+void ticket_query_order()
+{
+	int uid; date _date; catalog _catalog;
+	scanf("%d%s%s", &uid, _data, _catalog);
+	// ...
+}
+void ticket_refund_ticket()
+{
+	int uid, num; train_id tid; loc loc1, loc2; date _date; ticket_kind _kind;
+	scanf("%d%d%s%s%s%s%s", &uid, &num, tid, loc1, loc2, _date, _kind);
+	// ...
+}
 // ======= Ticket END =======
 
 // ======= Train BEGIN =======
 train train_system;
-void train_add_train();
-void train_sale_train();
+void train_add_train()
+{
+	train_id tid; name _name; catalog _cata; int num_station, num_price;
+	for (int i = 0; i < num_price; ++i);
+	// ...
+}
+void train_sale_train()
+{
+	train_id tid; scanf("%s", tid);
+	// ...
+}
 void train_query_train()
 {
 	try {
@@ -115,13 +134,20 @@ void train_query_train()
 		}
 	} catch(index_out_of_bound) {puts("0");}
 }
-void train_delete_train();
-void train_modify_train();
+void train_delete_train()
+{
+	train_id tid; scanf("%s", tid);
+	printf("%d\n", train_system.erase(tid));
+}
+void train_modify_train()
+{
+	// ...
+}
 // ======= Train END =======
 
 // ======= System BEGIN =======
 void system_clean();
-void system_exit();
+void system_exit() {return ;}
 // ======= System END =======
 int main()
 {
@@ -156,7 +182,8 @@ int main()
 		char str[30]; scanf("%s", str);
 		for (int i = 0; i < command_number; ++i)
 			if (!strcmp(str, command_name[i]))
-				command[i]();
+				if (i == command_number - 1) return 0;
+				else command[i]();
 	}
 	return 0;
 }
