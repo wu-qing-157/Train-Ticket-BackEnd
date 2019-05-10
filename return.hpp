@@ -8,23 +8,22 @@
 #include "info.hpp"
 
 struct info_query_profile {  //It's very similar with info_user, except that it does not contain passward.
-    wchar_t name[20];
-    char email[20];
-	long long phone;
-    short previlege;
+    wchar_t name[40];
+    char email[20], phone[20];
+    short privilege;
 
 	info_query_profile(info_user data) {
-		memcpy(name, data.name, 20 * sizeof(wchar_t));
+		memcpy(name, data.name, 40 * sizeof wchar_t );
 		memcpy(email, data.email, 20);
-		phone = data.phone;
-		previlege = data.previlege;
+		memcpy(phone, data.phone, 20);
+		privilege = data.privilege;
 	}
-	info_query_profile (wchar_t _name[], char _email[], long long _phone,
-                         short _previlege){
-        memcpy(name, _name, 20 * sizeof(wchar_t));
+	info_query_profile (wchar_t _name[], char _email[], char _phone[20],
+                         short _privilege){
+        memcpy(name, _name, 40 * sizeof wchar_t);
         memcpy(email, _email, 20);
-		phone = _phone;
-        previlege = _previlege;
+		memcpy(phone, data.phone, 20);
+        privilege = _privilege;
     }
 };
 
@@ -86,7 +85,7 @@ struct query_order_return{
 
 struct query_train_return{
     short num_station, num_price;
-    wchar_t name[20], name_price[5][20];
+    wchar_t name[40], name_price[5][20];
     char train_id[20], catalog[10];
     info_station* data;
 
@@ -95,15 +94,15 @@ struct query_train_return{
                        short _num_price, info_station* _data){
         num_price = _num_price;
         num_station = _num_station;
-        memcpy(name, _name, 20 * sizeof(wchar_t));
+        memcpy(name, _name, 40 * sizeof wchar_t);
 		//memcpy(name_price, _name_price, num_price * 4);  It seems that this sentence should be deleted, but I'm not sure.
-		for (int i = 0; i < num_price; ++i){
-            memcpy(name_price[i], _name_price[i], 20 * sizeof(wchar_t));
+		for (int i = 0; i < num_price; ++i) {
+            memcpy(name_price[i], _name_price[i], 20 * sizeof wchar_t);
         }
         memcpy(train_id, _train_id, 20);
         memcpy(catalog, _catalog, 10);
         data = new info_station[num_station];
-        memcpy(data, _data, num_station * sizeof(info_station));
+        memcpy(data, _data, num_station * sizeof info_station);
     }
 
     ~query_train_return(){
