@@ -14,7 +14,7 @@ struct info_user {
 	info_user(const info_user& other) = default;
 	info_user(wchar_t _name[], char _passward[], char _email[],
 		char _phone[20], long long _id, short _privilege) {
-		memcpy(name, _name, 40 * sizeof wchar_t); // Diffenrece between Win and Linux.
+		memcpy(name, _name, 40 * sizeof (wchar_t)); // Diffenrece between Win and Linux. //Just keep the parenthesis
 		memcpy(passward, _passward, 32);
 		memcpy(email, _email, 20);
 		memcpy(phone, _phone, 20);
@@ -44,10 +44,10 @@ struct info_train {
 		train_id.cpy(_train_id);  //NOTE HERE: I'm using char[] to construct train_id, but it's stored as str.
 		num_price = _num_price;
 		num_station = _num_station;
-		memcpy(name, _name, 40 * sizeof wchar_t );
+		memcpy(name, _name, 40 * sizeof (wchar_t));
 		//memcpy(name_price, _name_price, num_price * 4); It seems that this sentence should be deleted, but I'm not sure.
 		for (int i = 0; i < num_price; ++i) {
-			memcpy(name_price[i], _name_price[i], 20 * sizeof wchar_t );
+			memcpy(name_price[i], _name_price[i], 20 * sizeof (wchar_t));
 		}
 		memcpy(catalog, _catalog, 10);
 		data = new info_station[num_station];

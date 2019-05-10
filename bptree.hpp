@@ -3,7 +3,7 @@
 //
 #include <functional>
 #include <cstddef>
-#include "utility.hpp"
+//#include "utility.hpp"
 #include "exceptions.hpp"
 
 using namespace std;
@@ -333,7 +333,19 @@ namespace sjtu {
             erase(root, key, nullptr, -1);
         }
 
-        value_t &at(Key key) {
+		value_t at(const Key& key) const {
+			node* tmp = root; int Pos;
+			while (!tmp->isLeaf) {
+				int pos = findPos(tmp, key);
+				Pos = pos;
+				if (pos < tmp->curSize && tmp->mainKey[pos] == key) ++pos;
+				tmp = tmp->son[pos];
+			}
+			if (Pos == tmp->curSize || tmp->key[Pos] != key) throw index_out_of_bound();
+			return tmp->data[Pos];
+		} // added by yy.
+
+        value_t	& at(const Key &key) {
             node *tmp = root;int Pos;
             while(!tmp->isLeaf){
                 int pos = findPos(tmp, key);

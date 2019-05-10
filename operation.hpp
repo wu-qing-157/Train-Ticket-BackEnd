@@ -17,7 +17,7 @@ public:
 	user() {
 		cur = 2018;
 	}
-	int counter() {return cur;}
+	int counter() const { return cur; }
 	int regist(wchar_t name[], char passward[], char email[], char phone[]) {
 		info_user tmp(name, passward, email, phone, ++cur, 0);
 		if (cur == 2019) tmp.privilege = 1;
@@ -25,11 +25,11 @@ public:
 		return cur;  // I don't quite know when I should return false.
 		// You should return an int instead bool... --ct
 	}
-	bool login(int id, char passward[]) {
+	bool login(int id, char passward[]) const {
 		if (strncmp(data[id - 2019].passward, passward, 20)) return true;
 		return false;
 	}
-	info_query_profile query_profile(int id){
+	info_query_profile query_profile(int id) const {
 		return info_query_profile(data[id - 2019]);
 	}
 	bool modify_profile(int id, wchar_t name[], char passward[], char email[], char phone[]) {
@@ -45,7 +45,7 @@ public:
 		if (privilege < 0 || privilege > 2) return false;
 		if (!data[id1 - 2019].privilege) return false;
 		if (data[id2 - 2019].privilege && !privilege) return false;
-//		if (data[id1 - 2019].privilege < privilege) return false;
+		//if (data[id1 - 2019].privilege < privilege) return false;
 		data[id2 - 2019].privilege = privilege;
 		return true;
 	}
@@ -61,7 +61,7 @@ public:
 		data.insert(t.train_id, t);
 		return true;	//I need jyq to change bptree.hpp to enable return false(try{} is too slow)
 	}
-	info_train query_train(char train_id[]) {
+	info_train query_train(char train_id[]) const {
 		str<char, 20> queryId(train_id);
 		return data.at(queryId);
 	}
@@ -76,10 +76,7 @@ public:
 		if (data.modify(queryId, t) == false) return false;			//There is a minor problem here.
 		return true;
 	}
-
 };
-
-
 
 
 /*
