@@ -41,6 +41,7 @@ public:
 	bool modify_previledge(long long id1, long long id2, short previlege) {
 		if (id1 > cur || id2 > cur || id1 < 2019 || id2 < 2019) return false;
 		if (data[id1 - 2019].previlege < previlege) return false;
+		if (data[id2 - 2019].previlege > previlege) return false;
 		data[id2 - 2019].previlege = previlege;
 		return true;
 	}
@@ -65,29 +66,40 @@ public:
 		data.erase(queryId);
 		return true;    //I need jyq to change bptree.hpp to enable return false(try{} is too slow)
 	}
-	bool modify_train(char train_id[], info_train& t) {
+	bool modify_train(char train_id[], const info_train& t) {
 		str<char, 20> queryId(train_id);
 		if (data.at(queryId).on_sale == true) return false;
 		if (data.modify(queryId, t) == false) return false;			//There is a minor problem here.
 		return true;
 	}
-
 };
 
 
 
-
-/*
-class ticket{
-private:
+struct info_ticket{
     date date_from, date_to;
     time time_from, time_to;
     wchar_t loc_from[20], loc_to[20], ticket_kind[5][20];
     short num_price, ticket_quantity[5];
     float price[5];
 
+	info_ticket() = default;
+	info_ticket(const info_ticket& other) = default;
+};
+
+class ticket {
+private:
+	train* tr;
+	str<char, 20> 
+
+public:
+	ticket() {}
+	ticket(train* _tr):tr(_tr){}
+	info_ticket query_ticket(wchar_t loc1[], wchar_t loc2[], date day, char catalog[]) {
+
+	}
 
 };
-*/
 
-#endif   //OPERATION
+
+#endif 

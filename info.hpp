@@ -57,4 +57,4 @@ struct info_train {
 	info_train(const info_train& other) = delete;
 };
 
-#endif
+#endif  //INFO
