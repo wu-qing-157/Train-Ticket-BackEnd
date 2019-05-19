@@ -53,6 +53,15 @@ struct time {
 		else printf("%hd:%hd", hour(), minute());
 		if (end) printf("%c", end);
 	}
+	bool operator< (const time& other) {
+		return data < other.data;
+	}
+	bool operator== (const time& other) {
+		return data == other.data;
+	}
+	bool operator> (const time& other) {
+		return data > other.data;
+	}
 };
 
 struct date {

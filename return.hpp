@@ -27,14 +27,6 @@ struct info_query_profile {  //It's very similar with info_user, except that it 
     }
 };
 
-struct info_ticket{
-    date date_from, date_to;
-    time time_from, time_to;
-    wchar_t loc_from[20], loc_to[20], ticket_kind[5][20];
-    short num_price, ticket_quantity[5];
-    float price[5];
-};
-
 struct query_ticket_return{
     int listnum;
     info_ticket* data;

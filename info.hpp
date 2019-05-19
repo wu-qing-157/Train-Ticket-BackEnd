@@ -35,6 +35,7 @@ struct info_train {
 	wchar_t name[40], name_price[5][20];
 	char catalog[10];
 	info_station* data;
+	short num_ticket[40][60];  //40 means days, 60 means station number
 	bool on_sale;
 
 	info_train() = default;
@@ -55,6 +56,31 @@ struct info_train {
 		on_sale = false;
 	}
 	info_train(const info_train& other) = delete;
+};
+
+struct info_ticket {
+	date date_from;
+	time time_from, time_to;
+	wchar_t loc_from[20], loc_to[20], ticket_kind[5][20];
+	short num_price, ticket_quantity[5];
+	float price[5];
+
+	info_ticket() = default;
+	info_ticket(date _date_from, time _time_from, time _time_to,
+		wchar_t _loc_from[], wchar_t _loc_to[], wchar_t _ticket_kind[][20],
+		short _num_price, short _ticket_quantity[], float _price[5]) {
+		date_from = _date_from;
+		time_from = _time_from;
+		time_to = _time_to;
+		memcpy(loc_from, _loc_from, 20 * sizeof(wchar_t));
+		memcpy(loc_to, _loc_to, 20 * sizeof(wchar_t));
+		for (int i = 0; i < num_price; ++i) {
+			memcpy(ticket_kind[i], _ticket_kind[i], 20 * sizeof(wchar_t));
+		}
+		num_price = _num_price;
+		memcpy(ticket_quantity, _ticket_quantity, sizeof(short));
+		memcpy(price, _price, 5 * sizeof(short));
+	}
 };
 
 #endif  //INFO
