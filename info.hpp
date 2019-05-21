@@ -25,7 +25,7 @@ struct info_user {
 
 struct info_station {
 	wchar_t name[40];
-	time arriv, start, stopover;
+	my_time arriv, start, stopover;
 	float price[5];
 };
 
@@ -52,7 +52,7 @@ struct info_train {
 		}
 		memcpy(catalog, _catalog, 10);
 		data = new info_station[num_station];
-		memcpy(data, _data, num_station * sizeof info_station);
+		memcpy(data, _data, num_station * sizeof (info_station));
 		on_sale = false;
 	}
 	info_train(const info_train& other) = delete;
@@ -60,13 +60,13 @@ struct info_train {
 
 struct info_ticket {
 	date date_from;
-	time time_from, time_to;
+	my_time time_from, time_to;
 	wchar_t loc_from[20], loc_to[20], ticket_kind[5][20];
 	short num_price, ticket_quantity[5];
 	float price[5];
 
 	info_ticket() = default;
-	info_ticket(date _date_from, time _time_from, time _time_to,
+	info_ticket(date _date_from, my_time _time_from, my_time _time_to,
 		wchar_t _loc_from[], wchar_t _loc_to[], wchar_t _ticket_kind[][20],
 		short _num_price, short _ticket_quantity[], float _price[5]) {
 		date_from = _date_from;

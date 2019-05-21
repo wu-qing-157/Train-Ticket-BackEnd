@@ -91,10 +91,10 @@ struct query_train_return{
 		for (int i = 0; i < num_price; ++i) {
             memcpy(name_price[i], _name_price[i], 20 * sizeof (wchar_t));
         }
-        memcpy(train_id, _train_id, 20);
+        memcpy(train_id, _train_id, 20);info_station
         memcpy(catalog, _catalog, 10);
         data = new info_station[num_station];
-        memcpy(data, _data, num_station * sizeof info_station);
+        memcpy(data, _data, num_station * sizeof (info_station));
     }
 
     ~query_train_return(){

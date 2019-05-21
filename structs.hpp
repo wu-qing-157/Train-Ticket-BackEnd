@@ -36,11 +36,11 @@ struct str {
 	}
 };
 
-struct time {
+struct my_time {
 	short data;
 
-	time() :data(0) {}
-	time(char s[]) {
+	my_time() :data(0) {}
+	my_time(char s[]) {
 		if (s[0] == 'x') data = -1;
 		else data = (((s[0] - '0') * 10 + s[1] - '0') * 100 + s[3] - '0') * 10 + s[4] - '0';
 	}
@@ -53,13 +53,13 @@ struct time {
 		else printf("%hd:%hd", hour(), minute());
 		if (end) printf("%c", end);
 	}
-	bool operator< (const time& other) {
+	bool operator< (const my_time& other) {
 		return data < other.data;
 	}
-	bool operator== (const time& other) {
+	bool operator== (const my_time& other) {
 		return data == other.data;
 	}
-	bool operator> (const time& other) {
+	bool operator> (const my_time& other) {
 		return data > other.data;
 	}
 };
