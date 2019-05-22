@@ -3,378 +3,978 @@
 //
 #include <functional>
 #include <cstddef>
-//#include "utility.hpp"
+#include <iostream>
+#include <cstring>
+#include "utility.hpp"
 #include "exceptions.hpp"
+#include "find_blank.hpp"
 
 using namespace std;
 #ifndef BPTREE_BPTREE_HPP
 #define BPTREE_BPTREE_HPP
 
-const int K = 1000;
 namespace sjtu {
-    template<class Key, class value_t, int N, int K>
+    template<class Key, class value_t, size_t K = 4096, class Compare = std::less<Key>>
     class bptree {
+        typedef char* _buffer;
+        typedef char buffer[K];
+        const size_t node_size;
+        const size_t leaf_size;
+
+        FILE *file;
+        find_blank finder;
+        off_t head, rear, root;
+        char *filename, *index_file;
+        Compare comp = Compare();
+        bool compare(const Key &a, const Key &b){
+            return !(comp(a,b)||comp(b,a));
+        }
+
         struct node {
-            off_t POS;
-            int curSize;
+            Key mainKey;
+            off_t prev,next;
+            size_t curSize;
+            off_t pos;
             bool isLeaf;
-            node *prev;
-            node *next;
-            Key mainKey[K + 1];
-            node *son[K + 1];
-            value_t data[N + 1];
+            node(off_t Pos = invalid_off, off_t Prev = invalid_off, off_t Next = invalid_off, bool IsLeaf = true)
+                    :pos(Pos),
+                     prev(Prev),
+                     next(Next),
+                     isLeaf(IsLeaf),
+                     curSize(0){
+                mainKey = Key();
+            }//leaf
+            node(off_t Pos = invalid_off, bool Isleaf = false)
+                    :pos(Pos),
+                     isLeaf(Isleaf),
+                     curSize(0){
+                mainKey = Key();
+            }//node
 
-            node(bool is_leaf) {
-                curSize = 0;
-                isLeaf = is_leaf;
-                prev = next = nullptr;
-                for (int i = 0; i < K; ++i) {
-                    mainKey[i] = Key();
-                    son[i] = nullptr;
-                }
-                for (int i = 0; i < N; ++i) {
-                    data[i] = value_t();
-                }
-            }
         };
-
     private:
-        node *root, *head, *rear;
-
-        void insertLeaf(Key key, value_t value, node *nw, int pos){
-            for(int i = nw->curSize; i>pos; --i){
-                nw->data[i] = nw->data[i-1];
-                nw->mainKey[i] = nw->mainKey[i-1];
-            }
-            nw->mainKey[pos] = key;
-            nw->data[pos] = value;
-            ++nw->curSize;
+        inline void save_node(const node &x){
+            fseek(file, x.pos, SEEK_SET);
+            fwrite(&x, sizeof(node), 1, file);
+            fflush(file);
         }
 
-        void insertNode(Key key, node *Son, node *nw, int pos){
-            for(int i = nw->curSize; i>pos; --i){
-                nw->mainKey[i] = nw->mainKey[i-1];
-            }
-            for(int i = nw->curSize+1; i>pos+1;--i){
-                nw->son[i] = nw->son[i-1];
-            }
-            nw->mainKey[pos] = key;
-            nw->son[pos+1] = Son;
-            ++nw->curSize;
+        inline void delete_node(const node &x){
+            finder._delete(x.pos);
         }
 
-        void eraseLeaf(node *nw, int pos){
-            if(pos<nw->curSize-1)
-                for(int i = pos; i<nw->curSize-1; ++i){
-                    nw->data[i] = nw->data[i+1];
-                    nw->mainKey[i] = nw->mainKey[i+1];
-                }
-            nw->son[nw->curSize-1] = value_t();
-            nw->mainKey[nw->curSize-1] = Key();
-            --nw->curSize;
+        void save_info() {
+            fseek(file, 0, SEEK_SET);
+            fwrite(&head, sizeof(off_t), 1, file);
+            fwrite(&rear, sizeof(off_t), 1, file);
+            fwrite(&root, sizeof(off_t), 1, file);
+            fflush(file);
         }
 
-        void eraseNode(node *nw, int pos) {
-            if (pos < nw->curSize - 1) {
-                for (int i = pos; i < nw->curSize - 1; ++i) {
-                    nw->mainKey[i] = nw->mainKey[i + 1];
-                }
-                for (int i = pos + 1; i < nw->curSize; ++i) {
-                nw->son[i] = nw->son[i + 1];
-                }
+        void init(){
+            head = rear = root = invalid_off;
+            fseek(file, 0, SEEK_SET);
+            save_info();
+        }
+
+        inline void buffer_load_node(_buffer b, const node &x){
+            fseek(file, x.pos+sizeof(node), SEEK_SET);
+            if(x.curSize == 0) return;
+            fread(b, 1, x.curSize*(sizeof(off_t)+sizeof(Key)), file);
+        }
+
+        inline void buffer_load_leaf(_buffer b, const node &x){
+            fseek(file, x.pos+sizeof(node), SEEK_SET);
+            if(x.curSize == 0) return;
+            fread(b, 1, x.curSize*(sizeof(value_t)+sizeof(Key)), file);
+        }
+
+        inline void buffer_save_node(_buffer b, const node &x){
+            fseek(file, x.pos+sizeof(node), SEEK_SET);
+            fwrite(b, 1, x.curSize*(sizeof(off_t)+sizeof(Key)), file);
+            fflush(file);
+        }
+
+        inline void buffer_save_leaf(_buffer b, const node &x){
+            fseek(file, x.pos+sizeof(node), SEEK_SET);
+            fwrite(b, 1, x.curSize*(sizeof(value_t)+sizeof(Key)), file);
+            fflush(file);
+        }
+
+        //================get info from node==================
+
+        Key *get_key_node(size_t num, _buffer b){
+            return (Key *)(b+num*(sizeof(Key)+sizeof(off_t)));
+        }
+
+        off_t *get_son_node(size_t num, _buffer b){
+            return (off_t *)(b+num*(sizeof(Key)+sizeof(off_t))+sizeof(Key));
+        }
+
+        Key *get_key_leaf(size_t num, _buffer b){
+            return (Key *)(b+num*(sizeof(Key)+sizeof(value_t)));
+        }
+
+        value_t *get_value_leaf(size_t num, _buffer b){
+            return (value_t *)(b+num*(sizeof(Key)+sizeof(value_t))+sizeof(Key));
+        }
+
+        node get_node(off_t t){
+            node x(invalid_off, false);
+            fseek(file, t, SEEK_SET);
+            fread(&x, sizeof(node), 1, file);
+            return x;
+        }
+
+        size_t leaf_find_pos(_buffer b, Key key, size_t n){
+            size_t l=0, r=n, mid;
+            while(l<r){
+                mid = (l+r)/2;
+                if(comp(*get_key_leaf(mid, b), key)) l = mid+1;
+                else r = mid;
             }
-            nw->mainKey[nw->curSize - 1] = Key();
-            nw->son[nw->curSize] = nullptr;
-            --nw->curSize;
+            return l;
         }
 
+        size_t node_find_pos(_buffer b, Key key, size_t n){
+            size_t l=0, r=n, mid;
+            while(l<r){
+                mid = (l+r)/2;
+                if(comp(*get_key_node(mid, b), key)) l = mid+1;
+                else r = mid;
+            }
+            return l;
+        }
 
-        bool insert(node *nw, const Key &key, value_t value, node **splitNode, Key *splitKey) {
-            if(nw->isLeaf == true){
-                int pos = findPos(nw, key);
-                if(nw->mainKey[pos] == key) {
-                    nw->data[pos] = value;
-                    return false;
-                }
-                insertLeaf(key, value, nw, pos);
-                if(nw->curSize>=N){
-                    *splitNode = leaf_split(nw, splitKey);
-                }
-                return true;
+        void insert_trans_node(_buffer b, node &p, size_t t){
+            for(size_t i = p.curSize; i>t; --i){
+                *get_key_node(i, b) = *get_key_node(i-1, b);
+                *get_son_node(i, b) = *get_son_node(i-1, b);
+            }
+        }
+
+        void insert_trans_leaf(_buffer b, node &p, size_t t){
+            for(size_t i = p.curSize; i>t; --i){
+                *get_key_leaf(i, b) = *get_key_leaf(i-1, b);
+                *get_value_leaf(i, b) = *get_value_leaf(i-1, b);
+            }
+        }
+
+        node split_node(_buffer b, node &x){
+            size_t sz = x.curSize/2, new_sz = x.curSize - sz;
+            node new_node(finder._alloc(), false);
+            new_node.mainKey = *get_key_node(sz, b);
+            new_node.curSize = new_sz;
+            x.curSize = sz;
+            save_node(x);
+            buffer_save_node(b, x);
+            save_node(new_node);
+            buffer_save_node(b+sz*(sizeof(Key)+sizeof(off_t)), new_node);
+            return new_node;
+        }
+
+        node split_leaf(_buffer b, node &x){
+            size_t sz = x.curSize/2, new_sz = x.curSize-sz;
+            off_t nxt = x.next;
+            node new_leaf(finder._alloc(), x.pos, x.next, true);
+            x.next = new_leaf.pos;
+            x.curSize = sz;
+            new_leaf.curSize = new_sz;
+            new_leaf.mainKey = *get_key_leaf(sz, b);
+            if(new_leaf.next == invalid_off){
+                rear = new_leaf.pos;
+                save_info();
             }
             else{
-                Key tmpKey = Key();node *tmpNode = nullptr;
-                int pos = findPos(tmpNode, tmpKey);
-                bool result = insert(nw->son[pos], key, value, &tmpNode, &tmpKey);
-                if(tmpNode){
-                    insertNode(key, tmpNode, nw, pos);
-                    if(nw->curSize>=K){
-                        *splitNode = node_split(nw, splitKey);
+                node new_leaf_nxt = get_node(nxt);
+                new_leaf_nxt.prev = new_leaf.pos;
+                save_node(new_leaf_nxt);
+            }
+            save_node(x);
+            buffer_save_leaf(b ,x);
+            save_node(new_leaf);
+            buffer_save_leaf(b+sz*(sizeof(Key)+sizeof(value_t)), new_leaf);
+            return new_leaf;
+        }
+
+        node insert(node &x, Key key, value_t value, bool &is_change){
+            if(x.isLeaf){
+                buffer b;
+                buffer_load_leaf(b, x);
+                node new_node = buffer_insert_leaf(b, x, key, value, is_change);
+                return new_node;
+            }
+            else{
+                buffer b;
+                buffer_load_node(b, x);
+                size_t pos = node_find_pos(b, key, x.curSize);
+                if(!compare(key,*get_key_node(pos, b))&&pos > 0) pos--;
+                off_t pre_son = *get_son_node(pos, b);
+                node pre_son_node = get_node(pre_son);
+                node new_node = insert(pre_son_node, key, value, is_change);
+                if(new_node.pos != pre_son_node.pos){
+                    //*get_key_node(pos, b) = pre_son_node.mainKey;
+                    node n_node = buffer_insert_node(b, x, new_node.mainKey, new_node.pos, pos+1);
+                    return n_node;
+                }
+                else{
+                    *get_key_node(pos, b) = pre_son_node.mainKey;
+                    x.mainKey = *get_key_node(0, b);
+                    save_node(x);
+                    buffer_save_node(b, x);
+                    return x;
+                }
+
+            }
+        }
+
+        node buffer_insert_node(_buffer b, node &x, Key key, off_t son, size_t t){
+            //size_t t = node_find_pos(b, key, x.curSize);
+            //if(t<x.curSize&&comp(key, *get_key_node(t, b)))
+            //    return x;
+            insert_trans_node(b, x, t);
+            *get_key_node(t, b) = key;
+            *get_son_node(t, b) = son;
+            x.mainKey = *get_key_node(0, b);
+            ++x.curSize;
+            save_node(x);
+            if(x.curSize > node_size){
+                node y = split_node(b, x);
+                return y;
+            }
+            else{
+                buffer_save_node(b, x);
+                return x;
+            }
+        }
+
+        node buffer_insert_leaf(_buffer b, node &x, Key key, value_t value, bool &is_change){
+            size_t t = leaf_find_pos(b, key, x.curSize);
+            if(t<x.curSize&&compare(key, *get_key_leaf(t, b))) {
+                *get_value_leaf(t, b) = value;
+                is_change = true;
+                return x;
+            }
+            //if(!compare(key, *get_key_leaf(t, b))&&t>0) t--;
+            insert_trans_leaf(b, x, t);
+            *get_key_leaf(t, b) = key;
+            *get_value_leaf(t, b) = value;
+            x.mainKey = *get_key_node(0, b);
+            ++x.curSize;
+            save_node(x);//1///////////////////////////////////////////////////////////////
+            is_change = false;
+            if(x.curSize > leaf_size){
+                node y = split_leaf(b, x);
+                return y;
+            }
+            else{
+                buffer_save_leaf(b, x);
+                return x;
+            }
+        }
+        //================================================erase=================================================================================
+
+        void merge_node_right(_buffer bx, node &x, node &y){
+            buffer by;
+            buffer_load_node(by, y);
+            for(size_t i = 0; i<y.curSize; ++i){
+                *get_son_node(i+x.curSize, bx) = *get_son_node(i, by);
+                *get_key_node(i+x.curSize, bx) = *get_key_node(i, by);
+            }
+            x.curSize+=y.curSize;
+            delete_node(y);
+            save_node(x);
+            buffer_save_node(bx, x);
+        }
+
+        void merge_node_left(_buffer bx, node &x, node &y){
+            buffer by;
+            buffer_load_node(by, y);
+            for(size_t i = 0; i<x.curSize; ++i){
+                *get_son_node(i+y.curSize, by) = *get_son_node(i, bx);
+                *get_key_node(i+y.curSize, by) = *get_key_node(i, bx);
+            }
+            y.curSize+=x.curSize;
+            delete_node(x);
+            save_node(y);
+            buffer_save_node(by, y);
+        }
+
+        void merge_leaf_right(_buffer bx, node &x, node &y){
+            buffer by;
+            buffer_load_leaf(by, y);
+            for(size_t i = 0; i<y.curSize; ++i){
+                *get_value_leaf(i+x.curSize, bx) = *get_value_leaf(i, by);
+                *get_key_leaf(i+x.curSize, bx) = *get_key_leaf(i, by);
+            }
+            x.curSize += y.curSize;
+            x.next = y.next;
+            if(y.next != invalid_off){
+                node ny = get_node(y.next);
+                ny.prev = x.pos;
+                save_node(ny);
+            }
+            delete_node(y);
+            save_node(x);
+            buffer_save_leaf(bx, x);
+        }
+
+        void merge_leaf_left(_buffer bx, node &x, node &y){
+            buffer by;
+            buffer_load_leaf(by, y);
+            for(size_t i = 0; i<x.curSize; ++i){
+                *get_value_leaf(i+y.curSize, by) = *get_value_leaf(i, bx);
+                *get_key_leaf(i+y.curSize, by) = *get_key_leaf(i, bx);
+            }
+            y.curSize += x.curSize;
+            y.next = x.next;
+            if(x.next != invalid_off){
+                node nx = get_node(x.next);
+                nx.prev = y.pos;
+                save_node(nx);
+            }
+            delete_node(x);
+            save_node(y);
+            buffer_save_leaf(by, y);
+        }
+
+        void buffer_erase_node(_buffer b, node &x, Key key){
+            size_t t = node_find_pos(b, key, x.curSize);
+            if(!(t<x.curSize&&compare(key, *get_key_node(t, b))))
+                throw "erase node";
+            for(size_t i = t; i<x.curSize-1; ++i){
+                *get_key_node(i, b) = *get_key_node(i+1, b);
+                *get_son_node(i, b) = *get_son_node(i+1, b);
+            }
+            x.mainKey = *get_key_node(b, 0);
+            --x.curSize;
+        }
+
+        void buffer_erase_leaf(_buffer b, node &x, Key key){
+            size_t t = leaf_find_pos(b, key, x.curSize);
+            if(!(t<x.curSize&&compare(key, *get_key_leaf(t, b))))
+                throw "erase_leaf";
+            for(size_t i = t; i<x.curSize-1; ++i){
+                *get_key_leaf(i, b) = *get_key_leaf(i+1, b);
+                *get_value_leaf(i, b) = *get_value_leaf(i+1, b);
+            }
+            x.mainKey = *get_key_leaf(0, b);
+            --x.curSize;
+        }
+
+        pair<int, Key> leaf_balance(_buffer b, node &x, off_t prev, off_t next){
+            //-1 not merged and balance with next    0 not merged and balance with prev     1 merged with prev    2 merged with next      3 deleted
+            if(prev == invalid_off && next == invalid_off){
+                if(!x.curSize){
+                    delete_node(x);
+                    head = rear = root = invalid_off;
+                    save_info();
+                    save_node(x);
+                    buffer_save_leaf(b, x);
+                    return pair<int, Key>(3, Key());
+                }
+                return pair<int, Key>(0, Key());
+            }
+            if(prev == invalid_off){
+                node n = get_node(next);
+                if(n.curSize>=leaf_size/2+1){
+                    buffer bn;
+                    buffer_load_leaf(bn, n);
+                    *get_key_leaf(x.curSize, b) = *get_key_leaf(0, bn);
+                    *get_value_leaf(x.curSize, b) = *get_value_leaf(0, bn);
+                    for(size_t i = 0; i<n.curSize-1; ++i){
+                        *get_key_leaf(i, bn) = *get_key_leaf(i+1, bn);
+                        *get_value_leaf(i, bn) = *get_value_leaf(i+1, bn);
+                    }
+                    n.mainKey = *get_key_leaf(0, bn);
+                    x.curSize++;
+                    n.curSize--;
+                    save_node(x);
+                    buffer_save_leaf(b, x);
+                    save_node(n);
+                    buffer_save_leaf(bn, n);
+                    return pair<int, Key>(-1, n.mainKey);
+                }
+                else {
+                    merge_leaf_right(b, x, n);
+                    return pair<int, Key>(2, Key());
+                }
+            }
+            if(next == invalid_off){
+                node p = get_node(prev);
+                if(p.curSize>=leaf_size/2+1){
+                    buffer bp;
+                    buffer_load_leaf(bp, p);
+                    for(size_t i = x.curSize; i > 0; --i){
+                        *get_key_leaf(i, b) = *get_key_leaf(i-1, b);
+                        *get_value_leaf(i, b) = *get_value_leaf(i-1, b);
+                    }
+                    *get_key_leaf(0, b) = *get_key_leaf(p.curSize-1, bp);
+                    *get_value_leaf(0, b) = *get_value_leaf(p.curSize-1, bp);
+                    x.mainKey = *get_key_leaf(0, b);
+                    x.curSize++;
+                    p.curSize--;
+                    save_node(x);
+                    buffer_save_leaf(b, x);
+                    save_node(p);
+                    buffer_save_leaf(bp, p);
+                    return pair<int, Key>(0, x.mainKey);
+                }
+                else{
+                    merge_leaf_left(b, x, p);
+                    return pair<int, Key>(1, Key());
+                }
+            }
+            node p = get_node(prev), n = get_node(next);
+            if(p.curSize>=leaf_size/2+1){
+                buffer bp;
+                buffer_load_leaf(bp, p);
+                for(size_t i = x.curSize; i > 0; --i){
+                    *get_key_leaf(i, b) = *get_key_leaf(i-1, b);
+                    *get_value_leaf(i, b) = *get_value_leaf(i-1, b);
+                }
+                *get_key_leaf(0, b) = *get_key_leaf(p.curSize-1, bp);
+                *get_value_leaf(0, b) = *get_value_leaf(p.curSize-1, bp);
+                x.mainKey = *get_key_leaf(0, b);
+                x.curSize++;
+                p.curSize--;
+                save_node(x);
+                buffer_save_leaf(b, x);
+                save_node(p);
+                buffer_save_leaf(bp, p);
+                return pair<int, Key>(0, x.mainKey);
+            }
+            else{
+                if(n.curSize>=leaf_size/2+1){
+                    buffer bn;
+                    buffer_load_leaf(bn, n);
+                    *get_key_leaf(x.curSize, b) = *get_key_leaf(0, bn);
+                    *get_value_leaf(x.curSize, b) = *get_value_leaf(0, bn);
+                    for(size_t i = 0; i<n.curSize-1; ++i){
+                        *get_key_leaf(i, bn) = *get_key_leaf(i+1, bn);
+                        *get_value_leaf(i, bn) = *get_value_leaf(i+1, bn);
+                    }
+                    n.mainKey = *get_key_leaf(0, bn);
+                    x.curSize++;
+                    n.curSize--;
+                    save_node(x);
+                    buffer_save_leaf(b, x);
+                    save_node(n);
+                    buffer_save_leaf(bn, n);
+                    return pair<int, Key>(-1, n.mainKey);
+                }
+                else{
+                    merge_leaf_right(b, x, n);
+                    return pair<int, Key>(2, Key());
+                }
+            }
+        }
+
+        pair<int, Key> node_balance(_buffer b, node &x, off_t prev, off_t next){
+            //-1 not merged and balance with next    0 not merged and balance with prev     1 merged with prev    2 merged with next      3 deleted
+            if(prev == invalid_off && next == invalid_off){
+                if(!x.curSize){
+                    delete_node(x);
+                    head = rear = root = invalid_off;
+                    save_info();
+                    save_node(x);
+                    buffer_save_node(b, x);
+                    return pair<int, Key>(3, Key());
+                }
+                return pair<int, Key>(0, Key());
+            }
+            if(prev == invalid_off){
+                node n = get_node(next);
+                if(n.curSize>=node_size/2+1){
+                    buffer bn;
+                    buffer_load_node(bn, n);
+                    *get_key_node(x.curSize, b) = *get_key_node(0, bn);
+                    *get_son_node(x.curSize, b) = *get_son_node(0, bn);
+                    for(size_t i = 0; i<n.curSize-1; ++i){
+                        *get_key_node(i, bn) = *get_key_node(i+1, bn);
+                        *get_son_node(i, bn) = *get_son_node(i+1, bn);
+                    }
+                    n.mainKey = *get_key_node(0, bn);
+                    x.curSize++;
+                    n.curSize--;
+                    save_node(x);
+                    buffer_save_node(b, x);
+                    save_node(n);
+                    buffer_save_node(bn, n);
+                    return pair<int, Key>(-1, n.mainKey);
+                }
+                else {
+                    merge_node_right(b, x, n);
+                    return pair<int, Key>(2, Key());
+                }
+            }
+            if(next == invalid_off){
+                node p = get_node(prev);
+                if(p.curSize>=node_size/2+1){
+                    buffer bp;
+                    buffer_load_node(bp, p);
+                    for(size_t i = x.curSize; i > 0; --i){
+                        *get_key_node(i, b) = *get_key_node(i-1, b);
+                        *get_son_node(i, b) = *get_son_node(i-1, b);
+                    }
+                    *get_key_node(0, b) = *get_key_node(p.curSize-1, bp);
+                    *get_son_node(0, b) = *get_son_node(p.curSize-1, bp);
+                    x.mainKey = *get_key_node(0, b);
+                    x.curSize++;
+                    p.curSize--;
+                    save_node(x);
+                    buffer_save_node(b, x);
+                    save_node(p);
+                    buffer_save_node(bp, p);
+                    return pair<int, Key>(0, x.mainKey);
+                }
+                else{
+                    merge_node_left(b, x, p);
+                    return pair<int, Key>(1, Key());
+                }
+            }
+            node p = get_node(prev), n = get_node(next);
+            if(p.curSize>=node_size/2+1){
+                buffer bp;
+                buffer_load_node(bp, p);
+                for(size_t i = x.curSize; i > 0; --i){
+                    *get_key_node(i, b) = *get_key_node(i-1, b);
+                    *get_son_node(i, b) = *get_son_node(i-1, b);
+                }
+                *get_key_node(0, b) = *get_key_node(p.curSize-1, bp);
+                *get_son_node(0, b) = *get_son_node(p.curSize-1, bp);
+                x.mainKey = *get_key_node(0, b);
+                x.curSize++;
+                p.curSize--;
+                save_node(x);
+                buffer_save_node(b, x);
+                save_node(p);
+                buffer_save_node(bp, p);
+                return pair<int, Key>(0, x.mainKey);
+            }
+            else{
+                if(n.curSize>=node_size/2+1){
+                    buffer bn;
+                    buffer_load_node(bn, n);
+                    *get_key_node(x.curSize, b) = *get_key_node(0, bn);
+                    *get_son_node(x.curSize, b) = *get_son_node(0, bn);
+                    for(size_t i = 0; i<n.curSize-1; ++i){
+                        *get_key_node(i, bn) = *get_key_node(i+1, bn);
+                        *get_son_node(i, bn) = *get_son_node(i+1, bn);
+                    }
+                    n.mainKey = *get_key_node(0, bn);
+                    x.curSize++;
+                    n.curSize--;
+                    save_node(x);
+                    buffer_save_node(b, x);
+                    save_node(n);
+                    buffer_save_node(bn, n);
+                    return pair<int, Key>(-1, n.mainKey);
+                }
+                else{
+                    merge_node_right(b, x, n);
+                    return pair<int, Key>(2, Key());
+                }
+            }
+        }
+
+        pair<int , Key> erase(node &x, const Key &key, node &parent){
+            //-1 not merged and balance with next    0 not merged and balance with prev     1 merged with prev    2 merged with next      3 deleted
+            buffer b;
+            if(x.isLeaf){
+                buffer_load_leaf(b, x);
+                buffer_erase_leaf(b, x, key);
+                if(x.curSize == 0 && x.pos == root){
+                    root = head = rear = invalid_off;
+                    save_info();
+                    return pair<int, Key>(0, x.mainKey);
+                }
+                if(x.curSize<leaf_size/2&&x.pos != root){
+                    buffer bp;
+                    buffer_load_node(bp, parent);
+                    size_t t = node_find_pos(bp, x.mainKey, parent.curSize);
+                    if(!compare(x.mainKey,*get_key_node(t, bp))&&t>0) t--;
+                    if (t == parent.curSize) --t;
+                    off_t prev = (t>0)?(*get_son_node(t-1, bp)):invalid_off;
+                    off_t next = (t<parent.curSize-1)?(*get_son_node(t+1, bp)):invalid_off;
+                    return leaf_balance(b, x, prev, next);
+                }
+                save_node(x);
+                buffer_save_leaf(b, x);
+                return pair<int, Key>(0, x.mainKey);
+            }
+            else{
+                buffer_load_node(b, x);
+                size_t tx = node_find_pos(b, key, x.curSize);
+                if(!compare(key, *get_key_node(tx, b))&&tx>0)tx--;
+                node x_son = get_node(*get_son_node(tx, b));
+                pair<int, Key> tmp = erase(x_son, key, x);
+                switch (tmp.first){
+                    case -1:{
+                        *get_key_node(tx, b)   = x_son.mainKey;
+                        *get_key_node(tx+1, b) = tmp.second;
+                        if(!tx) x.mainKey = x_son.mainKey;
+                        save_node(x);
+                        buffer_save_node(b, x);
+                        break;
+                    }
+                    case 0:{
+                        *get_key_node(tx, b) = tmp.second;
+                        save_node(x);
+                        buffer_save_node(b, x);
+                        break;
+                    }
+                    case 1:{
+                        for(size_t i = tx; i<x.curSize-1; ++i){
+                            *get_son_node(i, b) = *get_son_node(i+1, b);
+                            *get_key_node(i, b) = *get_key_node(i+1, b);
+                        }
+                        x.curSize--;
+                        save_node(x);
+                        buffer_save_node(b, x);
+                        break;
+                    }
+                    case 2:{
+                        for(size_t i = tx+1; i<x.curSize-1; ++i){
+                            *get_son_node(i, b) = *get_son_node(i+1, b);
+                            *get_key_node(i, b) = *get_key_node(i+1, b);
+                        }
+                        if(!tx) x.mainKey = x_son.mainKey;
+                        x.curSize--;
+                        save_node(x);
+                        buffer_save_node(b, x);
+                        break;
+                    }
+                    default:{
+                        delete_node(x);
+                        head = rear = root = invalid_off;
+                        save_info();
+                        return pair<int, Key>(3, Key());
                     }
                 }
-                return result;
-            }
-        }
 
-        bool erase(node *nw, Key key, node * parent, int pos) {
-            if(nw->isLeaf == true){
-                int pos = findPos(nw, key);
-                if(pos<nw->curSize) eraseLeaf(nw, pos);
-                else return false;
-                if(nw->curSize>=(N+1)/2||nw == root) return true;
-                node *Next = nullptr, *Prev = nullptr;
-                if(pos+1<=parent->curSize) Next = parent->son[pos+1];
-                if(pos-1>=0) Prev = parent->son[pos-1];
-                if(Next == nullptr) balanceLeftLeaf(nw, Prev, parent, pos);
-                else balanceRightLeaf(nw, Next, parent, pos);
-            }
-            else{
-                int pos = findPos(nw, key);
-                if(pos<nw->curSize&&nw->mainKey[pos]==key) pos++;
-                if(nw == root&&nw->curSize == 0){
-                    node *tmp = nw->son[0];
-                    delete root;
-                    root = tmp;
-                    return true;
+                if(x.pos == root&&x.curSize == 1){
+                    root = *get_son_node(0, b);
+                    save_info();
+                    return pair<int, Key>(0, Key());
                 }
-                erase(nw->son[pos], key, nw, pos);
-                if(nw->curSize>=(N+1)/2||nw == root) return true;
-                node *Next = nullptr, *Prev = nullptr;
-                if(pos+1<=parent->curSize) Next = parent->son[pos+1];
-                if(pos-1>=0) Prev = parent->son[pos-1];
-                if(Next == nullptr) balanceLeftNode(nw, Prev, parent, pos);
-                else balanceRightNode(nw, Next, parent, pos);
-            }
-        }
 
-        void balanceRightLeaf(node *nw, node *brother, node *parent, int pos){
-            if(brother->curSize>=(N+1)/2+1){
-                nw->mainKey[nw->curSize] = brother->mainKey[0];
-                nw->data[nw->curSize] = brother->data[0];
-                nw->curSize++;
-                eraseLeaf(brother, 0);
-                parent->mainKey[pos] = brother->mainKey[0];
-            }
-            else{
-                leaf_merge(nw, brother);
-                eraseNode(parent, pos);
-            }
-        }
-
-        void balanceLeftLeaf(node *nw, node *brother, node *parent, int pos){
-            if(brother->curSize>=(N+1)/2+1){
-                int tmp = brother->curSize-1;
-                insertLeaf(brother->mainKey[tmp], brother->data[tmp], nw, 0);
-                brother->mainKey[tmp] = Key();
-                brother->data[tmp] = value_t(tmp);
-                brother->curSize--;
-            }
-            else{
-                leaf_merge(brother, nw);
-                eraseNode(parent, pos);
-            }
-        }
-
-        void balanceRightNode(node *nw, node *brother, node *parent, int pos){
-            if(brother->curSize>=(K+1)/2+1){
-                nw->mainKey[nw->curSize] = brother->mainKey[0];
-                nw->son[nw->curSize+1] = brother->son[0];
-                nw->curSize++;
-                eraseNode(brother, 0);
-                parent->mainKey[pos] = brother->mainKey[0];
-            }
-            else{
-                nw->mainKey[nw->curSize] = parent->mainKey[pos];
-                for(int i = 0; i<brother->curSize; ++i){
-                    nw->mainKey[i+nw->curSize+1] = brother->mainKey[i];
-                    nw->son[i+nw->curSize+1] = brother->son[i];
+                if(x.curSize<node_size/2){
+                    if(root == x.pos) return node_balance(b, x, invalid_off, invalid_off);
+                    buffer bp;
+                    buffer_load_node(bp, parent);
+                    size_t t = node_find_pos(bp, x.mainKey, parent.curSize);
+                    if(!compare(x.mainKey,*get_key_node(t, bp))&&t>0) t--;
+                    off_t prev = (t>0)?(*get_son_node(t-1, bp)):invalid_off;
+                    off_t next = (t<parent.curSize-1)?(*get_son_node(t+1, bp)):invalid_off;
+                    return node_balance(b, x, prev, next);
                 }
-                nw->curSize += brother->curSize+1;
-                nw->son[nw->curSize] = brother->son[brother->curSize];
-                delete brother;
-                eraseNode(parent, pos);
+                x.mainKey = *get_key_node(0, b);
+                save_node(x);
+                buffer_save_node(b, x);
+                return pair<int, Key>(0, x.mainKey);
             }
         }
-
-        void balanceLeftNode(node *nw, node *brother, node *parent, int pos){
-            if(brother->curSize>=(K+1)/2+1){
-                int tmp = brother->curSize-1;
-                insertNode(brother->mainKey(tmp), brother->son[tmp+1], nw, 0);
-                brother->mainKey[tmp] = Key();
-                brother->son[tmp+1] = nullptr;
-                brother->curSize--;
+        pair<int , Key> erase(node &x, const Key &key, off_t prev, off_t next){
+            //-1 not merged and balance with next    0 not merged and balance with prev     1 merged with prev    2 merged with next      3 deleted
+            buffer b;
+            if(x.isLeaf){
+                buffer_load_leaf(b, x);
+                buffer_erase_leaf(b, x, key);
+                if(x.curSize == 0 && x.pos == root){
+                    root = head = rear = invalid_off;
+                    save_info();
+                    return pair<int, Key>(0, x.mainKey);
+                }
+                if(x.curSize<leaf_size/2&&x.pos!=root){
+                    return leaf_balance(b, x, prev, next);
+                }
+                save_node(x);
+                buffer_save_leaf(b, x);
+                return pair<int, Key>(0, x.mainKey);
             }
             else{
-                brother->mainKey[brother->curSize] = parent->mainKey[pos];
-                for(int i = 0; i<nw->curSize; ++i){
-                    brother->mainKey[i+brother->curSize+1] = nw->mainKey[i];
-                    brother->son[i+brother->curSize+1] = nw->son[i];
+                buffer_load_node(b, x);
+                size_t tx = node_find_pos(b, key, x.curSize);
+                if(!compare(key, *get_key_node(tx, b))&&tx>0)tx--;
+                if(tx == x.curSize) tx--;
+                off_t p = (tx>0)?(*get_son_node(tx-1, b)):invalid_off;
+                off_t n = (tx<x.curSize-1)?(*get_son_node(tx+1, b)):invalid_off;
+                node x_son = get_node(*get_son_node(tx, b));
+                pair<int, Key> tmp = erase(x_son, key, p, n);
+                switch (tmp.first){
+                    case -1:{
+                        *get_key_node(tx, b)   = x_son.mainKey;
+                        *get_key_node(tx+1, b) = tmp.second;
+                        if(!tx) x.mainKey = x_son.mainKey;
+                        save_node(x);
+                        buffer_save_node(b, x);
+                        break;
+                    }
+                    case 0:{
+                        *get_key_node(tx, b) = tmp.second;
+                        save_node(x);
+                        buffer_save_node(b, x);
+                        break;
+                    }
+                    case 1:{
+                        for(size_t i = tx; i<x.curSize-1; ++i){
+                            *get_son_node(i, b) = *get_son_node(i+1, b);
+                            *get_key_node(i, b) = *get_key_node(i+1, b);
+                        }
+                        x.curSize--;
+                        save_node(x);
+                        buffer_save_node(b, x);
+                        break;
+                    }
+                    case 2:{
+                        for(size_t i = tx+1; i<x.curSize-1; ++i){
+                            *get_son_node(i, b) = *get_son_node(i+1, b);
+                            *get_key_node(i, b) = *get_key_node(i+1, b);
+                        }
+                        if(!tx) x.mainKey = x_son.mainKey;
+                        x.curSize--;
+                        save_node(x);
+                        buffer_save_node(b, x);
+                        break;
+                    }
+                    default:{
+                        delete_node(x);
+                        head = rear = root = invalid_off;
+                        save_info();
+                        return pair<int, Key>(3, Key());
+                    }
                 }
-                brother->curSize += nw->curSize+1;
-                brother->son[brother->curSize] = nw->son[nw->curSize];
-                delete nw;
-                eraseNode(parent, pos);
+
+                if(x.pos == root&&x.curSize == 1){
+                    root = *get_son_node(0, b);
+                    save_info();
+                    return pair<int, Key>(0, Key());
+                }
+
+                if(x.curSize<node_size/2){
+                    return node_balance(b, x, prev, next);
+                }
+                x.mainKey = *get_key_node(0, b);
+                save_node(x);
+                buffer_save_node(b, x);
+                return pair<int, Key>(0, x.mainKey);
             }
         }
 
-        node *leaf_split(node *nw, Key *newKey) {
-            int mid = (nw->curSize)/2;
-            node *nxt = new node(true);
-            nxt->curSize = nw->curSize-mid;
-            nxt->next = nw->next;
-            if(nxt->next = nullptr) rear = nxt;
-            else nw->next->prev = nxt;
-            nxt->prev = nw;
-            nw->next = nxt;
-            for(int i = 0; i<nw->curSize-mid; ++i){
-                nxt->data[i] = nw->data[i+mid];
-                nw->data[i+mid] = value_t();
-                nxt->mainKey[i] = nw->mainKey[i+mid];
-                nw->mainKey[i+mid] = Key();
-            }
-            nw->curSize = mid;
-            *newKey = nxt->mainKey[0];
-            return nxt;
-        }
-
-        node *node_split(node *nw, Key *newKey) {
-            int mid = (nw->curSize)/2;
-            node *nxt = new node(false);
-            nxt->curSize = nw->curSize-mid-1;
-            for(int i = 0; i<nw->curSize-mid-1; ++i){
-                nxt->son[i] = nw->son[i+mid+1];
-                nw->son[i+mid+1] = nullptr;
-                nxt->mainKey[i] = nw->mainKey[i+mid+1];
-                nw->mainKey[i+mid+1] = Key();
-            }
-            nxt->son[nw->curSize-mid-1] = nw->son[nw->curSize];
-            nw->son[nw->curSize] = nullptr;
-            *newKey = nw->mainKey[mid];
-            nw->mainKey[mid] = Key();
-            nw->curSize = mid;
-
-            return nxt;
-        }//内节点
-
-        void leaf_merge(node *nw, node *nxt) {
-            nw->next = nxt->next;
-            if(nw->next == nullptr) rear = nw;
-            else nxt->next->prev = nw;
-            for(int i = 0;i<nxt->curSize; ++i){
-                nw->data[i+nw->curSize+1] = nxt->data[i];
-                nxt->data[i] = value_t();
-                nw->mainKey[i+nw->curSize+1] = nxt->mainKey[i];
-                nxt->mainKey[i] = Key();
-            }
-            nw->curSize+=nxt->curSize;
-            delete nxt;
-        }//merge nxt to nw
-
-        void node_merge(node *nw, node *nxt) {
-            for(int i = 0;i<nxt->curSize; ++i){
-                nw->son[i+nw->curSize+1] = nxt->son[i];
-                nxt->son[i] = nullptr;
-                nw->mainKey[i+nw->curSize+1] = nxt->mainKey[i];
-                nxt->mainKey[i] = Key();
-            }
-            nw->curSize+=nxt->curSize;
-            delete nxt;
-        }
-
-        int findPos(node *nw, Key key) {
-            int l = 0, r = nw->curSize, mid;
-            while(l<r){
-                mid = (l + r)/2;
-                if(nw->mainKey[mid]<key) l = mid;
-                else r = mid;
-                if(l == r && l == mid) break;
-            }
-            return r;
-        }
+//=====================================================================================================================================================
 
     public:
-        bptree() {
-            root = nullptr;
+        bptree(const char *fname, const char *in_file)://leaf_size(5),node_size(5)
+        leaf_size((K - sizeof(node))/(sizeof(Key)+sizeof(value_t))-1),
+        node_size((K - sizeof(node))/(sizeof(Key)+sizeof(off_t))-1)
+        {
+            filename = new char[strlen(fname)+1];
+            strcpy(filename, fname);
+            index_file = new char[strlen(in_file)+1];
+            strcpy(index_file, in_file);
+            file = fopen(filename, "rb+");
+            //finder.load(index_file);
+            finder.init(in_file);
+            if(!file) {
+                file = fopen(fname, "wb+");
+                init();
+            }
+            else{
+                fseek(file, 0, SEEK_SET);
+                fread(&head, sizeof(off_t), 1, file);
+                fread(&rear, sizeof(off_t), 1, file);
+                fread(&root, sizeof(off_t), 1, file);
+
+            }
+        }
+
+        ~bptree(){
+            save_info();
+            if(file) fclose(file);
+            delete filename;
+            delete index_file;
         }
 
         inline bool empty() {
-            return root->curSize==0;
+            return root == invalid_off;
         }
 
-        int count(Key key) {
-            node *tmp = root;int Pos;
-            while(!tmp->isLeaf){
-                int pos = findPos(tmp, key);
-                Pos = pos;
-                if(pos < tmp->curSize&&tmp->mainKey[pos] == key) ++pos;
-                tmp = tmp->son[pos];
+        int count(const Key &key, node &x){
+            if(comp(key, x.mainKey))
+                return 0;
+            if(x.isLeaf){
+                buffer b;
+                buffer_load_leaf(b, x);
+                size_t tmp = leaf_find_pos(b, key, x.curSize);
+                if(tmp<x.curSize && compare(key, *get_key_leaf(tmp, b)))
+                    return 1;
+                else
+                    return 0;
             }
-            if(Pos == tmp->curSize || tmp->key[Pos] != key) return 0;
-            return  1;
+            buffer b;
+            buffer_load_node(b ,x);
+            size_t tmp = node_find_pos(b, key, x.curSize);
+            node y = get_node(*get_son_node(tmp, b));
+            return count(key, y);
+        }
+
+        int count(const Key &key) {
+            if(empty())
+                return 0;
+            node x = get_node(root);
+            return count(key, x);
         }//Returns the number of elements with key that compares equivalent to the specified argument, which is either 1 or 0
 
         void insert(const Key &key, const value_t &value) {
-            node *newSon; Key newKey;
-            if(root == nullptr){
-                root = head = rear = new node(true);
+            bool is_change;
+            if(empty()) {
+                node x(finder._alloc(), invalid_off, invalid_off, true);
+                buffer b;
+                buffer_insert_leaf(b, x, key, value, is_change);
+                head = rear = root = x.pos;
+                save_node(x);
+                buffer_save_leaf(b, x);
+                save_info();
+                return;
             }
-            insert(root, key, value, &newSon, &newKey);
-            if(newSon){
-                node *newRoot = new node(false);
-                newRoot->mainKey[0] = newKey;
-                newRoot->son[0] = root;
-                newRoot->son[1] = newSon;
-                newRoot->num = 1;
-                root = newRoot;
+            node x = get_node(root);
+            node result = insert(x, key, value, is_change);
+            if(result.pos != x.pos){
+                buffer b;
+                node new_root(finder._alloc(), invalid_off, invalid_off, false);
+                root = new_root.pos;
+                *get_key_node(0, b) = x.mainKey;
+                *get_son_node(0, b) = x.pos;
+                *get_key_node(1, b) = result.mainKey;
+                *get_son_node(1, b) = result.pos;
+                new_root.curSize = 2;
+                save_node(new_root);
+                buffer_save_node(b, new_root);
+                save_info();
+                return;
+            }
+            else{
+                save_node(x);
             }
         }
 
         void erase(const Key &key) {
-            erase(root, key, nullptr, -1);
+            node rt = get_node(root);
+            erase(rt, key, invalid_off, invalid_off);
         }
 
-		value_t at(const Key& key) const {
-			node* tmp = root; int Pos;
-			while (!tmp->isLeaf) {
-				int pos = findPos(tmp, key);
-				Pos = pos;
-				if (pos < tmp->curSize && tmp->mainKey[pos] == key) ++pos;
-				tmp = tmp->son[pos];
-			}
-			if (Pos == tmp->curSize || tmp->key[Pos] != key) throw index_out_of_bound();
-			return tmp->data[Pos];
-		} // added by yy.
-
-        value_t	& at(const Key &key) {
-            node *tmp = root;int Pos;
-            while(!tmp->isLeaf){
-                int pos = findPos(tmp, key);
-                Pos = pos;
-                if(pos < tmp->curSize&&tmp->mainKey[pos] == key) ++pos;
-                tmp = tmp->son[pos];
+        value_t at(const Key &key, node &x){
+            if(comp(key, x.mainKey)) {
+                value_t value = value_t();
+                return value;
             }
-            if(Pos == tmp->curSize || tmp->key[Pos] != key) throw index_out_of_bound();
-            return tmp->data[Pos];
+            if(x.isLeaf){
+                buffer b;
+                buffer_load_leaf(b, x);
+                size_t tmp = leaf_find_pos(b, key, x.curSize);
+                if(tmp<x.curSize && compare(key, *get_key_leaf(tmp, b)))
+                    return *get_value_leaf(tmp, b);
+                else {
+                    value_t value = value_t();
+                    return value;
+                }
+            }
+            buffer b;
+            buffer_load_node(b ,x);
+            size_t tmp = node_find_pos(b, key, x.curSize);
+            node y = get_node(*get_son_node(tmp, b));
+            return count(key, y);
         }
 
-        //void traverse() {}
+        value_t &at(const Key &key) {
+            if(empty()) throw "at";
+            node x = get_node(root);
+            return at(key, x);
+        }
+
+        void traverse() {
+            node x = get_node(head);
+            buffer b;
+            while(true){
+                buffer_load_leaf(b, x);
+                for(size_t i = 0; i<x.curSize;++i){
+                    cout<<*get_key_leaf(i, b)<<' '<<*get_value_leaf(i,b)<<endl;
+                }
+                if(x.next == invalid_off) break;
+                else x = get_node(x.next);
+            }
+        }
+        void traverse_tree(node &x){
+            buffer b;
+            if(x.isLeaf){
+                buffer_load_leaf(b, x);
+                cout<<"Leaf\n"<<" having "<<x.curSize<< "datas\n";
+                for(size_t i = 0; i<x.curSize; ++i){
+                    cout<<"("<<*get_key_leaf(i, b)<<','<<*get_value_leaf(i, b)<<")\n";
+                }
+            }
+            else{
+                buffer_load_node(b, x);
+                cout<<"Node\n"<<" having "<<x.curSize<<"sons\n";
+                for(size_t i = 0; i<x.curSize; ++i){
+                    cout<<*get_key_node(i, b)<<' ';
+                }
+                cout<<"\nsons\n";
+                for(size_t i = 0; i<x.curSize; ++i){
+                    cout<<*get_son_node(i, b)<<' ';
+                }
+                cout<<"\n\n";
+                for(size_t i = 0; i<x.curSize; ++i){
+                    node son = get_node(*get_son_node(i, b));
+                    traverse_tree(son);
+                }
+                cout<<"\n\n";
+            }
+        }
+        void traverse_tree(){
+            buffer btmp;
+            node test = get_node(53260);
+            buffer_load_node(btmp, test);
+            cout<<'\n'<<"last node's 4th son is"<<*get_key_node(3, btmp)<<endl;
+            node rt = get_node(root);
+            traverse_tree(rt);
+        }
         bool modify(const Key &key, const value_t &value){
-            node *newSon; Key newKey;
-            if(root == nullptr){
-                root = head = rear = new node(true);
+            bool is_change;
+            if(empty()) {
+                node x(finder._alloc(), invalid_off, invalid_off, true);
+                buffer b;
+                buffer_insert_leaf(b, x, key, value, is_change);
+                head = rear = root = x.pos;
+                save_node(x);
+                buffer_save_leaf(b, x);
+                save_info();
+                return is_change;
             }
-            bool result = insert(root, key, value, &newSon, &newKey);
-            if(newSon){
-                node *newRoot = new node(false);
-                newRoot->mainKey[0] = newKey;
-                newRoot->son[0] = root;
-                newRoot->son[1] = newSon;
-                newRoot->num = 1;
-                root = newRoot;
+            node x = get_node(root);
+            node result = insert(x, key, value, is_change);
+            if(result.pos != x.pos){
+                buffer b;
+                node new_root(finder._alloc(), invalid_off, invalid_off, false);
+                root = new_root.pos;
+                *get_key_node(0, b) = x.mainKey;
+                *get_son_node(0, b) = x.pos;
+                *get_key_node(1, b) = result.mainKey;
+                *get_son_node(1, b) = result.pos;
+                new_root.curSize = 2;
+                save_node(new_root);
+                buffer_save_node(b, new_root);
+                save_info();
+                return is_change;
             }
-            return result;
+            else{
+                save_node(x);
+                return is_change;
+            }
         }
     };
 }
 
 #endif //BPTREE_BPTREE_HPP
+
