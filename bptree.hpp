@@ -675,97 +675,11 @@ namespace sjtu {
                 return pair<int, Key>(0, x.mainKey);
             }
         }
-        pair<int , Key> erase(node &x, const Key &key, off_t prev, off_t next){
-            //-1 not merged and balance with next    0 not merged and balance with prev     1 merged with prev    2 merged with next      3 deleted
-            buffer b;
-            if(x.isLeaf){
-                buffer_load_leaf(b, x);
-                buffer_erase_leaf(b, x, key);
-                if(x.curSize == 0 && x.pos == root){
-                    root = head = rear = invalid_off;
-                    save_info();
-                    return pair<int, Key>(0, x.mainKey);
-                }
-                if(x.curSize<leaf_size/2&&x.pos!=root){
-                    return leaf_balance(b, x, prev, next);
-                }
-                save_node(x);
-                buffer_save_leaf(b, x);
-                return pair<int, Key>(0, x.mainKey);
-            }
-            else{
-                buffer_load_node(b, x);
-                size_t tx = node_find_pos(b, key, x.curSize);
-                if(!compare(key, *get_key_node(tx, b))&&tx>0)tx--;
-                if(tx == x.curSize) tx--;
-                off_t p = (tx>0)?(*get_son_node(tx-1, b)):invalid_off;
-                off_t n = (tx<x.curSize-1)?(*get_son_node(tx+1, b)):invalid_off;
-                node x_son = get_node(*get_son_node(tx, b));
-                pair<int, Key> tmp = erase(x_son, key, p, n);
-                switch (tmp.first){
-                    case -1:{
-                        *get_key_node(tx, b)   = x_son.mainKey;
-                        *get_key_node(tx+1, b) = tmp.second;
-                        if(!tx) x.mainKey = x_son.mainKey;
-                        save_node(x);
-                        buffer_save_node(b, x);
-                        break;
-                    }
-                    case 0:{
-                        *get_key_node(tx, b) = tmp.second;
-                        save_node(x);
-                        buffer_save_node(b, x);
-                        break;
-                    }
-                    case 1:{
-                        for(size_t i = tx; i<x.curSize-1; ++i){
-                            *get_son_node(i, b) = *get_son_node(i+1, b);
-                            *get_key_node(i, b) = *get_key_node(i+1, b);
-                        }
-                        x.curSize--;
-                        save_node(x);
-                        buffer_save_node(b, x);
-                        break;
-                    }
-                    case 2:{
-                        for(size_t i = tx+1; i<x.curSize-1; ++i){
-                            *get_son_node(i, b) = *get_son_node(i+1, b);
-                            *get_key_node(i, b) = *get_key_node(i+1, b);
-                        }
-                        if(!tx) x.mainKey = x_son.mainKey;
-                        x.curSize--;
-                        save_node(x);
-                        buffer_save_node(b, x);
-                        break;
-                    }
-                    default:{
-                        delete_node(x);
-                        head = rear = root = invalid_off;
-                        save_info();
-                        return pair<int, Key>(3, Key());
-                    }
-                }
-
-                if(x.pos == root&&x.curSize == 1){
-                    root = *get_son_node(0, b);
-                    save_info();
-                    return pair<int, Key>(0, Key());
-                }
-
-                if(x.curSize<node_size/2){
-                    return node_balance(b, x, prev, next);
-                }
-                x.mainKey = *get_key_node(0, b);
-                save_node(x);
-                buffer_save_node(b, x);
-                return pair<int, Key>(0, x.mainKey);
-            }
-        }
 
 //=====================================================================================================================================================
 
     public:
-        bptree(const char *fname, const char *in_file)://leaf_size(5),node_size(5)
+        bptree(const char *fname, const char *in_file):
         leaf_size((K - sizeof(node))/(sizeof(Key)+sizeof(value_t))-1),
         node_size((K - sizeof(node))/(sizeof(Key)+sizeof(off_t))-1)
         {
@@ -774,7 +688,7 @@ namespace sjtu {
             index_file = new char[strlen(in_file)+1];
             strcpy(index_file, in_file);
             file = fopen(filename, "rb+");
-            //finder.load(index_file);
+           
             finder.init(in_file);
             if(!file) {
                 file = fopen(fname, "wb+");
@@ -861,7 +775,7 @@ namespace sjtu {
 
         void erase(const Key &key) {
             node rt = get_node(root);
-            erase(rt, key, invalid_off, invalid_off);
+            erase(rt, key, rt);
         }
 
         value_t at(const Key &key, node &x){
