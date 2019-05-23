@@ -9,14 +9,19 @@
 #include "./vector/vector.hpp"
 
 class user {
+	friend class ticket;
 private:
 	sjtu::vector<info_user> data;
+	sjtu::bptree<int, info_ticket, 1000> ticket_tree;
 	int cur;
+
+	int counter() const { return cur; }
+
 public:
 	user() {
 		cur = 2018;
 	}
-	int counter() const { return cur; }
+	
 	int regist(wchar_t name[], char passward[], char email[], char phone[]) {
 		//printf("%s\n", passward );
 		info_user tmp(name, passward, email, phone, ++cur, 0);

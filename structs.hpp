@@ -64,13 +64,13 @@ struct my_time {
 	}
 };
 
-struct date {
+struct my_date {
 	short year;
 	short month;
 	short day;
 
-	date() = default;
-	date(char s[]) {
+	my_date() = default;
+	my_date(char s[]) {
 		year = (((s[0] - '0') * 10 + s[1] - '0') * 10 + s[3] - '0') * 10 + s[4] - '0';
 		month = (s[5] - '0') * 10 + s[6] - '0';
 		day = (s[8] - '0') * 10 + s[9] - '0';

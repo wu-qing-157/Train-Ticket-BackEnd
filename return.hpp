@@ -57,7 +57,7 @@ struct query_order_return{
     short listnum;
     info_ticket* data;
 
-    query_order_return(bool _success, short _listnum, info_ticket* _data){
+    query_order_return(bool _success, short _listnum = 0, info_ticket* _data = nullptr){
         success = _success;
         listnum = _listnum;
         data = new info_ticket[listnum];
@@ -91,7 +91,7 @@ struct query_train_return{
 		for (int i = 0; i < num_price; ++i) {
             memcpy(name_price[i], _name_price[i], 20 * sizeof (wchar_t));
         }
-        memcpy(train_id, _train_id, 20);info_station
+        memcpy(train_id, _train_id, 20);
         memcpy(catalog, _catalog, 10);
         data = new info_station[num_station];
         memcpy(data, _data, num_station * sizeof (info_station));

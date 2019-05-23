@@ -3,12 +3,14 @@
 #include <cstring>
 #include <iostream>
 #include "structs.hpp"
+#include "container.hpp"
 
 struct info_user {
 	wchar_t name[40];
 	char email[20], passward[32], phone[20];
 	long long id;
 	short privilege;
+	ctn_ticket user_ticket[40];
 
 	info_user() = default;
 	info_user(const info_user& other) = default;
@@ -39,6 +41,22 @@ struct info_train {
 	bool on_sale;
 
 	info_train() = default;
+	info_train(const info_train& other) {
+		train_id = other.train_id;
+		num_station = other.num_station;
+		num_price = other.num_price;
+		memcpy(name, other.name, 40 * sizeof(char));
+		memcpy(catalog, other.catalog, 10 * sizeof(char));
+		data = new info_station[num_station];
+		memcpy(data, other.data, num_station * sizeof(info_station));
+		for (int i = 0; i < num_price; ++i) {
+			memcpy(name_price[i], other.name_price[i], 20 * sizeof(wchar_t));
+		}
+		for (int i = 0; i < 40; ++i) {
+			memcpy(num_ticket[i], other.num_ticket[i], 60 * sizeof(short));
+		}
+		on_sale = other.on_sale;
+	}
 	info_train(wchar_t _name[], wchar_t _name_price[][20],
 		char _train_id[], char _catalog[], short _num_station,
 		short _num_price, info_station* _data) {
@@ -51,22 +69,24 @@ struct info_train {
 			memcpy(name_price[i], _name_price[i], 20 * sizeof (wchar_t));
 		}
 		memcpy(catalog, _catalog, 10);
+		delete[] data;
 		data = new info_station[num_station];
 		memcpy(data, _data, num_station * sizeof (info_station));
 		on_sale = false;
 	}
-	info_train(const info_train& other) = delete;
+	//info_train(const info_train& other) = delete;
 };
 
 struct info_ticket {
-	date date_from;
+	my_date date_from;
 	my_time time_from, time_to;
 	wchar_t loc_from[20], loc_to[20], ticket_kind[5][20];
 	short num_price, ticket_quantity[5];
 	float price[5];
 
 	info_ticket() = default;
-	info_ticket(date _date_from, my_time _time_from, my_time _time_to,
+	info_ticket(const info_ticket& other) = default;
+	info_ticket(my_date _date_from, my_time _time_from, my_time _time_to,
 		wchar_t _loc_from[], wchar_t _loc_to[], wchar_t _ticket_kind[][20],
 		short _num_price, short _ticket_quantity[], float _price[5]) {
 		date_from = _date_from;
