@@ -3,6 +3,7 @@
 //
 #include <functional>
 #include <cstddef>
+#include <cstdio>
 #include <iostream>
 #include <cstring>
 #include "utility.hpp"
@@ -16,6 +17,8 @@ using namespace std;
 namespace sjtu {
     template<class Key, class value_t, size_t K = 4096, class Compare = std::less<Key>>
     class bptree {
+        //friend class iterator;
+        //friend class const_iterator;
         typedef char* _buffer;
         typedef char buffer[K];
         const size_t node_size;
@@ -36,7 +39,7 @@ namespace sjtu {
             size_t curSize;
             off_t pos;
             bool isLeaf;
-            node(off_t Pos = invalid_off, off_t Prev = invalid_off, off_t Next = invalid_off, bool IsLeaf = true)
+            node(off_t Pos, off_t Prev = invalid_off, off_t Next = invalid_off, bool IsLeaf = true)
                     :pos(Pos),
                      prev(Prev),
                      next(Next),
@@ -44,13 +47,20 @@ namespace sjtu {
                      curSize(0){
                 mainKey = Key();
             }//leaf
-            node(off_t Pos = invalid_off, bool Isleaf = false)
+            node(off_t Pos, bool Isleaf = false)
                     :pos(Pos),
                      isLeaf(Isleaf),
                      curSize(0){
                 mainKey = Key();
             }//node
-
+            node(const node &other){
+                mainKey = other.mainKey;
+                prev = other.prev;
+                next = other.next;
+                curSize = other.curSize;
+                pos = other.pos;
+                isLeaf = other.isLeaf;
+            }
         };
     private:
         inline void save_node(const node &x){
@@ -675,11 +685,10 @@ namespace sjtu {
                 return pair<int, Key>(0, x.mainKey);
             }
         }
-
 //=====================================================================================================================================================
 
     public:
-        bptree(const char *fname, const char *in_file):
+        bptree(const char *fname, const char *in_file)://leaf_size(5),node_size(5)
         leaf_size((K - sizeof(node))/(sizeof(Key)+sizeof(value_t))-1),
         node_size((K - sizeof(node))/(sizeof(Key)+sizeof(off_t))-1)
         {
@@ -688,7 +697,7 @@ namespace sjtu {
             index_file = new char[strlen(in_file)+1];
             strcpy(index_file, in_file);
             file = fopen(filename, "rb+");
-           
+            //finder.load(index_file);
             finder.init(in_file);
             if(!file) {
                 file = fopen(fname, "wb+");
@@ -699,7 +708,6 @@ namespace sjtu {
                 fread(&head, sizeof(off_t), 1, file);
                 fread(&rear, sizeof(off_t), 1, file);
                 fread(&root, sizeof(off_t), 1, file);
-
             }
         }
 
@@ -708,6 +716,212 @@ namespace sjtu {
             if(file) fclose(file);
             delete filename;
             delete index_file;
+        }
+
+        void clear(){
+            char delete_file[40] = "rm ";
+            strncpy(delete_file+3, filename,  strlen(filename));
+            system(delete_file);
+            char delete_infile[40] = "rm ";
+            strncpy(delete_infile+3, index_file, strlen(index_file));
+            system(delete_infile);
+        }
+
+        class const_iterator;
+        class iterator{
+            friend const_iterator;
+        private:
+            node leaf;
+            size_t pos;
+            bptree *tree;
+
+        public:
+            iterator():leaf(invalid_off, invalid_off, invalid_off, true), pos(0), tree(nullptr){}
+
+            iterator(node _leaf, size_t p, bptree *_tree):leaf(_leaf){
+                pos  = p;
+                tree = _tree;
+            }
+
+            iterator(const iterator &other):leaf(other.leaf){
+                pos  = other.pos;
+                tree = other.tree;
+            }
+
+            iterator operator++(int){
+                iterator tmp(*this);
+                ++(*this);
+                return tmp;
+            }
+
+            iterator operator++(){
+                if(pos == leaf.curSize-1) {
+                    if(leaf.pos != tree->rear) {
+                        leaf = tree->get_node(leaf.next);
+                        pos = 0;
+                    }
+                    else {
+                        node tmp(invalid_off, invalid_off, invalid_off, true);
+                        leaf = tmp;
+                        pos = 0;
+                    }
+                }
+                else{
+                    pos++;
+                }
+                return *this;
+            }
+
+            iterator operator--(int){
+                iterator tmp(*this);
+                --(*this);
+                return  tmp;
+            }
+
+            iterator operator--(){
+                if(pos == 0){
+                    if(leaf.pos != tree->head){
+                        leaf = tree->get_node(leaf.prev);
+                        pos = leaf.curSize-1;
+                    }
+                    else {
+                        leaf = tree->get_node(tree->head);
+                        pos = 0;
+                    }
+                }
+                else{
+                    pos--;
+                }
+                return *this;
+            }
+
+            value_t& operator*(){
+                buffer b;
+                tree->buffer_load_leaf(b, leaf);
+                return *tree->get_value_leaf(pos, b);
+            }
+
+            bool operator==(const iterator &rhs)const{
+                return (leaf.pos == rhs.leaf.pos&&pos == rhs.pos);
+            }
+
+            bool operator!=(const iterator &rhs)const{
+                return !(*this == rhs);
+            }
+
+            bool operator==(const const_iterator &rhs)const{
+                return (leaf.pos == rhs.leaf.pos&&pos == rhs.pos);
+            }
+
+            bool operator!=(const const_iterator &rhs)const{
+                return !(*this == rhs);
+            }
+        };
+
+        class const_iterator{
+            friend iterator;
+        private:
+            node leaf;
+            size_t pos;
+            bptree *tree;
+
+        public:
+            const_iterator():leaf(invalid_off, invalid_off, invalid_off, true), pos(0), tree(nullptr){}
+
+            const_iterator(node _leaf, size_t p, bptree *_tree):leaf(_leaf){
+                    pos  = p;
+                    tree = _tree;
+            }
+
+            const_iterator(const iterator &other):leaf(other.leaf){
+                pos  = other.pos;
+                tree = other.tree;
+            }
+
+            const_iterator operator++(int){
+                const_iterator tmp(*this);
+                ++(*this);
+                return tmp;
+            }
+
+            const_iterator operator++(){
+                if(pos == leaf.curSize-1) {
+                    if(leaf.pos != tree->rear) {
+                        leaf = tree->get_node(leaf.next);
+                        pos = 0;
+                    }
+                    else {
+                        node tmp(invalid_off, invalid_off, invalid_off, true);
+                        leaf = tmp;
+                        pos = 0;
+                    }
+                }
+                else{
+                    pos++;
+                }
+                return *this;
+            }
+
+            const_iterator operator--(int){
+                const_iterator tmp(*this);
+                --(*this);
+                return  tmp;
+            }
+
+            const_iterator operator--(){
+                if(pos == 0){
+                    if(leaf.pos != tree->head){
+                        leaf = tree->get_node(leaf.prev);
+                        pos = leaf.curSize-1;
+                    }
+                    else {
+                        leaf = tree->get_node(tree->head);
+                        pos = 0;
+                    }
+                }
+                else{
+                    pos--;
+                }
+                return *this;
+            }
+
+            value_t& operator*(){
+                buffer b;
+                tree->buffer_load_leaf(b, leaf);
+                return *tree->get_value_leaf(pos, b);
+            }
+
+            bool operator==(const iterator &rhs)const{
+                return (leaf.pos == rhs.leaf.pos&&pos == rhs.pos);
+            }
+
+            bool operator!=(const iterator &rhs)const{
+                return !(*this == rhs);
+            }
+
+            bool operator==(const const_iterator &rhs)const{
+                return (leaf.pos == rhs.leaf.pos&&pos == rhs.pos);
+            }
+
+            bool operator!=(const const_iterator &rhs)const{
+                return !(*this == rhs);
+            }
+        };
+
+        iterator begin(){
+            return iterator(get_node(head), 0, this);
+        }
+
+        iterator end(){
+            return iterator(node(invalid_off, invalid_off, invalid_off, true), 0, this);
+        }
+
+        const_iterator cbegin(){
+            return const_iterator(get_node(head), 0, this);
+        }
+
+        const_iterator cend(){
+            return const_iterator(node(invalid_off, invalid_off, invalid_off, true), 0, this);
         }
 
         inline bool empty() {
@@ -729,6 +943,8 @@ namespace sjtu {
             buffer b;
             buffer_load_node(b ,x);
             size_t tmp = node_find_pos(b, key, x.curSize);
+            if(tmp>0 && !compare(key, *get_key_node(tmp, b))) tmp--;
+            if(tmp == x.curSize) tmp--;
             node y = get_node(*get_son_node(tmp, b));
             return count(key, y);
         }
@@ -797,34 +1013,31 @@ namespace sjtu {
             buffer b;
             buffer_load_node(b ,x);
             size_t tmp = node_find_pos(b, key, x.curSize);
+            if(tmp>0 && !compare(key, *get_key_node(tmp, b))) tmp--;
+            if(tmp == x.curSize) tmp--;
             node y = get_node(*get_son_node(tmp, b));
-            return count(key, y);
+            return at(key, y);
         }
 
-        value_t &at(const Key &key) {
+        value_t at(const Key &key) {
             if(empty()) throw "at";
             node x = get_node(root);
             return at(key, x);
         }
 
-		value_t at(const Key& key) const {
-			if (empty()) throw "at";
-			node x = get_node(root);
-			return at(key, x);
-		}
-
-        void traverse() {
+        void traverse(void *fun(Key *key, value_t *value)) {
             node x = get_node(head);
             buffer b;
             while(true){
                 buffer_load_leaf(b, x);
                 for(size_t i = 0; i<x.curSize;++i){
-                    cout<<*get_key_leaf(i, b)<<' '<<*get_value_leaf(i,b)<<endl;
+                    cout<<*get_key_leaf(i, b)<<' '<<*get_value_leaf(i, b)<<endl;
                 }
                 if(x.next == invalid_off) break;
                 else x = get_node(x.next);
             }
         }
+
         void traverse_tree(node &x){
             buffer b;
             if(x.isLeaf){
@@ -853,10 +1066,10 @@ namespace sjtu {
             }
         }
         void traverse_tree(){
-            buffer btmp;
-            node test = get_node(53260);
-            buffer_load_node(btmp, test);
-            cout<<'\n'<<"last node's 4th son is"<<*get_key_node(3, btmp)<<endl;
+            //buffer btmp;
+            //node test = get_node(53260);
+            //buffer_load_node(btmp, test);
+            //cout<<'\n'<<"last node's 4th son is"<<*get_key_node(3, btmp)<<endl;
             node rt = get_node(root);
             traverse_tree(rt);
         }
