@@ -33,11 +33,11 @@ public:
 	bool delete_train(char train_id[]) {
 		str<char, 20> queryId(train_id);
 		info_train x = data.at(queryId);
-		if (x.num_station == -1) throw 1;
+		if (x.num_station == -1) return false;
 		data.erase(queryId);
 		return true;
 	}
-	bool modify_train(char train_id[], info_train& t) {
+	bool modify_train(char train_id[], const info_train& t) {
 		str<char, 20> queryId(train_id);
 		info_train x = data.at(queryId);
 		if (x.num_station == -1) return false;
@@ -49,78 +49,86 @@ public:
 		str<char, 20> queryId(train_id);
 		info_train x = data.at(queryId);
 		if (x.num_station == -1) return false;
-		
+
 		for (short i = 0; i < x.num_station; ++i) {
 			loc_t a;
 			catalog_t catalog;
-			str<char, 20> loc(x.train_id);
+			str<char, 20> tid(x.train_id);
 			pair<str<char, 20>, short> pr;
-			pr = std::make_pair(loc, i);
-			memcpy(a, x.data[i].name, 20 * sizeof (wchar_t));
+			pr = std::make_pair(tid, i);
+			memcpy(a, x.data[i].name, 20 * sizeof(wchar_t));
 			memcpy(catalog, x.catalog, 10 * sizeof(char));
 			sjtu::bptree<str<char, 20>, pair<str<char, 20>, short>>
 				tree(a + catalog, a + "123" + catalog);
-			tree.insert(loc, pr);
+			tree.insert(tid, pr);
 		}
 
 		//遍历一遍车站
 		//加到b+树里
 
-		return data.at(queryId).sale();    // huge problems may have happened when return wrong.
+		return data.at(queryId).sell();    // huge problems may have happened when return wrong.
 	}
 };
 
 typedef sjtu::vector<info_ticket> ctn_ticket;
 
-class ticket{
+class ticket {
 private:
-	//sjtu::bptree<str<wchar_t, 20>, ctn_train, 1000, 1000> data;   //These two 1000 are written without any thoughts
-	//I have not considered catalog yet.
 	train* tra;
 	user* use;
-	
-	/*ctn_train mergeAndFind(loc_t a, loc_t b, int day, catalog_t catalog) {
-		ctn_train ans;
-		sjtu::bptree<str<char, 20>, pair<str<char, 20>, short>>(a + catalog, a + "123" + catalog);
-		sjtu::bptree<str<char, 20>, pair<str<char, 20>, short>>(b + catalog, b + "123" + catalog);
-
-		size_t cnta = 0, cntb = 0;
-
-		//以下部分得等贾雨祺遍历函数写完了
-		size_t maxa = a.size, maxb = b.size;
-		while (cnta < maxa && cntb < maxb) {
-			if (a[cnta].train_id == b[cntb].train_id) {
-				bool jdg = true;
-				if (a[cnta].num >= b[cntb].num) jdg = false;
-				if (jdg) {
-					for (int i = a[cnta].num; i < b[cntb].num; ++i){
-						if (tra->data.at(a[cnta].train_id).num_ticket[day][i] == 0) {
-							jdg = false;
-							break;
-						}
-					}
-				}
-				if (jdg) ans.push_back(a[cnta]);
-				cnta++;
-				cntb++;
-			}
-			if (a[cnta].train_id < b[cntb].train_id) cnta++;
-			else cntb++;
-		}
-		return ans;
-	}*/
 
 public:
 	ticket() = default;
-	query_train_return query_ticket(loc_t a, loc_t b, int day, catalog_t catalog) {
-		ctn_train ans;
-		sjtu::bptree<str<char, 20>, pair<str<char, 20>, short>>(a + catalog, a + "123" + catalog);
-		sjtu::bptree<str<char, 20>, pair<str<char, 20>, short>>(b + catalog, b + "123" + catalog);
+	sjtu::vector<info_ticket> query_ticket(loc_t a, loc_t b, int day, catalog_t catalog) {
+		sjtu::vector<info_ticket> ans;
+		sjtu::bptree<str<char, 20>, pair<str<char, 20>, short>> treeA(a + catalog, a + "123" + catalog);
+		sjtu::bptree<str<char, 20>, pair<str<char, 20>, short>> treeB(b + catalog, b + "123" + catalog);
 
 		size_t cnta = 0, cntb = 0;
 
+		typedef sjtu::bptree<str<char, 20>, pair<str<char, 20>, short>>::iterator bpt_itr;
+
 		//以下部分得等贾雨祺遍历函数写完了
-		size_t maxa = a.size, maxb = b.size;
+		bpt_itr iA;
+		bpt_itr iB;
+		iA = treeA.begin();
+		iB = treeB.begin();
+
+		while (iA != treeA.end() && iB != treeB.end()) {
+			if ((*iA).first == (*iB).first) {
+				if ((*iA).second >= (*iB).second) {  //Is operator * efficient enough as visit??
+					info_train info = tra->data.at((*iA).first);
+					info_ticket tic;
+					tic.date = my_date(day);
+					tic.time_from = info.data[(*iA).second].arriv;
+					tic.time_to = info.data[(*iB).second].start;
+					memcpy(tic.loc_from, info.data[(*iA).second].name, 20 * sizeof(wchar_t));
+					memcpy(tic.loc_to, info.data[(*iB).second].name, 20 * sizeof(wchar_t));
+					//I'm not sure whether this is what's suppposed to be.
+					tic.num_price = info.num_price;
+					for (int i = 0; i < info.num_price; ++i) {
+						memcpy(tic.ticket_kind[i], info.name_price[i], 20 * sizeof(wchar_t));
+						int cnt = 2000;
+						for (int j = (*iA).second; j < (*iB).second; ++j) {
+							if (cnt > info.quan_ticket[i][j][day]) cnt = info.quan_ticket[i][j][day];
+						}
+						tic.ticket_quantity[i] = cnt;
+					}
+					bool jdg = false;
+					for (int i = 0; i < tic.num_price; ++i) {
+						if (tic.ticket_quantity[i] != 0) jdg = true;
+						break;
+					}
+					if (jdg) ans.push_back(tic);
+				}
+			}
+			else if ((*iA).first < (*iB).first) iA++;
+			else iB++;
+		}
+
+		return ans;
+
+		/*size_t maxa = a.size, maxb = b.size;
 		while (cnta < maxa && cntb < maxb) {
 			if (a[cnta].train_id == b[cntb].train_id) {
 				bool jdg = true;
@@ -139,7 +147,7 @@ public:
 			}
 			if (a[cnta].train_id < b[cntb].train_id) cnta++;
 			else cntb++;
-		}
+		}*/
 		
 		
 		/*
@@ -149,12 +157,12 @@ public:
 		ctn_train t2 = data.at(loc2);
 		ctn_train t = mergeAndFind(t1, t2, 1);  // How can date be converted to int is to be considered.
 		*/
-
-		// to be done:how to return
-
 	}
 	query_ticket_return query_transfer(wchar_t _loc1[], wchar_t _loc2[], my_date date, char catalog[]) {
+		
+		//QUESTION: HOW CAN loclist BE CREATED / STORED
 		for (size_t i = 0; i < tra->loclist.size; ++i) {
+			//TO DO: design a special query_ticket function that can select the first train to arrive
 			query_ticket(_loc1, tra->loclist[i], date, catalog);
 			query_ticket(tra->loclist[i], _loc2, date, catalog);
 		}
@@ -188,7 +196,7 @@ public:
 		}
 
 		//below is how I can stroage user's ticket_ordered data.
-
+		vector<buy_info>
 	}
 
 	query_order_return query_order(int id, my_date date, char catalog[]) {

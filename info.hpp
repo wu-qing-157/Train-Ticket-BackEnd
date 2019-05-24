@@ -26,7 +26,7 @@ struct info_user {
 };
 
 struct info_station {
-	wchar_t name[40];
+	wchar_t name[20];
 	my_time arriv, start, stopover;
 	float price[5];
 };
@@ -41,7 +41,7 @@ struct info_train {
 	bool on_sale;
 
 	info_train() {
-		num_station = -1;	//这样设是为了方便判错
+		num_station = -1;	//for convenience of judging wrong visit
 	}
 	info_train(const info_train& other) {
 		train_id = other.train_id;
@@ -80,7 +80,7 @@ struct info_train {
 		}
 		on_sale = false;
 	}
-	bool sale() {
+	bool sell() {
 		if (on_sale) return false;
 		on_sale = true;
 		for (int i = 0; i < num_price; ++i) {
@@ -97,7 +97,7 @@ struct info_train {
 };
 
 struct info_ticket {
-	my_date date_from;
+	my_date date;
 	my_time time_from, time_to;
 	wchar_t loc_from[20], loc_to[20], ticket_kind[5][20];
 	short num_price, ticket_quantity[5];
@@ -105,10 +105,10 @@ struct info_ticket {
 
 	info_ticket() = default;
 	info_ticket(const info_ticket& other) = default;
-	info_ticket(my_date _date_from, my_time _time_from, my_time _time_to,
+	info_ticket(my_date _date, my_time _time_from, my_time _time_to,
 		wchar_t _loc_from[], wchar_t _loc_to[], wchar_t _ticket_kind[][20],
 		short _num_price, short _ticket_quantity[], float _price[5]) {
-		date_from = _date_from;
+		date = _date;
 		time_from = _time_from;
 		time_to = _time_to;
 		memcpy(loc_from, _loc_from, 20 * sizeof(wchar_t));

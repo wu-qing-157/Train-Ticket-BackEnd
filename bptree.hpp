@@ -1024,6 +1024,12 @@ namespace sjtu {
             node x = get_node(root);
             return at(key, x);
         }
+		
+		const value_t at(const Key& key) const{
+			if (empty()) throw "at";
+			node x = get_node(root);
+			return at(key, x);
+		}
 
         void traverse(void *fun(Key *key, value_t *value)) {
             node x = get_node(head);
