@@ -34,6 +34,17 @@ struct str {
 		}
 		return true;
 	}
+	template<class T, int M>
+	str<T, M + N> operator+(const str<T, M> other) {
+		str <T, M + N> ans;
+		for (int i = 0; i < N; ++i) {
+			ans.data[i] = data[i];
+		}
+		for (int i = n; i < M + N; ++i) {
+			ans.data[i] = data[i];
+		}
+		return ans;
+	}
 };
 
 struct my_time {

@@ -7,7 +7,7 @@
 
 struct info_user {
 	wchar_t name[40];
-	char email[20], passward[32], phone[20];
+	char email[20], passward[20], phone[20];
 	long long id;
 	short privilege;
 	ctn_ticket user_ticket[40];
@@ -17,7 +17,7 @@ struct info_user {
 	info_user(wchar_t _name[], char _passward[], char _email[],
 		char _phone[20], long long _id, short _privilege) {
 		memcpy(name, _name, 40 * sizeof (wchar_t)); // Diffenrece between Win and Linux. //Just keep the parenthesis
-		memcpy(passward, _passward, 32);
+		memcpy(passward, _passward, 20);
 		memcpy(email, _email, 20);
 		memcpy(phone, _phone, 20);
 		id = _id;
@@ -34,46 +34,65 @@ struct info_station {
 struct info_train {
 	str<char, 20> train_id;
 	short num_station, num_price;
-	wchar_t name[40], name_price[5][20];
+	wchar_t name[20], name_price[5][20];
 	char catalog[10];
-	info_station* data;
-	short num_ticket[40][60];  //40 means days, 60 means station number
+	info_station data[60];
+	short quan_ticket[5][60][30];  //5 means type of tickets, 60 means station number, 30 means days
 	bool on_sale;
 
-	info_train() = default;
+	info_train() {
+		num_station = -1;	//这样设是为了方便判错
+	}
 	info_train(const info_train& other) {
 		train_id = other.train_id;
 		num_station = other.num_station;
 		num_price = other.num_price;
-		memcpy(name, other.name, 40 * sizeof(char));
+		memcpy(name, other.name, 20 * sizeof(char));
 		memcpy(catalog, other.catalog, 10 * sizeof(char));
-		data = new info_station[num_station];
 		memcpy(data, other.data, num_station * sizeof(info_station));
 		for (int i = 0; i < num_price; ++i) {
 			memcpy(name_price[i], other.name_price[i], 20 * sizeof(wchar_t));
 		}
-		for (int i = 0; i < 40; ++i) {
-			memcpy(num_ticket[i], other.num_ticket[i], 60 * sizeof(short));
+		for (int i = 0; i < 5; ++i) {
+			for (int j = 0; j < 60; ++j) {
+				memcpy(quan_ticket[i][j], other.quan_ticket[i][j], 30 * sizeof(short));
+			}
 		}
 		on_sale = other.on_sale;
 	}
-	info_train(wchar_t _name[], wchar_t _name_price[][20],
-		char _train_id[], char _catalog[], short _num_station,
-		short _num_price, info_station* _data) {
+	info_train(wchar_t _name[20], wchar_t _name_price[5][20],
+		char _train_id[20], char _catalog[10], short _num_station,
+		short _num_price, short _quan_ticket[5][60][30], info_station _data[60]) {
 		train_id.cpy(_train_id);  //NOTE HERE: I'm using char[] to construct train_id, but it's stored as str.
 		num_price = _num_price;
 		num_station = _num_station;
-		memcpy(name, _name, 40 * sizeof (wchar_t));
+		memcpy(name, _name, 20 * sizeof (wchar_t));
 		//memcpy(name_price, _name_price, num_price * 4); It seems that this sentence should be deleted, but I'm not sure.
 		for (int i = 0; i < num_price; ++i) {
 			memcpy(name_price[i], _name_price[i], 20 * sizeof (wchar_t));
 		}
 		memcpy(catalog, _catalog, 10);
-		delete[] data;
-		data = new info_station[num_station];
 		memcpy(data, _data, num_station * sizeof (info_station));
+		for (int i = 0; i < 5; ++i) {
+			for (int j = 0; j < 60; ++j) {
+				memcpy(quan_ticket[i][j], _quan_ticket[i][j], 30 * sizeof(short));
+			}
+		}
 		on_sale = false;
 	}
+	bool sale() {
+		if (on_sale) return false;
+		on_sale = true;
+		for (int i = 0; i < num_price; ++i) {
+			for (int j = 0; i < num_station; ++j) {
+				for (int k = 0; k < 30; ++k) {
+					quan_ticket[i][j][k] = 2000;
+				}
+			}
+		}
+		return true;
+	}
+
 	//info_train(const info_train& other) = delete;
 };
 

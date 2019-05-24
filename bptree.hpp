@@ -807,6 +807,12 @@ namespace sjtu {
             return at(key, x);
         }
 
+		value_t at(const Key& key) const {
+			if (empty()) throw "at";
+			node x = get_node(root);
+			return at(key, x);
+		}
+
         void traverse() {
             node x = get_node(head);
             buffer b;
