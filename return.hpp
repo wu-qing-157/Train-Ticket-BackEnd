@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <cstring>
-#include "bptree.hpp"
 #include "structs.hpp"
 #include "info.hpp"
 
@@ -26,6 +25,8 @@ struct info_query_profile {  //It's very similar with info_user, except that it 
         privilege = _privilege;
     }
 };
+
+#ifndef CT
 
 struct query_ticket_return{
     int listnum;
@@ -101,5 +102,7 @@ struct query_train_return{
         delete [] data;
     }
 };
+
+#endif // CT
 
 #endif // RETURN
