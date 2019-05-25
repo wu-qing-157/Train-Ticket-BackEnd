@@ -80,36 +80,38 @@ private:
 public:
 	ticket() = default;
 	sjtu::vector<info_ticket> query_ticket(loc_t a, loc_t b, int day, catalog_t catalog) {
-		sjtu::vector<info_ticket> ans;
-		sjtu::bptree<str<char, 20>, pair<str<char, 20>, short>> treeA(a + catalog, a + "123" + catalog);
-		sjtu::bptree<str<char, 20>, pair<str<char, 20>, short>> treeB(b + catalog, b + "123" + catalog);
-
-		size_t cnta = 0, cntb = 0;
-
+		
+		typedef pair<str<char, 20>, short> value_t;
 		typedef sjtu::bptree<str<char, 20>, pair<str<char, 20>, short>>::iterator bpt_itr;
 
-		//以下部分得等贾雨祺遍历函数写完了
-		bpt_itr iA;
-		bpt_itr iB;
-		iA = treeA.begin();
-		iB = treeB.begin();
+		sjtu::vector<info_ticket> ans;
+		sjtu::bptree<str<char, 20>, value_t> treeA(a + catalog, a + "123" + catalog);
+		sjtu::bptree<str<char, 20>, value_t> treeB(b + catalog, b + "123" + catalog);
+
+		typedef pair<str<char, 20>, short> value_t;
+		typedef sjtu::bptree<str<char, 20>, pair<str<char, 20>, short>>::iterator bpt_itr;
+
+		bpt_itr iA = treeA.begin();
+		bpt_itr iB = treeB.begin();
+		value_t cA = *iA;
+		value_t cB = *iB;
 
 		while (iA != treeA.end() && iB != treeB.end()) {
-			if ((*iA).first == (*iB).first) {
-				if ((*iA).second >= (*iB).second) {  //Is operator * efficient enough as visit??
-					info_train info = tra->data.at((*iA).first);
+			if (cA.first == cB.first) {
+				if (cA.second >= cB.second) {
+					info_train info = tra->data.at(cA.first);
 					info_ticket tic;
 					tic.date = my_date(day);
-					tic.time_from = info.data[(*iA).second].arriv;
-					tic.time_to = info.data[(*iB).second].start;
-					memcpy(tic.loc_from, info.data[(*iA).second].name, 20 * sizeof(wchar_t));
-					memcpy(tic.loc_to, info.data[(*iB).second].name, 20 * sizeof(wchar_t));
-					//I'm not sure whether this is what's suppposed to be.
+					tic.time_from = info.data[cA.second].arriv;
+					tic.time_to = info.data[cB.second].start;
+					memcpy(tic.loc_from, info.data[cA.second].name, 20 * sizeof(wchar_t));
+					memcpy(tic.loc_to, info.data[cB.second].name, 20 * sizeof(wchar_t));
+					//I'm not sure whether above two sentencces are what's suppposed to be.
 					tic.num_price = info.num_price;
 					for (int i = 0; i < info.num_price; ++i) {
 						memcpy(tic.ticket_kind[i], info.name_price[i], 20 * sizeof(wchar_t));
 						int cnt = 2000;
-						for (int j = (*iA).second; j < (*iB).second; ++j) {
+						for (int j = cA.second; j < cB.second; ++j) {
 							if (cnt > info.quan_ticket[i][j][day]) cnt = info.quan_ticket[i][j][day];
 						}
 						tic.ticket_quantity[i] = cnt;
@@ -121,9 +123,12 @@ public:
 					}
 					if (jdg) ans.push_back(tic);
 				}
+				iA++; iB++;
+				cA = *iA; cB = *iB;
+
 			}
-			else if ((*iA).first < (*iB).first) iA++;
-			else iB++;
+			else if ((*iA).first < (*iB).first) { iA++; cA = *iA; }
+			else { iB++; cB = *iB; }
 		}
 
 		return ans;
@@ -158,15 +163,29 @@ public:
 		ctn_train t = mergeAndFind(t1, t2, 1);  // How can date be converted to int is to be considered.
 		*/
 	}
-	query_ticket_return query_transfer(wchar_t _loc1[], wchar_t _loc2[], my_date date, char catalog[]) {
+	
+	pair<info_ticket, info_ticket> query_transfer(wchar_t _loc1[], wchar_t _loc2[], int day, char catalog[]) {
 		
+		pair<info_ticket, info_ticket> ans;
+
 		//QUESTION: HOW CAN loclist BE CREATED / STORED
-		for (size_t i = 0; i < tra->loclist.size; ++i) {
-			//TO DO: design a special query_ticket function that can select the first train to arrive
-			query_ticket(_loc1, tra->loclist[i], date, catalog);
-			query_ticket(tra->loclist[i], _loc2, date, catalog);
+		for (size_t k = 0; k < tra->loclist.size(); ++k) {
+			sjtu::vector<info_ticket> bfr = query_ticket(_loc1, tra->loclist[k], day, catalog);
+			sjtu::vector<info_ticket> aft = query_ticket(tra->loclist[k], _loc2, day, catalog);
+			
+			for (int i = 0; i < bfr.size(); ++i) {
+				for (int j = 0; i < aft.size(); ++j) {
+					if (bfr[i].time_to > aft[j].time_from) continue;
+					if (ans.first.num_price = -1 ||
+						((aft[j].time_to - bfr[i].time_from) < (ans.second.time_to - ans.first.time_from))) {
+						ans.first = bfr[i];
+						ans.first = aft[j];
+					}
+				}
+			}
 		}
-		//to be finished
+		
+		return ans;
 	}
 
 	bool buy_ticket(int id, short num, str<char, 20> train_id, wchar_t _loc1[],

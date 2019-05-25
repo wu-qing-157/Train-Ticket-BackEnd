@@ -103,7 +103,9 @@ struct info_ticket {
 	short num_price, ticket_quantity[5];
 	float price[5];
 
-	info_ticket() = default;
+	info_ticket() {
+		num_price = -1;  //for convenience of judging wrong info_ticket
+	}
 	info_ticket(const info_ticket& other) = default;
 	info_ticket(my_date _date, my_time _time_from, my_time _time_to,
 		wchar_t _loc_from[], wchar_t _loc_to[], wchar_t _ticket_kind[][20],
@@ -120,6 +122,21 @@ struct info_ticket {
 		memcpy(ticket_quantity, _ticket_quantity, sizeof(short));
 		memcpy(price, _price, 5 * sizeof(short));
 	}
+	info_ticket operator= (const info_ticket& other) {
+		date = other.date;
+		time_from = other.time_from;
+		time_to = other.time_to;
+		memcpy(loc_from, other.loc_from, 20 * sizeof(wchar_t));
+		memcpy(loc_to, other.loc_to, 20 * sizeof(wchar_t));
+		for (int i = 0; i < num_price; ++i) {
+			memcpy(ticket_kind[i], other.ticket_kind[i], 20 * sizeof(wchar_t));
+		}
+		num_price = other.num_price;
+		memcpy(ticket_quantity, other.ticket_quantity, sizeof(short));
+		memcpy(price, other.price, 5 * sizeof(short));
+		return *this;
+	}
+	
 };
 
 #endif  //INFO
