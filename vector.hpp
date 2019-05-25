@@ -19,7 +19,6 @@ public:
 		if (!f)
 		{
 			f = fopen(filename, "wb+");
-			fwrite(&cur_cnt, sizeof (size_t), 1, f);
 		}
 		else
 		{
@@ -46,7 +45,6 @@ public:
 		if (!f)
 		{
 			f = fopen(filename, "wb+");
-			fwrite(&cur_cnt, sizeof (size_t), 1, f);
 		}
 		else
 		{
@@ -55,6 +53,7 @@ public:
 	}
 	void clean()
 	{
+		fclose(f);
 		char opt[20];
 		sprintf(opt, "rm %s", filename);
 		system(opt);
@@ -77,12 +76,12 @@ public:
 	{
 		if (index < 0 || index >= cur_cnt) throw index_out_of_bound();
 		fseek(f, sizeof (size_t) + index * sizeof (T), SEEK_SET);
-		fwrite(&value, sizeof (T), 1, f);
+		fwrite(&value, sizeof (T), 1, f); fflush(f);
 	}
 	void push_back(const T &value)
 	{
 		fseek(f, sizeof (size_t) + cur_cnt * sizeof (T), SEEK_SET);
-		fwrite(&value, sizeof (T), 1, f);
+		fwrite(&value, sizeof (T), 1, f); fflush(f);
 		++cur_cnt;
 	}
 };

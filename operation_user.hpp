@@ -3,26 +3,33 @@
 
 #include <cstring>
 #include "return.hpp"
-#include "structs.hpp"
+//#include "structs.hpp"
 #include "info.hpp"
 #include "exceptions.hpp"
-#include "./vector/vector.hpp"
+#include "vector.hpp"
 
+const char filename[] = "user_data";
 class user {
 	friend class ticket;
 private:
-	sjtu::vector<info_user> data;
-	sjtu::bptree<int, info_ticket, 1000> ticket_tree;
+	ct::vector<info_user, filename> data;
 	int cur;
 
-	int counter() const { return cur; }
 
 public:
-	user() {
+	int counter() const { return cur; }
+	void init()
+	{
+		data.init();
+		cur = 2018 + data.size();
+	}
+	void clean()
+	{
+		data.clean();
 		cur = 2018;
 	}
-	
-	int regist(wchar_t name[], char passward[], char email[], char phone[]) {
+
+	int regist(char name[], char passward[], char email[], char phone[]) {
 		//printf("%s\n", passward );
 		info_user tmp(name, passward, email, phone, ++cur, 0);
 		if (cur == 2019) tmp.privilege = 1;
@@ -39,21 +46,23 @@ public:
 	info_query_profile query_profile(int id) const {
 		return info_query_profile(data[id - 2019]);
 	}
-	bool modify_profile(int id, wchar_t name[], char passward[], char email[], char phone[]) {
+	bool modify_profile(int id, char name[], char passward[], char email[], char phone[]) {
 		if (id > cur || id < 2019) return false;
 		else {
 			info_user tmp(name, passward, email, phone, id, data[id - 2019].privilege);
-			data[id - 2019] = tmp;
+			data.modify(id - 2019, tmp);
 			return true;
 		}
 	}
 	bool modify_privilege(int id1, int id2, short privilege) {
 		if (id1 > cur || id2 > cur || id1 < 2019 || id2 < 2019) return false;
 		if (privilege < 0 || privilege > 2) return false;
-		if (!data[id1 - 2019].privilege) return false;
-		if (data[id2 - 2019].privilege && !privilege) return false;
+		info_user u1 = data[id1 - 2019], u2 = data[id2 - 2019];
+		if (!u1.privilege) return false;
+		if (u2.privilege && !privilege) return false;
 		//if (data[id1 - 2019].privilege < privilege) return false;
-		data[id2 - 2019].privilege = privilege;
+		u2.privilege = privilege;
+		data.modify(id2 - 2019, u2);
 		return true;
 	}
 };

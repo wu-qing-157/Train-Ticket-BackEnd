@@ -3,7 +3,7 @@
 #include <cstring>
 #include <iostream>
 
-#ifndef USER_DEBUG
+#ifndef CT
 	#include "return.hpp"
 	#include "operation.hpp"
 	#include "info.hpp"
@@ -12,14 +12,14 @@
 	#include "operation_user.hpp"
 #endif
 
-typedef wchar_t name_t[40];
+typedef char name_t[40];
 typedef char password_t[32];
 typedef char email_t[20];
 typedef char phone_t[20];
-typedef wchar_t loc_t[20];
+typedef char loc_t[20];
 typedef char date_t[20];
 typedef char catalog_t[10];
-typedef wchar_t ticket_kind_t[20];
+typedef char ticket_kind_t[20];
 typedef char train_id_t[20];
 
 // ======= User BEGIN =======
@@ -43,6 +43,7 @@ void user_login()
 void user_query_profile()
 {
 	int id; scanf("%d", &id);
+	// printf("当前人数： %d\n", user_system.counter() );
 	if (id < 2019 || id > user_system.counter()) {puts("0"); return ;}
 	info_query_profile ans = user_system.query_profile(id);
 	printf("%s %s %s %hd\n", ans.name, ans.email, ans.phone, ans.privilege);
@@ -148,11 +149,21 @@ void train_modify_train()
 // ======= Train END =======
 
 // ======= System BEGIN =======
-void system_clean(){return ;}
+bool is_it_clean;
+void system_clean()
+{
+	user_system.clean();
+	is_it_clean = 1;
+}
 void system_exit() {return ;}
+void system_init()
+{
+	user_system.init();
+}
 // ======= System END =======
 int main()
 {
+	system_init();
 	while (1)
 	{
 		const int command_number = 17;
@@ -185,7 +196,11 @@ int main()
 		for (int i = 0; i < command_number; ++i)
 			if (!strcmp(str, command_name[i]))
 				if (i == command_number - 1) return 0;
-				else command[i]();
+				else
+				{
+					if (i < command_number - 2 && is_it_clean) system_init();
+					command[i]();
+				}
 	}
 	return 0;
 }
