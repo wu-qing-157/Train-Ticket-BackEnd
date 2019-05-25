@@ -15,7 +15,6 @@ private:
 	ct::vector<info_user, filename> data;
 	int cur;
 
-
 public:
 	int counter() const { return cur; }
 	void init()

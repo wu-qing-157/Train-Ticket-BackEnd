@@ -23,6 +23,26 @@ struct info_user {
 	}
 };
 
+struct info_query_profile {  //It's very similar with info_user, except that it does not contain passward.
+	char name[40];
+	char email[20], phone[20];
+	short privilege;
+
+	info_query_profile(info_user data) {
+		memcpy(name, data.name, 40 * sizeof(char));
+		memcpy(email, data.email, 20);
+		memcpy(phone, data.phone, 20);
+		privilege = data.privilege;
+	}
+	info_query_profile(char _name[], char _email[], char _phone[20],
+		short _privilege) {
+		memcpy(name, _name, 40 * sizeof(char));
+		memcpy(email, _email, 20);
+		memcpy(phone, _phone, 20);
+		privilege = _privilege;
+	}
+};
+
 #ifndef CT
 
 struct info_station {
@@ -97,6 +117,7 @@ struct info_train {
 };
 
 struct info_ticket {
+	char train_id[20];
 	my_date date;
 	my_time time_from, time_to;
 	char loc_from[20], loc_to[20], ticket_kind[5][20];
@@ -107,9 +128,10 @@ struct info_ticket {
 		num_price = -1;  //for convenience of judging wrong info_ticket
 	}
 	info_ticket(const info_ticket& other) = default;
-	info_ticket(my_date _date, my_time _time_from, my_time _time_to,
+	info_ticket(char _train_id[], my_date _date, my_time _time_from, my_time _time_to,
 		char _loc_from[], char _loc_to[], char _ticket_kind[][20],
 		short _num_price, short _ticket_quantity[], float _price[5]) {
+		memcpy(train_id, _train_id, 20);
 		date = _date;
 		time_from = _time_from;
 		time_to = _time_to;
@@ -123,6 +145,7 @@ struct info_ticket {
 		memcpy(price, _price, 5 * sizeof(short));
 	}
 	info_ticket operator= (const info_ticket& other) {
+		memcpy(train_id, other.train_id, 20);
 		date = other.date;
 		time_from = other.time_from;
 		time_to = other.time_to;
@@ -137,6 +160,69 @@ struct info_ticket {
 		return *this;
 	}
 	
+};
+
+struct info_ticket_user{
+	int id;
+	char train_id[20];
+	char catalog[10];
+	my_date date;
+	my_time time_from, time_to;
+	char loc_from[20], loc_to[20], ticket_kind[5][20];
+	short num_price, ticket_quantity[5];
+	float price[5];
+
+	info_ticket_user() = default;
+	info_ticket_user(const info_ticket_user& other) = default;
+	info_ticket_user(int _id, char _train_id[20], char _catalog[10], const info_ticket other) {
+		id = _id;
+		memcpy(train_id, _train_id, 20);
+		memcpy(catalog, _catalog, 10);
+		date = other.date;
+		time_from = other.time_from;
+		time_to = other.time_to;
+		memcpy(loc_from, other.loc_from, 20 * sizeof(char));
+		memcpy(loc_to, other.loc_to, 20 * sizeof(char));
+		for (int i = 0; i < num_price; ++i) {
+			memcpy(ticket_kind[i], other.ticket_kind[i], 20 * sizeof(char));
+		}
+		num_price = other.num_price;
+		memcpy(ticket_quantity, other.ticket_quantity, sizeof(short));
+		memcpy(price, other.price, 5 * sizeof(short));
+	}
+	info_ticket_user operator= (const info_ticket_user& other) {
+		id = other.id;
+		memcpy(train_id, other.train_id, 20);
+		memcpy(catalog, other.catalog, 10);
+		date = other.date;
+		time_from = other.time_from;
+		time_to = other.time_to;
+		memcpy(loc_from, other.loc_from, 20 * sizeof(char));
+		memcpy(loc_to, other.loc_to, 20 * sizeof(char));
+		for (int i = 0; i < num_price; ++i) {
+			memcpy(ticket_kind[i], other.ticket_kind[i], 20 * sizeof(char));
+		}
+		num_price = other.num_price;
+		memcpy(ticket_quantity, other.ticket_quantity, sizeof(short));
+		memcpy(price, other.price, 5 * sizeof(short));
+		return *this;
+	}
+
+	info_ticket ticket() const {
+		info_ticket ans;
+		ans.date = date;
+		ans.time_from = time_from;
+		ans.time_to = time_to;
+		memcpy(ans.loc_from, loc_from, 20 * sizeof(char));
+		memcpy(ans.loc_to, loc_to, 20 * sizeof(char));
+		for (int i = 0; i < num_price; ++i) {
+			memcpy(ans.ticket_kind[i], ticket_kind[i], 20 * sizeof(char));
+		}
+		ans.num_price = num_price;
+		memcpy(ans.ticket_quantity, ticket_quantity, sizeof(short));
+		memcpy(ans.price, price, 5 * sizeof(short));
+		return ans;
+	}
 };
 
 #endif // CT

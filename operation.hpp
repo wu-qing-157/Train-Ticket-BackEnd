@@ -6,15 +6,25 @@
 #include "return.hpp"
 #include "structs.hpp"
 #include "info.hpp"
-#include "exceptions.hpp"
 #include "container.hpp"
 #include "operation_user.hpp"
+#include "vector.hpp"
 #include "./vector/vector.hpp"
+
+typedef char name_t[40];
+typedef char password_t[32];
+typedef char email_t[20];
+typedef char phone_t[20];
+typedef char loc_t[20];
+typedef char date_t[20];
+typedef char catalog_t[10];
+typedef char ticket_kind_t[20];
+typedef char train_id_t[20];
 
 class train {
 	friend class ticket;
 private:
-	sjtu::bptree<str<char, 20>, info_train, 1000> data{ "trainA", "trainB" };  //These two 1000 are written without any thoughts.
+	sjtu::bptree<str<char, 20>, info_train> data{ "trainA", "trainB" };  
 
 public:
 	sjtu::vector<char[20]> loclist;
@@ -62,9 +72,7 @@ public:
 				tree(a + catalog, a + "123" + catalog);
 			tree.insert(tid, pr);
 		}
-
-		//遍历一遍车站
-		//加到b+树里
+		//above: traverse all the station and push them into bptree
 
 		return data.at(queryId).sell();    // huge problems may have happened when return wrong.
 	}
@@ -72,14 +80,16 @@ public:
 
 typedef sjtu::vector<info_ticket> ctn_ticket;
 
+const char fnametic[] = "ticket_bought_data";
 class ticket {
 private:
 	train* tra;
 	user* use;
+	ct::vector<info_ticket_user, fnametic> data;
 
 public:
 	ticket() = default;
-	sjtu::vector<info_ticket> query_ticket(loc_t a, loc_t b, int day, catalog_t catalog) {
+	sjtu::vector<info_ticket> query_ticket(loc_t a, loc_t b, my_date date, catalog_t catalog) {
 		
 		typedef pair<str<char, 20>, short> value_t;
 		typedef sjtu::bptree<str<char, 20>, pair<str<char, 20>, short>>::iterator bpt_itr;
@@ -101,20 +111,24 @@ public:
 				if (cA.second >= cB.second) {
 					info_train info = tra->data.at(cA.first);
 					info_ticket tic;
-					tic.date = my_date(day);
+					memcpy(tic.train_id, cA.first.data, 20);
+					tic.date = date;
 					tic.time_from = info.data[cA.second].arriv;
 					tic.time_to = info.data[cB.second].start;
+					//I'm not sure whether above two sentencces are what's suppposed to be.
 					memcpy(tic.loc_from, info.data[cA.second].name, 20 * sizeof(char));
 					memcpy(tic.loc_to, info.data[cB.second].name, 20 * sizeof(char));
-					//I'm not sure whether above two sentencces are what's suppposed to be.
 					tic.num_price = info.num_price;
 					for (int i = 0; i < info.num_price; ++i) {
 						memcpy(tic.ticket_kind[i], info.name_price[i], 20 * sizeof(char));
 						int cnt = 2000;
+						float price = 0;
 						for (int j = cA.second; j < cB.second; ++j) {
-							if (cnt > info.quan_ticket[i][j][day]) cnt = info.quan_ticket[i][j][day];
+							if (cnt > info.quan_ticket[i][j][date]) cnt = info.quan_ticket[i][j][date];
+							price += info.data[j].price[i];
 						}
 						tic.ticket_quantity[i] = cnt;
+						tic.price[i] = price;
 					}
 					bool jdg = false;
 					for (int i = 0; i < tic.num_price; ++i) {
@@ -132,49 +146,19 @@ public:
 		}
 
 		return ans;
-
-		/*size_t maxa = a.size, maxb = b.size;
-		while (cnta < maxa && cntb < maxb) {
-			if (a[cnta].train_id == b[cntb].train_id) {
-				bool jdg = true;
-				if (a[cnta].num >= b[cntb].num) jdg = false;
-				if (jdg) {
-					for (int i = a[cnta].num; i < b[cntb].num; ++i) {
-						if (tra->data.at(a[cnta].train_id).num_ticket[day][i] == 0) {
-							jdg = false;
-							break;
-						}
-					}
-				}
-				if (jdg) ans.push_back(a[cnta]);
-				cnta++;
-				cntb++;
-			}
-			if (a[cnta].train_id < b[cntb].train_id) cnta++;
-			else cntb++;
-		}*/
-		
-		
-		/*
-		str<char, 20> loc1(_loc1);
-		str<char, 20> loc2(_loc2);
-		ctn_train t1 = data.at(loc1);
-		ctn_train t2 = data.at(loc2);
-		ctn_train t = mergeAndFind(t1, t2, 1);  // How can date be converted to int is to be considered.
-		*/
 	}
 	
-	pair<info_ticket, info_ticket> query_transfer(char _loc1[], char _loc2[], int day, char catalog[]) {
+	pair<info_ticket, info_ticket> query_transfer(char _loc1[], char _loc2[], my_date date, char catalog[]) {
 		
 		pair<info_ticket, info_ticket> ans;
 
 		//QUESTION: HOW CAN loclist BE CREATED / STORED
 		for (size_t k = 0; k < tra->loclist.size(); ++k) {
-			sjtu::vector<info_ticket> bfr = query_ticket(_loc1, tra->loclist[k], day, catalog);
-			sjtu::vector<info_ticket> aft = query_ticket(tra->loclist[k], _loc2, day, catalog);
+			sjtu::vector<info_ticket> bfr = query_ticket(_loc1, tra->loclist[k], date, catalog);
+			sjtu::vector<info_ticket> aft = query_ticket(tra->loclist[k], _loc2, date, catalog);
 			
-			for (int i = 0; i < bfr.size(); ++i) {
-				for (int j = 0; i < aft.size(); ++j) {
+			for (size_t i = 0; i < bfr.size(); ++i) {
+				for (size_t j = 0; j < aft.size(); ++j) {
 					if (bfr[i].time_to > aft[j].time_from) continue;
 					if (ans.first.num_price = -1 ||
 						((aft[j].time_to - bfr[i].time_from) < (ans.second.time_to - ans.first.time_from))) {
@@ -188,39 +172,169 @@ public:
 		return ans;
 	}
 
-	bool buy_ticket(int id, short num, str<char, 20> train_id, char _loc1[],
-		char _loc2[], my_date date, char ticket_kind[]) {  //注意判定ticket_kind是否存在
-		int day;  //to do: add a convertion rule
+	bool buy_ticket(int id, short num, char train_id[20], char _loc1[],
+		char _loc2[], my_date date, char ticket_kind[]) {
+		//the time-comsuming constant of this function can be better
+
 		if (id > use->cur || id < 2019) return false;
-		if (str<char, 40>(_loc1) == str<char, 40>(_loc2)) return false;
+		if (!strcmp(_loc1, _loc2)) return false;
 		info_train info = tra->data.at(train_id);
-		int i, a, b;
-		for (i = 0; i < info.num_station; ++i) {
-			if (str<char, 40>(info.data->name) == str<char, 40>(_loc1)) {
-				a = i;
-				break;
-			}	//I'm not sure whether str(pointer) is correct
-		};
-		for (; i < info.num_station; ++i) {
-			if (str<char, 40>(info.data->name) == str<char, 40>(_loc2)) {
-				b = i;
+		//NOTE HERE: there is a convertion of char[20] to str<char, 20> above, and I'm not sure it's correct.
+		int i = 0, j = 0;
+		int a, b, k;
+
+		for (; i < info.num_price; ++i) {
+			if (!strcmp(ticket_kind, info.name_price[i])) {
+				k = i;
 				break;
 			}
-			if (info.num_ticket[day][i] < num) return false;
 		}
-		if (i == info.num_station - 1) return false;
+		if (i == info.num_price) return false;
 
-		for (i = a; i < b; ++i) {
-			tra->data.at(train_id).num_ticket[day][i] -= num;
+		for (; j < info.num_station; ++j) {
+			if (!strcmp(info.data->name, _loc1)) {
+				a = j;
+				break;
+			}
+		}
+		for (; j < info.num_station; ++j) {
+			if (!strcmp(info.data->name, _loc2)) {
+				b = j;
+				break;
+			}
+			if (info.quan_ticket[i][j][date] < num) return false;
+		}
+		if (j == info.num_station) return false;
+
+		for (j = a; j < b; ++j) {
+			tra->data.at(train_id).quan_ticket[i][j][date] -= num;
 		}
 
 		//below is how I can stroage user's ticket_ordered data.
-		vector<buy_info>
+
+		info_ticket tic;
+		memcpy(tic.train_id, train_id, 20);
+		tic.date = date;
+		tic.time_from = info.data[a].arriv;
+		tic.time_to = info.data[b].start;
+		//I'm not sure whether above two sentencces are what's suppposed to be.
+		memcpy(tic.loc_from, info.data[a].name, 20 * sizeof(char));
+		memcpy(tic.loc_to, info.data[b].name, 20 * sizeof(char));
+		tic.num_price = info.num_price;
+		tic.ticket_quantity[k] = num;
+		for (i = 0; i < info.num_price; ++i) {
+			memcpy(tic.ticket_kind[i], info.name_price[i], 20 * sizeof(char));
+			float price = 0;
+			for (j = a; j < b; ++j) {
+				price += info.data[j].price[i];
+			}
+			tic.price[i] = price;
+		}
+		info_ticket_user ans(id, train_id, info.catalog, tic);
+		data.push_back(ans);
 	}
 
 	query_order_return query_order(int id, my_date date, char catalog[]) {
+		query_order_return ans;
+		
+		if (id > use->cur || id < 2019) return ans;
+		for (int i = 0; i < data.size(); ++i) {
+			if (data[i].id == id && data[i].date == date && !strcmp(data[i].catalog, catalog)) {
+				bool jdg = true;
+				for (int j = 0; j < ans.data.size(); ++j) {
+					if (!strcmp(ans.data[j].train_id, data[i].train_id)) {
+						int k = 0;
+						for (; k < ans.data[j].num_price; ++k) {
+							if (!strcmp(ans.data[j].ticket_kind[k], data[i].ticket_kind[k])) {
+								break;
+							}
+							ans.data[j].ticket_quantity[k] += data[i].ticket_quantity[k];
+						}
+						if (k == ans.data[j].num_price) throw 1;
+					}
+				}
+				if (jdg) {
+					ans.data.push_back(data[i].ticket());
+				}
+			}
+		}
+		ans.success = true;
+		return ans;
+	}
+
+	bool refund_ticket(int id, short num, char train_id[20],char loc_from[20],
+		char loc_to[20], my_date date, char ticket_kind[20]) {
+		if (id > use->cur || id < 2019) return false;
+		short cnt = num;
+		for (int i = 0; i < data.size(); ++i){
+			if (data[i].id == id && data[i].date == date && !strcmp(data[i].train_id, train_id)) {
+				int k = 0;
+				for (; k < data[i].num_price; ++k) {
+					if (!strcmp(data[i].ticket_kind[k], data[i].ticket_kind[k])) {
+						break;
+					}
+				}
+				cnt -= data[i].ticket_quantity[k];
+				if (cnt < 0) return false;
+			}
+		}
+
+		if (!strcmp(loc_from, loc_to)) return false;
+		info_train info = tra->data.at(train_id);
+		//NOTE HERE: there is a convertion of char[20] to str<char, 20> above, and I'm not sure it's correct.
+		int i = 0, j = 0;
+		int a, b, k;
+
+		for (; i < info.num_price; ++i) {
+			if (!strcmp(ticket_kind, info.name_price[i])) {
+				k = i;
+				break;
+			}
+		}
+		if (i == info.num_price) return false;
+
+		for (; j < info.num_station; ++j) {
+			if (!strcmp(info.data->name, loc_from)) {
+				a = j;
+				break;
+			}
+		}
+		for (; j < info.num_station; ++j) {
+			if (!strcmp(info.data->name, loc_to)) {
+				b = j;
+				break;
+			}
+		}
+		if (j == info.num_station) return false;
+
+		for (j = a; j < b; ++j) {
+			tra->data.at(train_id).quan_ticket[i][j][date] += num;
+		}
+
+		cnt = num;
+		for (int i = 0; i < data.size(); ++i) {
+			if (data[i].id == id && data[i].date == date && !strcmp(data[i].train_id, train_id)) {
+				int k = 0;
+				for (; k < data[i].num_price; ++k) {
+					if (!strcmp(data[i].ticket_kind[k], data[i].ticket_kind[k])) {
+						break;
+					}
+				}
+				if (cnt >= data[i].ticket_quantity[k]) {
+					cnt -= data[i].ticket_quantity[k];
+					data[i].ticket_quantity[k] = 0;     //This should be changed.
+				}
+				else {
+					data[i].ticket.quantity[k] -= cnt;  //NOTE HERE: I don't understand why it is not wrong.
+				}
+			}
+		}
+	}
+	
+	/*
+	query_order_return query_order(int id, my_date date, char catalog[]) {
 		if (id > use->cur || id < 2019) return query_order_return(false);
-		ctn_ticket ans = use->data[id - 2019].user_ticket[date];   //date should be transferred into int
+		ctn_ticket ans = use->data[id - 2019].user_ticket[date];
 		info_ticket* ticket_return = new info_ticket [ans.size()];
 		return query_order_return(true, ans.size(), ticket_return);
 	}
@@ -248,7 +362,7 @@ public:
 			}
 		}
 		
-	}
+	}*/
 
 };
 

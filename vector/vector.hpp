@@ -5,7 +5,6 @@
 
 #include <climits>
 #include <cstddef>
-#include <vector>
 
 namespace sjtu {
 /**
@@ -286,12 +285,6 @@ public:
 		for (int i = 0; i < curLen; ++i){
 			data[i] = o.data[i];
 		}
-	}
-	vector(const std::vector<T> &o){
-		maxSize = o.capacity();
-		curLen = o.size();
-		data = (T*) malloc(sizeof(T) * maxSize);
-		for (size_t i = 0; i < curLen; ++i) data[i] = o[i];
 	}
 	/**
 	 * TODO Destructor

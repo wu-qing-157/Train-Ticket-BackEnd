@@ -84,11 +84,11 @@ struct my_time {
 		if (*this < other) throw 1;
 		if (this->minute() >= other.minute()) {
 			ans.modify_minute(this->minute() - other.minute());
-			ans.modify_hour(this->hour - other.hour());
+			ans.modify_hour(this->hour() - other.hour());
 		}
 		else {
 			ans.modify_minute(this->minute() + 60 - other.minute());
-			ans.modify_hour(this->hour - 1 - other.hour());
+			ans.modify_hour(this->hour() - 1 - other.hour());
 		}
 		return ans;
 	}
@@ -100,15 +100,14 @@ struct my_time {
 };
 
 struct my_date {
-	short year;
-	short month;
 	short day;
 
 	my_date() = default;
-	my_date(char s[]) {
-		year = (((s[0] - '0') * 10 + s[1] - '0') * 10 + s[3] - '0') * 10 + s[4] - '0';
-		month = (s[5] - '0') * 10 + s[6] - '0';
+	my_date(char s[]) {  //this function read in string like "2019-06-21"
 		day = (s[8] - '0') * 10 + s[9] - '0';
+	}
+	operator short() const {
+		return day - 1;
 	}
 };
 
