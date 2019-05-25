@@ -17,7 +17,7 @@ private:
 	sjtu::bptree<str<char, 20>, info_train, 1000> data{ "trainA", "trainB" };  //These two 1000 are written without any thoughts.
 
 public:
-	sjtu::vector<wchar_t[20]> loclist;
+	sjtu::vector<char[20]> loclist;
 
 	train() {}
 	bool add(const info_train& t) {   //Maybe there needs to be some changes here.
@@ -56,7 +56,7 @@ public:
 			str<char, 20> tid(x.train_id);
 			pair<str<char, 20>, short> pr;
 			pr = std::make_pair(tid, i);
-			memcpy(a, x.data[i].name, 20 * sizeof(wchar_t));
+			memcpy(a, x.data[i].name, 20 * sizeof(char));
 			memcpy(catalog, x.catalog, 10 * sizeof(char));
 			sjtu::bptree<str<char, 20>, pair<str<char, 20>, short>>
 				tree(a + catalog, a + "123" + catalog);
@@ -104,12 +104,12 @@ public:
 					tic.date = my_date(day);
 					tic.time_from = info.data[cA.second].arriv;
 					tic.time_to = info.data[cB.second].start;
-					memcpy(tic.loc_from, info.data[cA.second].name, 20 * sizeof(wchar_t));
-					memcpy(tic.loc_to, info.data[cB.second].name, 20 * sizeof(wchar_t));
+					memcpy(tic.loc_from, info.data[cA.second].name, 20 * sizeof(char));
+					memcpy(tic.loc_to, info.data[cB.second].name, 20 * sizeof(char));
 					//I'm not sure whether above two sentencces are what's suppposed to be.
 					tic.num_price = info.num_price;
 					for (int i = 0; i < info.num_price; ++i) {
-						memcpy(tic.ticket_kind[i], info.name_price[i], 20 * sizeof(wchar_t));
+						memcpy(tic.ticket_kind[i], info.name_price[i], 20 * sizeof(char));
 						int cnt = 2000;
 						for (int j = cA.second; j < cB.second; ++j) {
 							if (cnt > info.quan_ticket[i][j][day]) cnt = info.quan_ticket[i][j][day];
@@ -156,15 +156,15 @@ public:
 		
 		
 		/*
-		str<wchar_t, 20> loc1(_loc1);
-		str<wchar_t, 20> loc2(_loc2);
+		str<char, 20> loc1(_loc1);
+		str<char, 20> loc2(_loc2);
 		ctn_train t1 = data.at(loc1);
 		ctn_train t2 = data.at(loc2);
 		ctn_train t = mergeAndFind(t1, t2, 1);  // How can date be converted to int is to be considered.
 		*/
 	}
 	
-	pair<info_ticket, info_ticket> query_transfer(wchar_t _loc1[], wchar_t _loc2[], int day, char catalog[]) {
+	pair<info_ticket, info_ticket> query_transfer(char _loc1[], char _loc2[], int day, char catalog[]) {
 		
 		pair<info_ticket, info_ticket> ans;
 
@@ -188,21 +188,21 @@ public:
 		return ans;
 	}
 
-	bool buy_ticket(int id, short num, str<char, 20> train_id, wchar_t _loc1[],
-		wchar_t _loc2[], my_date date, char ticket_kind[]) {  //注意判定ticket_kind是否存在
+	bool buy_ticket(int id, short num, str<char, 20> train_id, char _loc1[],
+		char _loc2[], my_date date, char ticket_kind[]) {  //注意判定ticket_kind是否存在
 		int day;  //to do: add a convertion rule
 		if (id > use->cur || id < 2019) return false;
-		if (str<wchar_t, 40>(_loc1) == str<wchar_t, 40>(_loc2)) return false;
+		if (str<char, 40>(_loc1) == str<char, 40>(_loc2)) return false;
 		info_train info = tra->data.at(train_id);
 		int i, a, b;
 		for (i = 0; i < info.num_station; ++i) {
-			if (str<wchar_t, 40>(info.data->name) == str<wchar_t, 40>(_loc1)) {
+			if (str<char, 40>(info.data->name) == str<char, 40>(_loc1)) {
 				a = i;
 				break;
 			}	//I'm not sure whether str(pointer) is correct
 		};
 		for (; i < info.num_station; ++i) {
-			if (str<wchar_t, 40>(info.data->name) == str<wchar_t, 40>(_loc2)) {
+			if (str<char, 40>(info.data->name) == str<char, 40>(_loc2)) {
 				b = i;
 				break;
 			}
@@ -230,7 +230,7 @@ public:
 		for (int i = use->data[id - 2019].user_ticket[date].size() - 1; i > 0; --i) {
 			if (use->data[id - 2019].user_ticket[date][i].loc_from == loc_from &&
 				use->data[id - 2019].user_ticket[date][i].loc_to == loc_to) {
-				//I want to change ALL the char[] and wchar_t into str<> (There's a huge bug above)
+				//I want to change ALL the char[] and char[] into str<> (There's a huge bug above)
 				cnt++;
 				if (cnt >= num) break;
 				//Is the counting process is too time-consuming?

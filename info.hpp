@@ -126,10 +126,10 @@ struct info_ticket {
 		date = other.date;
 		time_from = other.time_from;
 		time_to = other.time_to;
-		memcpy(loc_from, other.loc_from, 20 * sizeof(wchar_t));
-		memcpy(loc_to, other.loc_to, 20 * sizeof(wchar_t));
+		memcpy(loc_from, other.loc_from, 20 * sizeof(char));
+		memcpy(loc_to, other.loc_to, 20 * sizeof(char));
 		for (int i = 0; i < num_price; ++i) {
-			memcpy(ticket_kind[i], other.ticket_kind[i], 20 * sizeof(wchar_t));
+			memcpy(ticket_kind[i], other.ticket_kind[i], 20 * sizeof(char));
 		}
 		num_price = other.num_price;
 		memcpy(ticket_quantity, other.ticket_quantity, sizeof(short));
