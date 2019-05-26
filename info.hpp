@@ -49,6 +49,14 @@ struct info_station {
 	char name[20];
 	my_time arriv, start, stopover;
 	float price[5];
+
+	void checkday() {
+		if (arriv > start) start.modify_hour(start.hour() + 24);
+	}
+	void dayplus() {
+		arriv.modify_hour(arriv.hour() + 24);
+		start.modify_hour(start.hour() + 24);
+	}
 };
 
 struct info_train {
@@ -87,12 +95,12 @@ struct info_train {
 		num_price = _num_price;
 		num_station = _num_station;
 		memcpy(name, _name, 20 * sizeof (char));
-		//memcpy(name_price, _name_price, num_price * 4); It seems that this sentence should be deleted, but I'm not sure.
 		for (int i = 0; i < num_price; ++i) {
 			memcpy(name_price[i], _name_price[i], 20 * sizeof (char));
 		}
 		memcpy(catalog, _catalog, 10);
 		memcpy(data, _data, num_station * sizeof (info_station));
+		settime();   //NOTE HERE: I have changed trains that cross the days with new time(eg. 25:12).
 		for (int i = 0; i < 5; ++i) {
 			for (int j = 0; j < 60; ++j) {
 				memcpy(quan_ticket[i][j], _quan_ticket[i][j], 30 * sizeof(short));
@@ -112,13 +120,19 @@ struct info_train {
 		}
 		return true;
 	}
-
-	//info_train(const info_train& other) = delete;
+	void settime() {
+		data[0].checkday();
+		for (int i = 1; i < num_station; ++i) {
+			data[i].checkday();
+			if (data[i].arriv < data[i - 1].start) data[i].dayplus();
+		}
+	}
 };
 
 struct info_ticket {
 	char train_id[20];
 	my_date date;
+	my_date date_from, date_to;
 	my_time time_from, time_to;
 	char loc_from[20], loc_to[20], ticket_kind[5][20];
 	short num_price, ticket_quantity[5];
@@ -128,11 +142,14 @@ struct info_ticket {
 		num_price = -1;  //for convenience of judging wrong info_ticket
 	}
 	info_ticket(const info_ticket& other) = default;
-	info_ticket(char _train_id[], my_date _date, my_time _time_from, my_time _time_to,
+	info_ticket(char _train_id[], my_date _date, my_date _date_from, 
+		my_date _date_to, my_time _time_from, my_time _time_to,
 		char _loc_from[], char _loc_to[], char _ticket_kind[][20],
 		short _num_price, short _ticket_quantity[], float _price[5]) {
 		memcpy(train_id, _train_id, 20);
 		date = _date;
+		date_from = _date_from;
+		date_to = _date_to;
 		time_from = _time_from;
 		time_to = _time_to;
 		memcpy(loc_from, _loc_from, 20 * sizeof(char));
@@ -147,6 +164,8 @@ struct info_ticket {
 	info_ticket operator= (const info_ticket& other) {
 		memcpy(train_id, other.train_id, 20);
 		date = other.date;
+		date_from = other.date_from;
+		date_to = other.date_to;
 		time_from = other.time_from;
 		time_to = other.time_to;
 		memcpy(loc_from, other.loc_from, 20 * sizeof(char));
@@ -159,7 +178,12 @@ struct info_ticket {
 		memcpy(price, other.price, 5 * sizeof(short));
 		return *this;
 	}
-	
+	void setnormal() {
+		date_from = date.plus(time_from.day_added());
+		date_to = date.plus(time_to.day_added());
+		time_from.normalize();
+		time_to.normalize();
+	}
 };
 
 struct info_ticket_user{
@@ -167,6 +191,7 @@ struct info_ticket_user{
 	char train_id[20];
 	char catalog[10];
 	my_date date;
+	my_date date_from, date_to;
 	my_time time_from, time_to;
 	char loc_from[20], loc_to[20], ticket_kind[5][20];
 	short num_price, ticket_quantity[5];
@@ -178,6 +203,8 @@ struct info_ticket_user{
 		memcpy(train_id, other.train_id, 20);
 		memcpy(catalog, other.catalog, 10);
 		date = other.date;
+		date_from = other.date_from;
+		date_to = other.date_to;
 		time_from = other.time_from;
 		time_to = other.time_to;
 		memcpy(loc_from, other.loc_from, 20 * sizeof(char));
@@ -194,6 +221,8 @@ struct info_ticket_user{
 		memcpy(train_id, _train_id, 20);
 		memcpy(catalog, _catalog, 10);
 		date = other.date;
+		date_from = other.date_from;
+		date_to = other.date_to;
 		time_from = other.time_from;
 		time_to = other.time_to;
 		memcpy(loc_from, other.loc_from, 20 * sizeof(char));

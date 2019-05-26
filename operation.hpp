@@ -137,6 +137,7 @@ public:
 						if (tic.ticket_quantity[i] != 0) jdg = true;
 						break;
 					}
+					tic.setnormal();
 					if (jdg) ans.push_back(tic);
 				}
 				iA++; iB++;
@@ -232,6 +233,7 @@ public:
 			}
 			tic.price[i] = price;
 		}
+		tic.setnormal();
 		info_ticket_user ans(id, train_id, info.catalog, tic);
 		data.push_back(ans);
 	}
@@ -377,7 +379,7 @@ public:
 				memcpy(loc, tra->loclist[i], 20);
 				memcpy(cat, tra->catlist[i], 10);
 				typedef pair<str<char, 20>, short> value_t;
-				sjtu::bptree<str<char, 20>, value_t> tree(loc + cat, a + "123" + cat);
+				sjtu::bptree<str<char, 20>, value_t> tree(loc + cat, loc + "123" + cat);
 				tree.clear();
 			}
 		}

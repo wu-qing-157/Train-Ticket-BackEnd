@@ -71,15 +71,18 @@ struct my_time {
 		data = hour() * 100 + new_minute;
 	}
 	bool operator< (const my_time& other) const{
+		if (data == -1 || other.data == -1) return false;
 		return data < other.data;
 	}
 	bool operator== (const my_time& other) const {
 		return data == other.data;
 	}
 	bool operator> (const my_time& other) const {
+		if (data == -1 || other.data == -1) return false;
 		return data > other.data;
 	}
 	my_time operator- (const my_time& other) const {
+		if (data == -1 || other.data == -1) throw 2;
 		my_time ans;
 		if (*this < other) throw 1;
 		if (this->minute() >= other.minute()) {
@@ -96,18 +99,28 @@ struct my_time {
 		data = other.data;
 		return *this;
 	}
-
+	short day_added() const {
+		return (hour() / 24);
+	}
+	void normalize() {
+		modify_hour(hour() % 24);
+	}
 };
 
 struct my_date {
 	short day;
 
 	my_date() = default;
+	my_date(const my_date& other) = default;
 	my_date(char s[]) {  //this function read in string like "2019-06-21"
 		day = (s[8] - '0') * 10 + s[9] - '0';
 	}
 	operator short() const {
 		return day - 1;
+	}
+	my_date plus(short i) {
+		day += i;
+		return *this;
 	}
 };
 
