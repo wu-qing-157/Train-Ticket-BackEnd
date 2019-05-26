@@ -19,21 +19,21 @@ struct str {
 	void cpy(T _data[]) {
 		memcpy(data, _data, N * sizeof(T));
 	}
-	bool operator<(const str& other) {
+	bool operator<(const str& other) const {
 		for (int i = 0; i < N; ++i) {
 			if (data[i] < other.data[i]) return true;
 			if (data[i] > other.data[i]) return false;
 		}
 		return false;
 	}
-	bool operator>(const str& other) {
+	bool operator>(const str& other) const {
 		for (int i = 0; i < N; ++i) {
 			if (data[i] > other.data[i]) return true;
 			if (data[i] < other.data[i]) return false;
 		}
 		return false;
 	}
-	bool operator==(const str& other) {
+	bool operator==(const str& other) const {
 		for (int i = 0; i < N; ++i) {
 			if (data[i] != other.data[i]) return false;
 		}

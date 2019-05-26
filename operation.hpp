@@ -27,8 +27,8 @@ private:
 	sjtu::bptree<str<char, 20>, info_train> data{ "trainData", "trainIndex" };  
 
 public:
-	sjtu::bptree<str<char, 20>, char[20]> llist{"llistData", "llistIndex"};
-	sjtu::bptree<str<char, 31>, char[31]> lclist{"lclistData", "lclistIndex"};
+	sjtu::bptree<str<char, 20>, str<char, 20>> llist{"llistData", "llistIndex"};
+	sjtu::bptree<str<char, 31>, str<char, 31>> lclist{"lclistData", "lclistIndex"};
 
 	train() {}
 	bool add(info_train& t) {   //Maybe there needs to be some changes here.
@@ -186,10 +186,10 @@ public:
 		
 		pair<info_ticket, info_ticket> ans;
 
-		sjtu::bptree<str<char, 20>, char[20]>::iterator it = tra->llist.begin();
+		sjtu::bptree<str<char, 20>, str<char, 20>>::iterator it = tra->llist.begin();
 		for (; it != tra->llist.end(); ++it) {
 			char ct[20];
-			memcpy(ct, *it, 20);
+			memcpy(ct, (*it).data, 20);
 			sjtu::vector<info_ticket> bfr = query_ticket(_loc1, ct, date, catalog);
 			sjtu::vector<info_ticket> aft = query_ticket(ct, _loc2, date, catalog);
 			
@@ -406,10 +406,10 @@ public:
 	}*/
 	void clean() {
 		data.clean();
-		sjtu::bptree<str<char, 31>, char[31]>::iterator it = tra->lclist.begin();
+		sjtu::bptree<str<char, 31>, str<char, 31>>::iterator it = tra->lclist.begin();
 		for (; it != tra->lclist.end(); ++it) {
 			char ct[31];
-			memcpy(ct, *it, 31);
+			memcpy(ct, (*it).data, 31);
 			char s1[36], s2[37];
 			sprintf(s1, "data_%s", ct);
 			sprintf(s2, "index_%s", ct);

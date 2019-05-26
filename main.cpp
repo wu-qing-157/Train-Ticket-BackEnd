@@ -156,7 +156,7 @@ void train_query_train()
 		{
 			cout << ans.data[i].name << ' ' << ans.data[i].arriv << ' ' << ans.data[i].start << ' ' << ans.data[i].stopover;
 			for (int j = 0; j < ans.num_price; ++j)
-				cout << " ￥" << ans.data[i].price[j];
+				cout << " $" << ans.data[i].price[j];
 			cout << '\n';
 		}
 	} catch(...) {cout << "0\n";}

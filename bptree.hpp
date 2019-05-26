@@ -29,7 +29,7 @@ namespace sjtu {
         off_t head, rear, root;
         char *filename, *index_file;
         Compare comp = Compare();
-        bool compare(const Key &a, const Key &b){
+        bool compare(const Key &a, const Key &b) const{
             return !(comp(a,b)||comp(b,a));
         }
 
@@ -87,13 +87,13 @@ namespace sjtu {
             save_info();
         }
 
-        inline void buffer_load_node(_buffer b, const node &x){
+        inline void buffer_load_node(_buffer b, const node &x) const{
             fseek(file, x.pos+sizeof(node), SEEK_SET);
             if(x.curSize == 0) return;
             fread(b, 1, x.curSize*(sizeof(off_t)+sizeof(Key)), file);
         }
 
-        inline void buffer_load_leaf(_buffer b, const node &x){
+        inline void buffer_load_leaf(_buffer b, const node &x) const{
             fseek(file, x.pos+sizeof(node), SEEK_SET);
             if(x.curSize == 0) return;
             fread(b, 1, x.curSize*(sizeof(value_t)+sizeof(Key)), file);
@@ -113,30 +113,30 @@ namespace sjtu {
 
         //================get info from node==================
 
-        Key *get_key_node(size_t num, _buffer b){
+        Key *get_key_node(size_t num, _buffer b) const {
             return (Key *)(b+num*(sizeof(Key)+sizeof(off_t)));
         }
 
-        off_t *get_son_node(size_t num, _buffer b){
+        off_t *get_son_node(size_t num, _buffer b) const{
             return (off_t *)(b+num*(sizeof(Key)+sizeof(off_t))+sizeof(Key));
         }
 
-        Key *get_key_leaf(size_t num, _buffer b){
+        Key *get_key_leaf(size_t num, _buffer b) const {
             return (Key *)(b+num*(sizeof(Key)+sizeof(value_t)));
         }
 
-        value_t *get_value_leaf(size_t num, _buffer b){
+        value_t *get_value_leaf(size_t num, _buffer b) const{
             return (value_t *)(b+num*(sizeof(Key)+sizeof(value_t))+sizeof(Key));
         }
 
-        node get_node(off_t t){
+        node get_node(off_t t) const{
             node x(invalid_off, false);
             fseek(file, t, SEEK_SET);
             fread(&x, sizeof(node), 1, file);
             return x;
         }
 
-        size_t leaf_find_pos(_buffer b, Key key, size_t n){
+        size_t leaf_find_pos(_buffer b, Key key, size_t n) const{
             size_t l=0, r=n, mid;
             while(l<r){
                 mid = (l+r)/2;
@@ -146,7 +146,7 @@ namespace sjtu {
             return l;
         }
 
-        size_t node_find_pos(_buffer b, Key key, size_t n){
+        size_t node_find_pos(_buffer b, Key key, size_t n) const{
             size_t l=0, r=n, mid;
             while(l<r){
                 mid = (l+r)/2;
@@ -916,15 +916,15 @@ namespace sjtu {
             return iterator(node(invalid_off, invalid_off, invalid_off, true), 0, this);
         }
 
-        const_iterator cbegin(){
+        const_iterator cbegin() const {
             return const_iterator(get_node(head), 0, this);
         }
 
-        const_iterator cend(){
+        const_iterator cend() const {
             return const_iterator(node(invalid_off, invalid_off, invalid_off, true), 0, this);
         }
 
-        inline bool empty() {
+        inline bool empty() const {
             return root == invalid_off;
         }
 
@@ -1024,6 +1024,31 @@ namespace sjtu {
             node x = get_node(root);
             return at(key, x);
         }
+
+		const value_t at(const Key& key, node& x) const {
+			if (comp(key, x.mainKey)) {
+				value_t value = value_t();
+				return value;
+			}
+			if (x.isLeaf) {
+				buffer b;
+				buffer_load_leaf(b, x);
+				size_t tmp = leaf_find_pos(b, key, x.curSize);
+				if (tmp < x.curSize && compare(key, *get_key_leaf(tmp, b)))
+					return *get_value_leaf(tmp, b);
+				else {
+					value_t value = value_t();
+					return value;
+				}
+			}
+			buffer b;
+			buffer_load_node(b, x);
+			size_t tmp = node_find_pos(b, key, x.curSize);
+			if (tmp > 0 && !compare(key, *get_key_node(tmp, b))) tmp--;
+			if (tmp == x.curSize) tmp--;
+			node y = get_node(*get_son_node(tmp, b));
+			return at(key, y);
+		}
 		
 		const value_t at(const Key& key) const{
 			if (empty()) throw "at";
