@@ -4,6 +4,10 @@
 #include <iostream>
 #include <iomanip>
 
+using std::ostream;
+using std::setfill;
+using std::setw;
+
 template<class T, int N>
 struct str {
 	T data[N];
@@ -110,7 +114,7 @@ struct my_time {
 };
 ostream& operator << (ostream &os, const my_time &obj)
 {
-	if (obj.data == -1) os << "xx:xx"
+	if (obj.data == -1) os << "xx:xx";
 	else os << setw(2) << setfill('0') << obj.hour() << ':' << setw(2) << setfill('0') << obj.minute();
 	return os;
 }
@@ -134,7 +138,7 @@ struct my_date {
 };
 ostream& operator << (ostream &os, const my_date &obj)
 {
-	os << "2019-06-" << setw(2) << setfill('0') << obj.day();
+	os << "2019-06-" << setw(2) << setfill('0') << obj.day;
 	return os;
 }
 

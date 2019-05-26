@@ -17,7 +17,7 @@ using std::cin;
 using std::cout;
 
 typedef char name_t[40];
-typedef char password_t[32];
+typedef char password_t[20];
 typedef char email_t[20];
 typedef char phone_t[20];
 typedef char loc_t[20];
@@ -68,7 +68,7 @@ void user_modify_privilege()
 
 // ======= Ticket BEGIN =======
 train train_system;
-ticket ticket_system{train_system, user_system};
+ticket ticket_system{&train_system, &user_system};
 void ticket_query_ticket()
 {
 	loc_t loc1, loc2; date_t _date; catalog_t _catalog;
@@ -113,7 +113,7 @@ void ticket_query_order()
 void ticket_refund_ticket()
 {
 	int uid, num; train_id_t tid; loc_t loc1, loc2; date_t _date; ticket_kind_t _kind;
-	cin << uid << num << tid << loc1 << loc2 << _date << _kind;
+	cin >> uid >> num >> tid >> loc1 >> loc2 >> _date >> _kind;
 	cout << ticket_system.refund_ticket(uid, num, tid, loc1, loc2, my_date(_date), _kind);
 	// ...
 }
@@ -140,14 +140,14 @@ void train_add_train()
 }
 void train_sale_train()
 {
-	train_id_t tid; cin << tid;
+	train_id_t tid; cin >> tid;
 	cout << train_system.sale_train(tid) << '\n';
 }
 void train_query_train()
 {
 	try
 	{
-		train_id_t tid[20]; cin << tid;
+		train_id_t tid; cin >> tid;
 		info_train ans = train_system.query_train(tid);
 		cout << tid << ' ' << ans.name << ' ' << ans.catalog << ' ' << ans.num_station << ' ' << ans.num_price;
 		for (int i = 0; i < ans.num_price; ++i) cout << ' ' << ans.name_price[i];
@@ -231,11 +231,7 @@ int main()
 		for (int i = 0; i < command_number; ++i)
 			if (!strcmp(str, command_name[i]))
 				if (i == command_number - 1) return 0;
-				else
-				{
-					if (i < command_number - 2 && is_it_clean) system_init();
-					command[i]();
-				}
+				else command[i]();
 	}
 	return 0;
 }

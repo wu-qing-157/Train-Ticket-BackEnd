@@ -52,7 +52,10 @@ struct info_station {
 
 	info_station() = default;
 	info_station(char _name[20], my_time _arriv, my_time _start, my_time _stopover, float _price[5]) :
-		name(_name), arriv(_arriv), start(_start), stopover(_stopover), price(_price) {}
+		arriv(_arriv), start(_start), stopover(_stopover){
+		memcpy(name, _name, 20);
+		memcpy(price, _price, 5 * sizeof(float));
+	}
 
 	void checkday() {
 		if (arriv > start) start.modify_hour(start.hour() + 24);

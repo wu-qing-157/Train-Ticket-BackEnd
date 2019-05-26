@@ -12,7 +12,7 @@
 #include "./vector/vector.hpp"
 
 typedef char name_t[40];
-typedef char password_t[32];
+typedef char password_t[20];
 typedef char email_t[20];
 typedef char phone_t[20];
 typedef char loc_t[20];
@@ -24,15 +24,14 @@ typedef char train_id_t[20];
 class train {
 	friend class ticket;
 private:
-	sjtu::bptree<str<char, 20>, info_train> data{ "trainA", "trainB" };  
+	sjtu::bptree<str<char, 20>, info_train> data{ "trainData", "trainIndex" };  
 
 public:
-	ct::vector<char[20]> loclist;
-	ct::vector<char[10]> loc+cat;
-	// these two lists above have not been initialized
+	sjtu::bptree<str<char, 20>, char[20]> llist{"llistData", "llistIndex"};
+	sjtu::bptree<str<char, 31>, char[31]> lclist{"lclistData", "lclistIndex"};
 
 	train() {}
-	bool add(const info_train& t) {   //Maybe there needs to be some changes here.
+	bool add(info_train& t) {   //Maybe there needs to be some changes here.
 		data.insert(t.train_id, t);
 		return true;	//I need jyq to change bptree.hpp to enable return false(try{} is too slow)
 	}
@@ -62,6 +61,13 @@ public:
 		info_train x = data.at(queryId);
 		if (x.num_station == -1) return false;
 
+		for (int i = 0; i < x.num_station; ++i) {
+			llist.insert(x.data[i].name, x.data[i].name);
+			char s[31];
+			sprintf(s, "%s_%s", x.data[i].name, x.catalog);
+			lclist.insert(s, s);
+		}
+
 		for (short i = 0; i < x.num_station; ++i) {
 			loc_t a;
 			catalog_t catalog;
@@ -70,13 +76,22 @@ public:
 			pr = std::make_pair(tid, i);
 			memcpy(a, x.data[i].name, 20 * sizeof(char));
 			memcpy(catalog, x.catalog, 10 * sizeof(char));
+			char filename[36], ffname[37];
+			sprintf(filename, "data_%s_%s", a, catalog);
+			sprintf(ffname, "index_%s_%s", a, catalog);
+
 			sjtu::bptree<str<char, 20>, pair<str<char, 20>, short>>
-				tree(a + catalog, a + "123" + catalog);
+				tree(filename, ffname);
 			tree.insert(tid, pr);
 		}
 		//above: traverse all the station and push them into bptree
 
 		return data.at(queryId).sell();    // huge problems may have happened when return wrong.
+	}
+	void clean() {
+		data.clear();
+		llist.clear();
+		lclist.clear();
 	}
 };
 
@@ -93,23 +108,28 @@ public:
 	ticket() = default;
 	ticket(train *_tr, user *_us) : tra(_tr), use(_us) {}
 
-// jia yi ge gou zao han shu
-
-
 	sjtu::vector<info_ticket> query_ticket(loc_t a, loc_t b, my_date date, catalog_t catalog) {
 		
 		typedef pair<str<char, 20>, short> value_t;
 		typedef sjtu::bptree<str<char, 20>, pair<str<char, 20>, short>>::iterator bpt_itr;
 
 		sjtu::vector<info_ticket> ans;
-//
-		FILE *f = fopen(a + catalog, "rw+");
-		if (!f) return ans;
-		char filename[20];
-		sprintf(filename, "%s%s", a, catalog);
-		sjtu::bptree<str<char, 20>, value_t> treeA(a + catalog, a + "123" + catalog);
-		sjtu::bptree<str<char, 20>, value_t> treeB(b + catalog, b + "123" + catalog);
-// wei dai ma
+
+		char filename1[36], filename2[36];
+		sprintf(filename1, "data_%s_%s", a, catalog);
+		sprintf(filename2, "data_%s_%s", b, catalog);
+		FILE *f = fopen(filename1, "rw+");
+		if (!f) return ans;  //NOTE HERE: this ans cannot be used directedly
+		f = fopen(filename2, "rw+");
+		if (!f) return ans;  //NOTE HERE: this ans cannot be used directedly
+
+		char ffname1[37], ffname2[37];
+		sprintf(ffname1, "index_%s_%s", a, catalog);
+		sprintf(ffname2, "index_%s_%s", b, catalog);
+
+		sjtu::bptree<str<char, 20>, value_t> treeA(filename1, ffname1);
+		sjtu::bptree<str<char, 20>, value_t> treeB(filename2, ffname2);
+
 
 		typedef pair<str<char, 20>, short> value_t;
 		typedef sjtu::bptree<str<char, 20>, pair<str<char, 20>, short>>::iterator bpt_itr;
@@ -166,10 +186,12 @@ public:
 		
 		pair<info_ticket, info_ticket> ans;
 
-		//QUESTION: HOW CAN loclist BE CREATED / STORED
-		for (size_t k = 0; k < tra->loclist.size(); ++k) {
-			sjtu::vector<info_ticket> bfr = query_ticket(_loc1, tra->loclist[k], date, catalog);
-			sjtu::vector<info_ticket> aft = query_ticket(tra->loclist[k], _loc2, date, catalog);
+		sjtu::bptree<str<char, 20>, char[20]>::iterator it = tra->llist.begin();
+		for (; it != tra->llist.end(); ++it) {
+			char ct[20];
+			memcpy(ct, *it, 20);
+			sjtu::vector<info_ticket> bfr = query_ticket(_loc1, ct, date, catalog);
+			sjtu::vector<info_ticket> aft = query_ticket(ct, _loc2, date, catalog);
 			
 			for (size_t i = 0; i < bfr.size(); ++i) {
 				for (size_t j = 0; j < aft.size(); ++j) {
@@ -384,17 +406,17 @@ public:
 	}*/
 	void clean() {
 		data.clean();
-		for (int i = 0; i < tra->loclist.size(); ++i) {
-			for (int j = 0; j < tra->catlist.size(); ++j) {
-				char loc[20], cat[10];
-				memcpy(loc, tra->loclist[i], 20);
-				memcpy(cat, tra->catlist[i], 10);
-				typedef pair<str<char, 20>, short> value_t;
-				sjtu::bptree<str<char, 20>, value_t> tree(loc + cat, loc + "123" + cat);
-				tree.clear();
-			}
+		sjtu::bptree<str<char, 31>, char[31]>::iterator it = tra->lclist.begin();
+		for (; it != tra->lclist.end(); ++it) {
+			char ct[31];
+			memcpy(ct, *it, 31);
+			char s1[36], s2[37];
+			sprintf(s1, "data_%s", ct);
+			sprintf(s2, "index_%s", ct);
+			typedef pair<str<char, 20>, short> value_t;
+			sjtu::bptree<str<char, 20>, value_t> tree(s1, s2);
+			tree.clear();
 		}
-		use->data.clean();
 	}
 };
 
