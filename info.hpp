@@ -173,7 +173,22 @@ struct info_ticket_user{
 	float price[5];
 
 	info_ticket_user() = default;
-	info_ticket_user(const info_ticket_user& other) = default;
+	info_ticket_user(const info_ticket_user& other) {
+		id = other.id;
+		memcpy(train_id, other.train_id, 20);
+		memcpy(catalog, other.catalog, 10);
+		date = other.date;
+		time_from = other.time_from;
+		time_to = other.time_to;
+		memcpy(loc_from, other.loc_from, 20 * sizeof(char));
+		memcpy(loc_to, other.loc_to, 20 * sizeof(char));
+		for (int i = 0; i < num_price; ++i) {
+			memcpy(ticket_kind[i], other.ticket_kind[i], 20 * sizeof(char));
+		}
+		num_price = other.num_price;
+		memcpy(ticket_quantity, other.ticket_quantity, sizeof(short));
+		memcpy(price, other.price, 5 * sizeof(short));
+	}
 	info_ticket_user(int _id, char _train_id[20], char _catalog[10], const info_ticket other) {
 		id = _id;
 		memcpy(train_id, _train_id, 20);

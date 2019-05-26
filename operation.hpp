@@ -8,7 +8,7 @@
 #include "info.hpp"
 #include "container.hpp"
 #include "operation_user.hpp"
-#include "vector.hpp"
+#include "ct_vector.hpp"
 #include "./vector/vector.hpp"
 
 typedef char name_t[40];
@@ -28,6 +28,8 @@ private:
 
 public:
 	sjtu::vector<char[20]> loclist;
+	sjtu::vector<char[10]> catlist;
+	// these two lists above have not been initialized
 
 	train() {}
 	bool add(const info_train& t) {   //Maybe there needs to be some changes here.
@@ -37,7 +39,7 @@ public:
 	info_train query_train(char train_id[]) const {
 		str<char, 20> queryId(train_id);
 		info_train x = data.at(queryId);
-		if (x.num_station == -1) throw 1;    //如果查不到信息，num_station我会设为-1
+		if (x.num_station == -1) throw 1;    //if no information queried，num_station will be set as -1
 		return data.at(queryId);
 	}
 	bool delete_train(char train_id[]) {
@@ -322,10 +324,14 @@ public:
 				}
 				if (cnt >= data[i].ticket_quantity[k]) {
 					cnt -= data[i].ticket_quantity[k];
-					data[i].ticket_quantity[k] = 0;     //This should be changed.
+					info_ticket_user tmp = data[i];
+					tmp.ticket_quantity[k] = 0;
+					data.modify(i, tmp);
 				}
 				else {
-					data[i].ticket.quantity[k] -= cnt;  //NOTE HERE: I don't understand why it is not wrong.
+					info_ticket_user tmp = data[i];
+					tmp.ticket_quantity[k] -= cnt;
+					data.modify(i, tmp);
 				}
 			}
 		}
@@ -363,7 +369,20 @@ public:
 		}
 		
 	}*/
-
+	void clean() {
+		data.clean();
+		for (int i = 0; i < tra->loclist.size(); ++i) {
+			for (int j = 0; j < tra->catlist.size(); ++j) {
+				char loc[20], cat[10];
+				memcpy(loc, tra->loclist[i], 20);
+				memcpy(cat, tra->catlist[i], 10);
+				typedef pair<str<char, 20>, short> value_t;
+				sjtu::bptree<str<char, 20>, value_t> tree(loc + cat, a + "123" + cat);
+				tree.clear();
+			}
+		}
+		use->data.clean();
+	}
 };
 
 #endif   //OPERATION

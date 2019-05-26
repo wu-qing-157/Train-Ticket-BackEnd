@@ -7,7 +7,7 @@
 #include <iostream>
 #include <cstring>
 #include "utility.hpp"
-#include "exceptions.hpp"
+#include "./vector/exceptions.hpp"
 #include "find_blank.hpp"
 
 using namespace std;
