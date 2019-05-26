@@ -1,0 +1,720 @@
+In file included from operation.hpp:10:0,
+                 from main.cpp:8:
+operation_user.hpp:12:7: warning: ‘user’ has a field ‘user::data’ whose type uses the anonymous namespace [-Wsubobject-linkage]
+ class user {
+       ^~~~
+In file included from operation.hpp:5:0,
+                 from main.cpp:8:
+bptree.hpp: In instantiation of ‘class sjtu::bptree<str<char, 20>, char [20]>’:
+operation.hpp:30:71:   required from here
+bptree.hpp:997:17: error: function returning an array
+         value_t at(const Key &key, node &x){
+                 ^~
+bptree.hpp:1022:17: error: function returning an array
+         value_t at(const Key &key) {
+                 ^~
+bptree.hpp:1028:17: error: function returning an array
+   const value_t at(const Key& key) const{
+                 ^~
+bptree.hpp: In instantiation of ‘class sjtu::bptree<str<char, 31>, char [31]>’:
+operation.hpp:31:74:   required from here
+bptree.hpp:997:17: error: function returning an array
+         value_t at(const Key &key, node &x){
+                 ^~
+bptree.hpp:1022:17: error: function returning an array
+         value_t at(const Key &key) {
+                 ^~
+bptree.hpp:1028:17: error: function returning an array
+   const value_t at(const Key& key) const{
+                 ^~
+In file included from main.cpp:8:0:
+operation.hpp:101:7: warning: ‘ticket’ has a field ‘ticket::data’ whose type uses the anonymous namespace [-Wsubobject-linkage]
+ class ticket {
+       ^~~~~~
+In file included from operation.hpp:5:0,
+                 from main.cpp:8:
+bptree.hpp: In instantiation of ‘const value_t sjtu::bptree<Key, value_t, K, Compare>::at(const Key&) const [with Key = str<char, 20>; value_t = info_train; long unsigned int K = 4096; Compare = std::less<str<char, 20> >]’:
+operation.hpp:40:33:   required from here
+bptree.hpp:1029:13: error: passing ‘const sjtu::bptree<str<char, 20>, info_train>’ as ‘this’ argument discards qualifiers [-fpermissive]
+    if (empty()) throw "at";
+        ~~~~~^~
+bptree.hpp:927:21: note:   in call to ‘bool sjtu::bptree<Key, value_t, K, Compare>::empty() [with Key = str<char, 20>; value_t = info_train; long unsigned int K = 4096; Compare = std::less<str<char, 20> >]’
+         inline bool empty() {
+                     ^~~~~
+bptree.hpp:1030:21: error: passing ‘const sjtu::bptree<str<char, 20>, info_train>’ as ‘this’ argument discards qualifiers [-fpermissive]
+    node x = get_node(root);
+             ~~~~~~~~^~~~~~
+In file included from operation.hpp:5:0,
+                 from main.cpp:8:
+bptree.hpp:132:14: note:   in call to ‘sjtu::bptree<Key, value_t, K, Compare>::node sjtu::bptree<Key, value_t, K, Compare>::get_node(off_t) [with Key = str<char, 20>; value_t = info_train; long unsigned int K = 4096; Compare = std::less<str<char, 20> >; off_t = long int]’
+         node get_node(off_t t){
+              ^~~~~~~~
+In file included from operation.hpp:5:0,
+                 from main.cpp:8:
+bptree.hpp:1031:13: error: passing ‘const sjtu::bptree<str<char, 20>, info_train>’ as ‘this’ argument discards qualifiers [-fpermissive]
+    return at(key, x);
+           ~~^~~~~~~~
+bptree.hpp:997:17: note:   in call to ‘value_t sjtu::bptree<Key, value_t, K, Compare>::at(const Key&, sjtu::bptree<Key, value_t, K, Compare>::node&) [with Key = str<char, 20>; value_t = info_train; long unsigned int K = 4096; Compare = std::less<str<char, 20> >]’
+         value_t at(const Key &key, node &x){
+                 ^~
+bptree.hpp: In instantiation of ‘void sjtu::bptree<Key, value_t, K, Compare>::insert(const Key&, const value_t&) [with Key = str<char, 20>; value_t = char [20]; long unsigned int K = 4096; Compare = std::less<str<char, 20> >]’:
+operation.hpp:65:47:   required from here
+bptree.hpp:964:35: error: invalid conversion from ‘const char*’ to ‘char*’ [-fpermissive]
+                 buffer_insert_leaf(b, x, key, value, is_change);
+                 ~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from operation.hpp:5:0,
+                 from main.cpp:8:
+bptree.hpp:261:14: note:   initializing argument 4 of ‘sjtu::bptree<Key, value_t, K, Compare>::node sjtu::bptree<Key, value_t, K, Compare>::buffer_insert_leaf(sjtu::bptree<Key, value_t, K, Compare>::_buffer, sjtu::bptree<Key, value_t, K, Compare>::node&, Key, value_t, bool&) [with Key = str<char, 20>; value_t = char [20]; long unsigned int K = 4096; Compare = std::less<str<char, 20> >; sjtu::bptree<Key, value_t, K, Compare>::_buffer = char*]’
+         node buffer_insert_leaf(_buffer b, node &x, Key key, value_t value, bool &is_change){
+              ^~~~~~~~~~~~~~~~~~
+In file included from operation.hpp:5:0,
+                 from main.cpp:8:
+bptree.hpp:972:33: error: invalid conversion from ‘const char*’ to ‘char*’ [-fpermissive]
+             node result = insert(x, key, value, is_change);
+                           ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from operation.hpp:5:0,
+                 from main.cpp:8:
+bptree.hpp:210:14: note:   initializing argument 3 of ‘sjtu::bptree<Key, value_t, K, Compare>::node sjtu::bptree<Key, value_t, K, Compare>::insert(sjtu::bptree<Key, value_t, K, Compare>::node&, Key, value_t, bool&) [with Key = str<char, 20>; value_t = char [20]; long unsigned int K = 4096; Compare = std::less<str<char, 20> >]’
+         node insert(node &x, Key key, value_t value, bool &is_change){
+              ^~~~~~
+In file included from operation.hpp:5:0,
+                 from main.cpp:8:
+bptree.hpp: In instantiation of ‘void sjtu::bptree<Key, value_t, K, Compare>::insert(const Key&, const value_t&) [with Key = str<char, 31>; value_t = char [31]; long unsigned int K = 4096; Compare = std::less<str<char, 31> >]’:
+operation.hpp:68:22:   required from here
+bptree.hpp:964:35: error: invalid conversion from ‘const char*’ to ‘char*’ [-fpermissive]
+                 buffer_insert_leaf(b, x, key, value, is_change);
+                 ~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from operation.hpp:5:0,
+                 from main.cpp:8:
+bptree.hpp:261:14: note:   initializing argument 4 of ‘sjtu::bptree<Key, value_t, K, Compare>::node sjtu::bptree<Key, value_t, K, Compare>::buffer_insert_leaf(sjtu::bptree<Key, value_t, K, Compare>::_buffer, sjtu::bptree<Key, value_t, K, Compare>::node&, Key, value_t, bool&) [with Key = str<char, 31>; value_t = char [31]; long unsigned int K = 4096; Compare = std::less<str<char, 31> >; sjtu::bptree<Key, value_t, K, Compare>::_buffer = char*]’
+         node buffer_insert_leaf(_buffer b, node &x, Key key, value_t value, bool &is_change){
+              ^~~~~~~~~~~~~~~~~~
+In file included from operation.hpp:5:0,
+                 from main.cpp:8:
+bptree.hpp:972:33: error: invalid conversion from ‘const char*’ to ‘char*’ [-fpermissive]
+             node result = insert(x, key, value, is_change);
+                           ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from operation.hpp:5:0,
+                 from main.cpp:8:
+bptree.hpp:210:14: note:   initializing argument 3 of ‘sjtu::bptree<Key, value_t, K, Compare>::node sjtu::bptree<Key, value_t, K, Compare>::insert(sjtu::bptree<Key, value_t, K, Compare>::node&, Key, value_t, bool&) [with Key = str<char, 31>; value_t = char [31]; long unsigned int K = 4096; Compare = std::less<str<char, 31> >]’
+         node insert(node &x, Key key, value_t value, bool &is_change){
+              ^~~~~~
+bptree.hpp: In instantiation of ‘sjtu::bptree<Key, value_t, K, Compare>::node sjtu::bptree<Key, value_t, K, Compare>::buffer_insert_leaf(sjtu::bptree<Key, value_t, K, Compare>::_buffer, sjtu::bptree<Key, value_t, K, Compare>::node&, Key, value_t, bool&) [with Key = str<char, 20>; value_t = char [20]; long unsigned int K = 4096; Compare = std::less<str<char, 20> >; sjtu::bptree<Key, value_t, K, Compare>::_buffer = char*]’:
+bptree.hpp:964:35:   required from ‘void sjtu::bptree<Key, value_t, K, Compare>::insert(const Key&, const value_t&) [with Key = str<char, 20>; value_t = char [20]; long unsigned int K = 4096; Compare = std::less<str<char, 20> >]’
+operation.hpp:65:47:   required from here
+bptree.hpp:264:39: error: incompatible types in assignment of ‘char*’ to ‘char [20]’
+                 *get_value_leaf(t, b) = value;
+                 ~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+bptree.hpp:271:35: error: incompatible types in assignment of ‘char*’ to ‘char [20]’
+             *get_value_leaf(t, b) = value;
+             ~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+bptree.hpp: In instantiation of ‘sjtu::bptree<Key, value_t, K, Compare>::node sjtu::bptree<Key, value_t, K, Compare>::buffer_insert_leaf(sjtu::bptree<Key, value_t, K, Compare>::_buffer, sjtu::bptree<Key, value_t, K, Compare>::node&, Key, value_t, bool&) [with Key = str<char, 31>; value_t = char [31]; long unsigned int K = 4096; Compare = std::less<str<char, 31> >; sjtu::bptree<Key, value_t, K, Compare>::_buffer = char*]’:
+bptree.hpp:964:35:   required from ‘void sjtu::bptree<Key, value_t, K, Compare>::insert(const Key&, const value_t&) [with Key = str<char, 31>; value_t = char [31]; long unsigned int K = 4096; Compare = std::less<str<char, 31> >]’
+operation.hpp:68:22:   required from here
+bptree.hpp:264:39: error: incompatible types in assignment of ‘char*’ to ‘char [31]’
+                 *get_value_leaf(t, b) = value;
+                 ~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+bptree.hpp:271:35: error: incompatible types in assignment of ‘char*’ to ‘char [31]’
+             *get_value_leaf(t, b) = value;
+             ~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h: In instantiation of ‘bool std::less<_Tp>::operator()(const _Tp&, const _Tp&) const [with _Tp = str<char, 20>]’:
+bptree.hpp:143:17:   required from ‘size_t sjtu::bptree<Key, value_t, K, Compare>::leaf_find_pos(sjtu::bptree<Key, value_t, K, Compare>::_buffer, Key, size_t) [with Key = str<char, 20>; value_t = info_train; long unsigned int K = 4096; Compare = std::less<str<char, 20> >; size_t = long unsigned int; sjtu::bptree<Key, value_t, K, Compare>::_buffer = char*]’
+bptree.hpp:262:37:   required from ‘sjtu::bptree<Key, value_t, K, Compare>::node sjtu::bptree<Key, value_t, K, Compare>::buffer_insert_leaf(sjtu::bptree<Key, value_t, K, Compare>::_buffer, sjtu::bptree<Key, value_t, K, Compare>::node&, Key, value_t, bool&) [with Key = str<char, 20>; value_t = info_train; long unsigned int K = 4096; Compare = std::less<str<char, 20> >; sjtu::bptree<Key, value_t, K, Compare>::_buffer = char*]’
+bptree.hpp:964:35:   required from ‘void sjtu::bptree<Key, value_t, K, Compare>::insert(const Key&, const value_t&) [with Key = str<char, 20>; value_t = info_train; long unsigned int K = 4096; Compare = std::less<str<char, 20> >]’
+operation.hpp:35:28:   required from here
+/usr/include/c++/7/bits/stl_function.h:386:20: error: no match for ‘operator<’ (operand types are ‘const str<char, 20>’ and ‘const str<char, 20>’)
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from return.hpp:6:0,
+                 from main.cpp:7:
+structs.hpp:22:7: note: candidate: bool str<T, N>::operator<(const str<T, N>&) [with T = char; int N = 20] <near match>
+  bool operator<(const str& other) {
+       ^~~~~~~~
+structs.hpp:22:7: note:   passing ‘const str<char, 20>*’ as ‘this’ argument discards qualifiers
+In file included from /usr/include/c++/7/bits/stl_algobase.h:64:0,
+                 from /usr/include/c++/7/bits/char_traits.h:39,
+                 from /usr/include/c++/7/ios:40,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_pair.h:454:5: note: candidate: template<class _T1, class _T2> constexpr bool std::operator<(const std::pair<_T1, _T2>&, const std::pair<_T1, _T2>&)
+     operator<(const pair<_T1, _T2>& __x, const pair<_T1, _T2>& __y)
+     ^~~~~~~~
+/usr/include/c++/7/bits/stl_pair.h:454:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 20>’ is not derived from ‘const std::pair<_T1, _T2>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/bits/stl_algobase.h:67:0,
+                 from /usr/include/c++/7/bits/char_traits.h:39,
+                 from /usr/include/c++/7/ios:40,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_iterator.h:308:5: note: candidate: template<class _Iterator> bool std::operator<(const std::reverse_iterator<_Iterator>&, const std::reverse_iterator<_Iterator>&)
+     operator<(const reverse_iterator<_Iterator>& __x,
+     ^~~~~~~~
+/usr/include/c++/7/bits/stl_iterator.h:308:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 20>’ is not derived from ‘const std::reverse_iterator<_Iterator>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/bits/stl_algobase.h:67:0,
+                 from /usr/include/c++/7/bits/char_traits.h:39,
+                 from /usr/include/c++/7/ios:40,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_iterator.h:346:5: note: candidate: template<class _IteratorL, class _IteratorR> bool std::operator<(const std::reverse_iterator<_Iterator>&, const std::reverse_iterator<_IteratorR>&)
+     operator<(const reverse_iterator<_IteratorL>& __x,
+     ^~~~~~~~
+/usr/include/c++/7/bits/stl_iterator.h:346:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 20>’ is not derived from ‘const std::reverse_iterator<_Iterator>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/bits/stl_algobase.h:67:0,
+                 from /usr/include/c++/7/bits/char_traits.h:39,
+                 from /usr/include/c++/7/ios:40,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_iterator.h:1145:5: note: candidate: template<class _IteratorL, class _IteratorR> bool std::operator<(const std::move_iterator<_IteratorL>&, const std::move_iterator<_IteratorR>&)
+     operator<(const move_iterator<_IteratorL>& __x,
+     ^~~~~~~~
+/usr/include/c++/7/bits/stl_iterator.h:1145:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 20>’ is not derived from ‘const std::move_iterator<_IteratorL>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/bits/stl_algobase.h:67:0,
+                 from /usr/include/c++/7/bits/char_traits.h:39,
+                 from /usr/include/c++/7/ios:40,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_iterator.h:1151:5: note: candidate: template<class _Iterator> bool std::operator<(const std::move_iterator<_IteratorL>&, const std::move_iterator<_IteratorL>&)
+     operator<(const move_iterator<_Iterator>& __x,
+     ^~~~~~~~
+/usr/include/c++/7/bits/stl_iterator.h:1151:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 20>’ is not derived from ‘const std::move_iterator<_IteratorL>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/string:52:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/basic_string.h:6094:5: note: candidate: template<class _CharT, class _Traits, class _Alloc> bool std::operator<(const std::__cxx11::basic_string<_CharT, _Traits, _Alloc>&, const std::__cxx11::basic_string<_CharT, _Traits, _Alloc>&)
+     operator<(const basic_string<_CharT, _Traits, _Alloc>& __lhs,
+     ^~~~~~~~
+/usr/include/c++/7/bits/basic_string.h:6094:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 20>’ is not derived from ‘const std::__cxx11::basic_string<_CharT, _Traits, _Alloc>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/string:52:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/basic_string.h:6107:5: note: candidate: template<class _CharT, class _Traits, class _Alloc> bool std::operator<(const std::__cxx11::basic_string<_CharT, _Traits, _Alloc>&, const _CharT*)
+     operator<(const basic_string<_CharT, _Traits, _Alloc>& __lhs,
+     ^~~~~~~~
+/usr/include/c++/7/bits/basic_string.h:6107:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 20>’ is not derived from ‘const std::__cxx11::basic_string<_CharT, _Traits, _Alloc>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/string:52:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/basic_string.h:6119:5: note: candidate: template<class _CharT, class _Traits, class _Alloc> bool std::operator<(const _CharT*, const std::__cxx11::basic_string<_CharT, _Traits, _Alloc>&)
+     operator<(const _CharT* __lhs,
+     ^~~~~~~~
+/usr/include/c++/7/bits/basic_string.h:6119:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   mismatched types ‘const _CharT*’ and ‘str<char, 20>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/bits/ios_base.h:46:0,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/system_error:208:3: note: candidate: bool std::operator<(const std::error_code&, const std::error_code&)
+   operator<(const error_code& __lhs, const error_code& __rhs) noexcept
+   ^~~~~~~~
+/usr/include/c++/7/system_error:208:3: note:   no known conversion for argument 1 from ‘const str<char, 20>’ to ‘const std::error_code&’
+/usr/include/c++/7/system_error:282:3: note: candidate: bool std::operator<(const std::error_condition&, const std::error_condition&)
+   operator<(const error_condition& __lhs,
+   ^~~~~~~~
+/usr/include/c++/7/system_error:282:3: note:   no known conversion for argument 1 from ‘const str<char, 20>’ to ‘const std::error_condition&’
+In file included from /usr/include/c++/7/tuple:39:0,
+                 from /usr/include/c++/7/bits/unique_ptr.h:37,
+                 from /usr/include/c++/7/bits/locale_conv.h:41,
+                 from /usr/include/c++/7/locale:43,
+                 from /usr/include/c++/7/iomanip:43,
+                 from structs.hpp:5,
+                 from return.hpp:6,
+                 from main.cpp:7:
+/usr/include/c++/7/array:262:5: note: candidate: template<class _Tp, long unsigned int _Nm> bool std::operator<(const std::array<_Tp, _Nm>&, const std::array<_Tp, _Nm>&)
+     operator<(const array<_Tp, _Nm>& __a, const array<_Tp, _Nm>& __b)
+     ^~~~~~~~
+/usr/include/c++/7/array:262:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 20>’ is not derived from ‘const std::array<_Tp, _Nm>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/bits/unique_ptr.h:37:0,
+                 from /usr/include/c++/7/bits/locale_conv.h:41,
+                 from /usr/include/c++/7/locale:43,
+                 from /usr/include/c++/7/iomanip:43,
+                 from structs.hpp:5,
+                 from return.hpp:6,
+                 from main.cpp:7:
+/usr/include/c++/7/tuple:1410:5: note: candidate: template<class ... _TElements, class ... _UElements> constexpr bool std::operator<(const std::tuple<_Tps ...>&, const std::tuple<_Elements ...>&)
+     operator<(const tuple<_TElements...>& __t,
+     ^~~~~~~~
+/usr/include/c++/7/tuple:1410:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 20>’ is not derived from ‘const std::tuple<_Tps ...>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/bits/locale_conv.h:41:0,
+                 from /usr/include/c++/7/locale:43,
+                 from /usr/include/c++/7/iomanip:43,
+                 from structs.hpp:5,
+                 from return.hpp:6,
+                 from main.cpp:7:
+/usr/include/c++/7/bits/unique_ptr.h:717:5: note: candidate: template<class _Tp, class _Dp, class _Up, class _Ep> bool std::operator<(const std::unique_ptr<_Tp, _Dp>&, const std::unique_ptr<_Up, _Ep>&)
+     operator<(const unique_ptr<_Tp, _Dp>& __x,
+     ^~~~~~~~
+/usr/include/c++/7/bits/unique_ptr.h:717:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 20>’ is not derived from ‘const std::unique_ptr<_Tp, _Dp>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/bits/locale_conv.h:41:0,
+                 from /usr/include/c++/7/locale:43,
+                 from /usr/include/c++/7/iomanip:43,
+                 from structs.hpp:5,
+                 from return.hpp:6,
+                 from main.cpp:7:
+/usr/include/c++/7/bits/unique_ptr.h:728:5: note: candidate: template<class _Tp, class _Dp> bool std::operator<(const std::unique_ptr<_Tp, _Dp>&, std::nullptr_t)
+     operator<(const unique_ptr<_Tp, _Dp>& __x, nullptr_t)
+     ^~~~~~~~
+/usr/include/c++/7/bits/unique_ptr.h:728:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 20>’ is not derived from ‘const std::unique_ptr<_Tp, _Dp>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/bits/locale_conv.h:41:0,
+                 from /usr/include/c++/7/locale:43,
+                 from /usr/include/c++/7/iomanip:43,
+                 from structs.hpp:5,
+                 from return.hpp:6,
+                 from main.cpp:7:
+/usr/include/c++/7/bits/unique_ptr.h:734:5: note: candidate: template<class _Tp, class _Dp> bool std::operator<(std::nullptr_t, const std::unique_ptr<_Tp, _Dp>&)
+     operator<(nullptr_t, const unique_ptr<_Tp, _Dp>& __x)
+     ^~~~~~~~
+/usr/include/c++/7/bits/unique_ptr.h:734:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 20>’ is not derived from ‘const std::unique_ptr<_Tp, _Dp>’
+       { return __x < __y; }
+                ~~~~^~~~~
+/usr/include/c++/7/bits/stl_function.h: In instantiation of ‘bool std::less<_Tp>::operator()(const _Tp&, const _Tp&) const [with _Tp = str<char, 31>]’:
+bptree.hpp:143:17:   required from ‘size_t sjtu::bptree<Key, value_t, K, Compare>::leaf_find_pos(sjtu::bptree<Key, value_t, K, Compare>::_buffer, Key, size_t) [with Key = str<char, 31>; value_t = char [31]; long unsigned int K = 4096; Compare = std::less<str<char, 31> >; size_t = long unsigned int; sjtu::bptree<Key, value_t, K, Compare>::_buffer = char*]’
+bptree.hpp:262:37:   required from ‘sjtu::bptree<Key, value_t, K, Compare>::node sjtu::bptree<Key, value_t, K, Compare>::buffer_insert_leaf(sjtu::bptree<Key, value_t, K, Compare>::_buffer, sjtu::bptree<Key, value_t, K, Compare>::node&, Key, value_t, bool&) [with Key = str<char, 31>; value_t = char [31]; long unsigned int K = 4096; Compare = std::less<str<char, 31> >; sjtu::bptree<Key, value_t, K, Compare>::_buffer = char*]’
+bptree.hpp:964:35:   required from ‘void sjtu::bptree<Key, value_t, K, Compare>::insert(const Key&, const value_t&) [with Key = str<char, 31>; value_t = char [31]; long unsigned int K = 4096; Compare = std::less<str<char, 31> >]’
+operation.hpp:68:22:   required from here
+/usr/include/c++/7/bits/stl_function.h:386:20: error: no match for ‘operator<’ (operand types are ‘const str<char, 31>’ and ‘const str<char, 31>’)
+In file included from return.hpp:6:0,
+                 from main.cpp:7:
+structs.hpp:22:7: note: candidate: bool str<T, N>::operator<(const str<T, N>&) [with T = char; int N = 31] <near match>
+  bool operator<(const str& other) {
+       ^~~~~~~~
+structs.hpp:22:7: note:   passing ‘const str<char, 31>*’ as ‘this’ argument discards qualifiers
+In file included from /usr/include/c++/7/bits/stl_algobase.h:64:0,
+                 from /usr/include/c++/7/bits/char_traits.h:39,
+                 from /usr/include/c++/7/ios:40,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_pair.h:454:5: note: candidate: template<class _T1, class _T2> constexpr bool std::operator<(const std::pair<_T1, _T2>&, const std::pair<_T1, _T2>&)
+     operator<(const pair<_T1, _T2>& __x, const pair<_T1, _T2>& __y)
+     ^~~~~~~~
+/usr/include/c++/7/bits/stl_pair.h:454:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 31>’ is not derived from ‘const std::pair<_T1, _T2>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/bits/stl_algobase.h:67:0,
+                 from /usr/include/c++/7/bits/char_traits.h:39,
+                 from /usr/include/c++/7/ios:40,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_iterator.h:308:5: note: candidate: template<class _Iterator> bool std::operator<(const std::reverse_iterator<_Iterator>&, const std::reverse_iterator<_Iterator>&)
+     operator<(const reverse_iterator<_Iterator>& __x,
+     ^~~~~~~~
+/usr/include/c++/7/bits/stl_iterator.h:308:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 31>’ is not derived from ‘const std::reverse_iterator<_Iterator>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/bits/stl_algobase.h:67:0,
+                 from /usr/include/c++/7/bits/char_traits.h:39,
+                 from /usr/include/c++/7/ios:40,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_iterator.h:346:5: note: candidate: template<class _IteratorL, class _IteratorR> bool std::operator<(const std::reverse_iterator<_Iterator>&, const std::reverse_iterator<_IteratorR>&)
+     operator<(const reverse_iterator<_IteratorL>& __x,
+     ^~~~~~~~
+/usr/include/c++/7/bits/stl_iterator.h:346:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 31>’ is not derived from ‘const std::reverse_iterator<_Iterator>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/bits/stl_algobase.h:67:0,
+                 from /usr/include/c++/7/bits/char_traits.h:39,
+                 from /usr/include/c++/7/ios:40,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_iterator.h:1145:5: note: candidate: template<class _IteratorL, class _IteratorR> bool std::operator<(const std::move_iterator<_IteratorL>&, const std::move_iterator<_IteratorR>&)
+     operator<(const move_iterator<_IteratorL>& __x,
+     ^~~~~~~~
+/usr/include/c++/7/bits/stl_iterator.h:1145:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 31>’ is not derived from ‘const std::move_iterator<_IteratorL>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/bits/stl_algobase.h:67:0,
+                 from /usr/include/c++/7/bits/char_traits.h:39,
+                 from /usr/include/c++/7/ios:40,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_iterator.h:1151:5: note: candidate: template<class _Iterator> bool std::operator<(const std::move_iterator<_IteratorL>&, const std::move_iterator<_IteratorL>&)
+     operator<(const move_iterator<_Iterator>& __x,
+     ^~~~~~~~
+/usr/include/c++/7/bits/stl_iterator.h:1151:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 31>’ is not derived from ‘const std::move_iterator<_IteratorL>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/string:52:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/basic_string.h:6094:5: note: candidate: template<class _CharT, class _Traits, class _Alloc> bool std::operator<(const std::__cxx11::basic_string<_CharT, _Traits, _Alloc>&, const std::__cxx11::basic_string<_CharT, _Traits, _Alloc>&)
+     operator<(const basic_string<_CharT, _Traits, _Alloc>& __lhs,
+     ^~~~~~~~
+/usr/include/c++/7/bits/basic_string.h:6094:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 31>’ is not derived from ‘const std::__cxx11::basic_string<_CharT, _Traits, _Alloc>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/string:52:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/basic_string.h:6107:5: note: candidate: template<class _CharT, class _Traits, class _Alloc> bool std::operator<(const std::__cxx11::basic_string<_CharT, _Traits, _Alloc>&, const _CharT*)
+     operator<(const basic_string<_CharT, _Traits, _Alloc>& __lhs,
+     ^~~~~~~~
+/usr/include/c++/7/bits/basic_string.h:6107:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 31>’ is not derived from ‘const std::__cxx11::basic_string<_CharT, _Traits, _Alloc>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/string:52:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/basic_string.h:6119:5: note: candidate: template<class _CharT, class _Traits, class _Alloc> bool std::operator<(const _CharT*, const std::__cxx11::basic_string<_CharT, _Traits, _Alloc>&)
+     operator<(const _CharT* __lhs,
+     ^~~~~~~~
+/usr/include/c++/7/bits/basic_string.h:6119:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   mismatched types ‘const _CharT*’ and ‘str<char, 31>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/bits/ios_base.h:46:0,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/system_error:208:3: note: candidate: bool std::operator<(const std::error_code&, const std::error_code&)
+   operator<(const error_code& __lhs, const error_code& __rhs) noexcept
+   ^~~~~~~~
+/usr/include/c++/7/system_error:208:3: note:   no known conversion for argument 1 from ‘const str<char, 31>’ to ‘const std::error_code&’
+/usr/include/c++/7/system_error:282:3: note: candidate: bool std::operator<(const std::error_condition&, const std::error_condition&)
+   operator<(const error_condition& __lhs,
+   ^~~~~~~~
+/usr/include/c++/7/system_error:282:3: note:   no known conversion for argument 1 from ‘const str<char, 31>’ to ‘const std::error_condition&’
+In file included from /usr/include/c++/7/tuple:39:0,
+                 from /usr/include/c++/7/bits/unique_ptr.h:37,
+                 from /usr/include/c++/7/bits/locale_conv.h:41,
+                 from /usr/include/c++/7/locale:43,
+                 from /usr/include/c++/7/iomanip:43,
+                 from structs.hpp:5,
+                 from return.hpp:6,
+                 from main.cpp:7:
+/usr/include/c++/7/array:262:5: note: candidate: template<class _Tp, long unsigned int _Nm> bool std::operator<(const std::array<_Tp, _Nm>&, const std::array<_Tp, _Nm>&)
+     operator<(const array<_Tp, _Nm>& __a, const array<_Tp, _Nm>& __b)
+     ^~~~~~~~
+/usr/include/c++/7/array:262:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 31>’ is not derived from ‘const std::array<_Tp, _Nm>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/bits/unique_ptr.h:37:0,
+                 from /usr/include/c++/7/bits/locale_conv.h:41,
+                 from /usr/include/c++/7/locale:43,
+                 from /usr/include/c++/7/iomanip:43,
+                 from structs.hpp:5,
+                 from return.hpp:6,
+                 from main.cpp:7:
+/usr/include/c++/7/tuple:1410:5: note: candidate: template<class ... _TElements, class ... _UElements> constexpr bool std::operator<(const std::tuple<_Tps ...>&, const std::tuple<_Elements ...>&)
+     operator<(const tuple<_TElements...>& __t,
+     ^~~~~~~~
+/usr/include/c++/7/tuple:1410:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 31>’ is not derived from ‘const std::tuple<_Tps ...>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/bits/locale_conv.h:41:0,
+                 from /usr/include/c++/7/locale:43,
+                 from /usr/include/c++/7/iomanip:43,
+                 from structs.hpp:5,
+                 from return.hpp:6,
+                 from main.cpp:7:
+/usr/include/c++/7/bits/unique_ptr.h:717:5: note: candidate: template<class _Tp, class _Dp, class _Up, class _Ep> bool std::operator<(const std::unique_ptr<_Tp, _Dp>&, const std::unique_ptr<_Up, _Ep>&)
+     operator<(const unique_ptr<_Tp, _Dp>& __x,
+     ^~~~~~~~
+/usr/include/c++/7/bits/unique_ptr.h:717:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 31>’ is not derived from ‘const std::unique_ptr<_Tp, _Dp>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/bits/locale_conv.h:41:0,
+                 from /usr/include/c++/7/locale:43,
+                 from /usr/include/c++/7/iomanip:43,
+                 from structs.hpp:5,
+                 from return.hpp:6,
+                 from main.cpp:7:
+/usr/include/c++/7/bits/unique_ptr.h:728:5: note: candidate: template<class _Tp, class _Dp> bool std::operator<(const std::unique_ptr<_Tp, _Dp>&, std::nullptr_t)
+     operator<(const unique_ptr<_Tp, _Dp>& __x, nullptr_t)
+     ^~~~~~~~
+/usr/include/c++/7/bits/unique_ptr.h:728:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 31>’ is not derived from ‘const std::unique_ptr<_Tp, _Dp>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from /usr/include/c++/7/bits/locale_conv.h:41:0,
+                 from /usr/include/c++/7/locale:43,
+                 from /usr/include/c++/7/iomanip:43,
+                 from structs.hpp:5,
+                 from return.hpp:6,
+                 from main.cpp:7:
+/usr/include/c++/7/bits/unique_ptr.h:734:5: note: candidate: template<class _Tp, class _Dp> bool std::operator<(std::nullptr_t, const std::unique_ptr<_Tp, _Dp>&)
+     operator<(nullptr_t, const unique_ptr<_Tp, _Dp>& __x)
+     ^~~~~~~~
+/usr/include/c++/7/bits/unique_ptr.h:734:5: note:   template argument deduction/substitution failed:
+In file included from /usr/include/c++/7/string:48:0,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from main.cpp:4:
+/usr/include/c++/7/bits/stl_function.h:386:20: note:   ‘const str<char, 31>’ is not derived from ‘const std::unique_ptr<_Tp, _Dp>’
+       { return __x < __y; }
+                ~~~~^~~~~
+In file included from operation_user.hpp:9:0,
+                 from operation.hpp:10,
+                 from main.cpp:8:
+ct_vector.hpp: In member function ‘void ct::vector<T, filename>::clean() [with T = info_ticket_user; const char* filename = (& fnametic)]’:
+ct_vector.hpp:54:7: warning: ‘%s’ directive writing 18 bytes into a region of size 17 [-Wformat-overflow=]
+  void clean()
+       ^~~~~
+ct_vector.hpp:58:10: note: ‘sprintf’ output 22 bytes into a destination of size 20
+   sprintf(opt, "rm %s", filename);
+   ~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~

@@ -25,7 +25,7 @@ typedef char date_t[20];
 typedef char catalog_t[10];
 typedef char ticket_kind_t[20];
 typedef char train_id_t[20];
-typedef char timer_t[10];
+typedef char my_timer_t[10];
 
 // ======= User BEGIN =======
 user user_system;
@@ -130,7 +130,7 @@ void train_add_train()
 	for (int i = 0; i < num_station; ++i)
 	{
 		loc_t loc;
-		timer_t arr, start, stopover; float price[5];
+		my_timer_t arr, start, stopover; float price[5];
 		cin >> loc >> arr >> start >> stopover;
 		for (int j = 0; j < num_price; ++j) cin >> price[j];
 		st_info[i] = info_station(loc, my_time(arr), my_time(start), my_time(stopover), price);
@@ -176,7 +176,7 @@ void train_modify_train()
 	for (int i = 0; i < num_station; ++i)
 	{
 		loc_t loc;
-		timer_t arr, start, stopover; float price[5];
+		my_timer_t arr, start, stopover; float price[5];
 		cin >> loc >> arr >> start >> stopover;
 		for (int j = 0; j < num_price; ++j) cin >> price[j];
 		st_info[i] = info_station(loc, my_time(arr), my_time(start), my_time(stopover), price);
