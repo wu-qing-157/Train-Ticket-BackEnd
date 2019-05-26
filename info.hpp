@@ -50,6 +50,10 @@ struct info_station {
 	my_time arriv, start, stopover;
 	float price[5];
 
+	info_station() = default;
+	info_station(char _name[20], my_time _arriv, my_time _start, my_time _stopover, float _price[5]) :
+		name(_name), arriv(_arriv), start(_start), stopover(_stopover), price(_price) {}
+
 	void checkday() {
 		if (arriv > start) start.modify_hour(start.hour() + 24);
 	}
@@ -90,7 +94,7 @@ struct info_train {
 	}
 	info_train(char _name[20], char _name_price[5][20],
 		char _train_id[20], char _catalog[10], short _num_station,
-		short _num_price, short _quan_ticket[5][60][30], info_station _data[60]) {
+		short _num_price, info_station _data[60]) {
 		train_id.cpy(_train_id);  //NOTE HERE: I'm using char[] to construct train_id, but it's stored as str.
 		num_price = _num_price;
 		num_station = _num_station;
@@ -101,11 +105,6 @@ struct info_train {
 		memcpy(catalog, _catalog, 10);
 		memcpy(data, _data, num_station * sizeof (info_station));
 		settime();   //NOTE HERE: I have changed trains that cross the days with new time(eg. 25:12).
-		for (int i = 0; i < 5; ++i) {
-			for (int j = 0; j < 60; ++j) {
-				memcpy(quan_ticket[i][j], _quan_ticket[i][j], 30 * sizeof(short));
-			}
-		}
 		on_sale = false;
 	}
 	bool sell() {

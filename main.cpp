@@ -25,6 +25,7 @@ typedef char date_t[20];
 typedef char catalog_t[10];
 typedef char ticket_kind_t[20];
 typedef char train_id_t[20];
+typedef char timer_t[10];
 
 // ======= User BEGIN =======
 user user_system;
@@ -122,42 +123,66 @@ void ticket_refund_ticket()
 void train_add_train()
 {
 	train_id_t tid; name_t _name; catalog_t _cata; int num_station, num_price;
-	for (int i = 0; i < num_price; ++i);
-	// ...
+	ticket_kind_t price_name[5];
+	cin >> tid >> _name >> _cata >> num_station >> num_price;
+	for (int i = 0; i < num_price; ++i) cin >> price_name[i];
+	info_station st_info[60];
+	for (int i = 0; i < num_station; ++i)
+	{
+		loc_t loc;
+		timer_t arr, start, stopover; float price[5];
+		cin >> loc >> arr >> start >> stopover;
+		for (int j = 0; j < num_price; ++j) cin >> price[j];
+		st_info[i] = info_station(loc, my_time(arr), my_time(start), my_time(stopover), price);
+	}
+	info_train now = info_train(_name, price_name, tid, _cata, num_station, num_price, st_info);
+	cout << train_system.add(now) << '\n';
 }
 void train_sale_train()
 {
-	train_id_t tid; scanf("%s", tid);
-	// ...
+	train_id_t tid; cin << tid;
+	cout << train_system.sale_train(tid) << '\n';
 }
 void train_query_train()
 {
-	try {
-		char train_id_t[20];
-		info_train ans = train_system.query_train(train_id);
-		printf("%s %s %s %hd %hd", train_id, ans._name, ans.catalog, ans.num_station, ans.num_price);
-		for (int i = 0; i < ans.num_price; ++i) printf(" %s", ans.name_price[i]);
-		puts("");
+	try
+	{
+		train_id_t tid[20]; cin << tid;
+		info_train ans = train_system.query_train(tid);
+		cout << tid << ' ' << ans.name << ' ' << ans.catalog << ' ' << ans.num_station << ' ' << ans.num_price;
+		for (int i = 0; i < ans.num_price; ++i) cout << ' ' << ans.name_price[i];
+		cout << '\n';
 		for (int i = 0; i < ans.num_station; ++i)
 		{
-			printf("%s ", ans.data[i]._name);
-			ans.data[i].arriv.print(" ");
-			ans.data[i].start.print(" ");
-			ans.data[i].stopover.print();
+			cout << ans.data[i].name << ' ' << ans.data[i].arriv << ' ' << ans.data[i].start << ' ' << ans.data[i].stopover;
 			for (int j = 0; j < ans.num_price; ++j)
-				printf(" ￥%f", ans.data[i].price[j]);
-			puts("");
+				cout << " ￥" << ans.data[i].price[j];
+			cout << '\n';
 		}
-	} catch(...) {puts("0");}
+	} catch(...) {cout << "0\n";}
 }
 void train_delete_train()
 {
-	train_id_t tid; scanf("%s", tid);
-	//printf("%d\n", train_system.erase(tid));
+	train_id_t tid; cin >> tid;
+	cout << train_system.delete_train(tid) << '\n';
 }
 void train_modify_train()
 {
-	// ...
+	train_id_t tid; name_t _name; catalog_t _cata; int num_station, num_price;
+	ticket_kind_t price_name[5];
+	cin >> tid >> _name >> _cata >> num_station >> num_price;
+	for (int i = 0; i < num_price; ++i) cin >> price_name[i];
+	info_station st_info[60];
+	for (int i = 0; i < num_station; ++i)
+	{
+		loc_t loc;
+		timer_t arr, start, stopover; float price[5];
+		cin >> loc >> arr >> start >> stopover;
+		for (int j = 0; j < num_price; ++j) cin >> price[j];
+		st_info[i] = info_station(loc, my_time(arr), my_time(start), my_time(stopover), price);
+	}
+	info_train now = info_train(_name, price_name, tid, _cata, num_station, num_price, st_info);
+	cout << train_system.modify_train(tid, now) << '\n';
 	return ;
 }
 // ======= Train END =======
