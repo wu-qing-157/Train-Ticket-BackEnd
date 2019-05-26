@@ -184,7 +184,17 @@ struct info_ticket {
 		time_from.normalize();
 		time_to.normalize();
 	}
+	friend ostream& operator << (ostream &os, const info_ticket &obj);
 };
+ostream &operator << (ostream &os, const info_ticket &obj)
+{
+	os << obj.train_id << ' ' << obj.loc_from << ' ' << obj.date_from << ' ' << obj.time_from << ' '
+									<< obj.loc_to << ' ' << obj.date_to << ' ' << obj.time_to;
+		for (int j = 0; j < obj.num_price; ++j)
+			os << ' ' << obj.ticket_kind[j] << ' ' << obj.ticket_quantity[j] << ' ' << obj.price[j];
+		os << '\n';
+	return os;
+}
 
 struct info_ticket_user{
 	int id;

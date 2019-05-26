@@ -27,8 +27,8 @@ private:
 	sjtu::bptree<str<char, 20>, info_train> data{ "trainA", "trainB" };  
 
 public:
-	sjtu::vector<char[20]> loclist;
-	sjtu::vector<char[10]> catlist;
+	ct::vector<char[20]> loclist;
+	ct::vector<char[10]> loc+cat;
 	// these two lists above have not been initialized
 
 	train() {}
@@ -91,14 +91,25 @@ private:
 
 public:
 	ticket() = default;
+	ticket(train *_tr, user *_us) : tra(_tr), use(_us) {}
+
+// jia yi ge gou zao han shu
+
+
 	sjtu::vector<info_ticket> query_ticket(loc_t a, loc_t b, my_date date, catalog_t catalog) {
 		
 		typedef pair<str<char, 20>, short> value_t;
 		typedef sjtu::bptree<str<char, 20>, pair<str<char, 20>, short>>::iterator bpt_itr;
 
 		sjtu::vector<info_ticket> ans;
+//
+		FILE *f = fopen(a + catalog, "rw+");
+		if (!f) return ans;
+		char filename[20];
+		sprintf(filename, "%s%s", a, catalog);
 		sjtu::bptree<str<char, 20>, value_t> treeA(a + catalog, a + "123" + catalog);
 		sjtu::bptree<str<char, 20>, value_t> treeB(b + catalog, b + "123" + catalog);
+// wei dai ma
 
 		typedef pair<str<char, 20>, short> value_t;
 		typedef sjtu::bptree<str<char, 20>, pair<str<char, 20>, short>>::iterator bpt_itr;

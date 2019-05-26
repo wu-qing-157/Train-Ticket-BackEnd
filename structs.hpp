@@ -2,6 +2,7 @@
 #define STRUCTS
 #include <cstring>
 #include <iostream>
+#include <iomanip>
 
 template<class T, int N>
 struct str {
@@ -105,7 +106,14 @@ struct my_time {
 	void normalize() {
 		modify_hour(hour() % 24);
 	}
+	friend ostream& operator << (ostream &os, const my_time &obj);
 };
+ostream& operator << (ostream &os, const my_time &obj)
+{
+	if (obj.data == -1) os << "xx:xx"
+	else os << setw(2) << setfill('0') << obj.hour() << ':' << setw(2) << setfill('0') << obj.minute();
+	return os;
+}
 
 struct my_date {
 	short day;
@@ -122,6 +130,12 @@ struct my_date {
 		day += i;
 		return *this;
 	}
+	friend ostream& operator << (ostream &os, const my_date &obj);
 };
+ostream& operator << (ostream &os, const my_date &obj)
+{
+	os << "2019-06-" << setw(2) << setfill('0') << obj.day();
+	return os;
+}
 
 #endif  //STRUCTS

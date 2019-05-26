@@ -6,11 +6,15 @@
 #ifndef CT
 	#include "return.hpp"
 	#include "operation.hpp"
+	#include "operation_user.hpp"
 	#include "info.hpp"
 	#include "structs.hpp"
 #else
 	#include "operation_user.hpp"
 #endif
+
+using std::cin;
+using std::cout;
 
 typedef char name_t[40];
 typedef char password_t[32];
@@ -30,54 +34,56 @@ void user_register()
 	password_t pwd;
 	email_t _email;
 	phone_t _phone;
-	scanf("%s%s%s%s", _name, pwd, _email, _phone);
-	printf("%d\n", user_system.regist(_name, pwd, _email, _phone));
+	cin >> _name >> pwd >> _email >> _phone;
+	cout << user_system.regist(_name, pwd, _email, _phone) << "\n";
 }
 void user_login()
 {
-	int id;
-	password_t pwd;
-	scanf("%d%s", &id, pwd);
-	printf("%d\n", user_system.login(id, pwd));
+	int id; password_t pwd;
+	cin >> id >> pwd;
+	cout << user_system.login(id, pwd) << "\n";
 }
 void user_query_profile()
 {
-	int id; scanf("%d", &id);
-	// printf("当前人数： %d\n", user_system.counter() );
+	int id; cin >> id;
 	if (id < 2019 || id > user_system.counter()) {puts("0"); return ;}
 	info_query_profile ans = user_system.query_profile(id);
-	printf("%s %s %s %hd\n", ans.name, ans.email, ans.phone, ans.privilege);
+	cout << ans.name << ' ' << ans.email << ' ' << ans.phone << ' ' << ans.privilege << '\n';
 }
 void user_modify_profile()
 {
-	int id; scanf("%d", &id);
+	int id; cin >> id;
 	name_t _name; password_t pwd; email_t _email; phone_t _phone;
-	scanf("%s%s%s%s", _name, pwd, _email, _phone);
-	printf("%d\n", user_system.modify_profile(id, _name, pwd, _email, _phone));
+	cin >> _name >> pwd >> _email >> _phone;
+	cout << user_system.modify_profile(id, _name, pwd, _email, _phone) << '\n';
 }
 void user_modify_privilege()
 {
 	int id1, id2; short privilege;
-	printf("%d\n", user_system.modify_privilege(id1, id2, privilege));
+	cin >> id1 >> id2 >> privilege;
+	cout << user_system.modify_privilege(id1, id2, privilege) << '\n';
 }
 // ======= User END =======
 
 // ======= Ticket BEGIN =======
-//ticket ticket_system;
+train train_system;
+ticket ticket_system{train_system, user_system};
 void ticket_query_ticket()
 {
-	loc_t loc1, loc2;
-	date_t _date; catalog_t _catalog;
-	scanf("%s%s%s%s", loc1, loc2, _date, _catalog);
-	// ...
+	loc_t loc1, loc2; date_t _date; catalog_t _catalog;
+	cin >> loc1 >> loc2 >> _date >> _catalog;
+	auto ret = ticket_system.query_ticket(loc1, loc2, my_date(_date), _catalog);
+	cout << ret.size() << "\n";
+	for (int i = 0; i < ret.size(); ++i) cout << ret[i];
 }
 void ticket_query_transfer()
 {
 	loc_t loc1, loc2;
 	date_t _date;
 	catalog_t _catalog;
-	scanf("%s%s%s%s", loc1, loc2, _date, _catalog);
-	// ...
+	cin >> loc1 >> loc2 >> _date >> _catalog;
+	auto ret = ticket_system.query_transfer(loc1, loc2, my_date(_date), _catalog);
+	cout << ret.first << ret.second;
 }
 void ticket_buy_ticket()
 {
@@ -86,25 +92,33 @@ void ticket_buy_ticket()
 	loc_t loc1, loc2;
 	date_t _date;
 	ticket_kind_t _kind;
-	scanf("%d%d%s%s%s%s%s", &uid, &num, t_id, loc1, loc2, _date, _kind);
-	// ...
+	cin >> uid >> num >> t_id >> loc1 >> loc2 >> _date >> _kind;
+	cout << ticket_system.buy_ticket(uid, num, t_id, loc1, loc2, my_date(_date), _kind) << '\n';
 }
 void ticket_query_order()
 {
 	int uid; date_t _date; catalog_t _catalog;
-	scanf("%d%s%s", &uid, _date, _catalog);
+	cin >> uid >> _date >> _catalog;
+	auto ret = ticket_system.query_order(uid, my_date(_date), _catalog);
+	if (ret.success)
+	{
+		cout << ret.data.size() << '\n';
+		for (int i = 0; i < ret.data.size(); ++i)
+			cout << ret.data[i];
+	}
+	else cout << "-1\n";
 	// ...
 }
 void ticket_refund_ticket()
 {
 	int uid, num; train_id_t tid; loc_t loc1, loc2; date_t _date; ticket_kind_t _kind;
-	scanf("%d%d%s%s%s%s%s", &uid, &num, tid, loc1, loc2, _date, _kind);
+	cin << uid << num << tid << loc1 << loc2 << _date << _kind;
+	cout << ticket_system.refund_ticket(uid, num, tid, loc1, loc2, my_date(_date), _kind);
 	// ...
 }
 // ======= Ticket END =======
 
 // ======= Train BEGIN =======
-//train train_system;
 void train_add_train()
 {
 	train_id_t tid; name_t _name; catalog_t _cata; int num_station, num_price;
@@ -118,7 +132,7 @@ void train_sale_train()
 }
 void train_query_train()
 {
-	/*try {
+	try {
 		char train_id_t[20];
 		info_train ans = train_system.query_train(train_id);
 		printf("%s %s %s %hd %hd", train_id, ans._name, ans.catalog, ans.num_station, ans.num_price);
@@ -134,7 +148,7 @@ void train_query_train()
 				printf(" ￥%f", ans.data[i].price[j]);
 			puts("");
 		}
-	} catch(index_out_of_bound) {puts("0");}*/
+	} catch(...) {puts("0");}
 }
 void train_delete_train()
 {
@@ -153,17 +167,13 @@ bool is_it_clean;
 void system_clean()
 {
 	user_system.clean();
+	ticket_system.clean();
 	is_it_clean = 1;
 }
 void system_exit() {return ;}
-void system_init()
-{
-	user_system.init();
-}
 // ======= System END =======
 int main()
 {
-	system_init();
 	while (1)
 	{
 		const int command_number = 17;
