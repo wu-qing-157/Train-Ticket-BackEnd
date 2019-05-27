@@ -47,9 +47,9 @@ void user_login()
 void user_query_profile()
 {
 	int id; cin >> id;
-	if (id < 2019 || id > user_system.counter()) {puts("0"); return ;}
+	if (id < 2019 || id > user_system.counter()) {cout << "0\n"; return ;}
 	info_query_profile ans = user_system.query_profile(id);
-	cout << ans.name << ' ' << ans.email << ' ' << ans.phone << ' ' << ans.privilege << '\n';
+	cout << ans.name << ' ' << ans.email << ' ' << ans.phone << ' ' << ans.privilege + 1 << '\n';
 }
 void user_modify_profile()
 {
@@ -61,7 +61,7 @@ void user_modify_profile()
 void user_modify_privilege()
 {
 	int id1, id2; short privilege;
-	cin >> id1 >> id2 >> privilege;
+	cin >> id1 >> id2 >> privilege; --privilege;
 	cout << user_system.modify_privilege(id1, id2, privilege) << '\n';
 }
 // ======= User END =======
@@ -125,14 +125,20 @@ void train_add_train()
 	train_id_t tid; name_t _name; catalog_t _cata; int num_station, num_price;
 	ticket_kind_t price_name[5];
 	cin >> tid >> _name >> _cata >> num_station >> num_price;
+	cout << tid << _name << _cata << num_station << num_price << '\n';
 	for (int i = 0; i < num_price; ++i) cin >> price_name[i];
 	info_station st_info[60];
 	for (int i = 0; i < num_station; ++i)
 	{
 		loc_t loc;
 		my_timer_t arr, start, stopover; float price[5];
+		char price_s[10];
 		cin >> loc >> arr >> start >> stopover;
-		for (int j = 0; j < num_price; ++j) cin >> price[j];
+		cout << loc << ' ' << arr << ' ' << start << ' ' << stopover << '\n';
+		for (int j = 0; j < num_price; ++j)
+		{
+			cin >> price_s; sscanf(price_s + 1, "%f", price + j);
+		}
 		st_info[i] = info_station(loc, my_time(arr), my_time(start), my_time(stopover), price);
 	}
 	info_train now = info_train(_name, price_name, tid, _cata, num_station, num_price, st_info);
@@ -177,8 +183,12 @@ void train_modify_train()
 	{
 		loc_t loc;
 		my_timer_t arr, start, stopover; float price[5];
+		char price_s[10];
 		cin >> loc >> arr >> start >> stopover;
-		for (int j = 0; j < num_price; ++j) cin >> price[j];
+		for (int j = 0; j < num_price; ++j)
+		{
+			cin >> price_s; sscanf(price_s + 1, "%f", price + j);
+		}
 		st_info[i] = info_station(loc, my_time(arr), my_time(start), my_time(stopover), price);
 	}
 	info_train now = info_train(_name, price_name, tid, _cata, num_station, num_price, st_info);
@@ -194,6 +204,7 @@ void system_clean()
 	user_system.clean();
 	ticket_system.clean();
 	is_it_clean = 1;
+	cout << "1\n";
 }
 void system_exit() {return ;}
 // ======= System END =======
@@ -231,7 +242,7 @@ int main()
 		char str[30]; scanf("%s", str);
 		for (int i = 0; i < command_number; ++i)
 			if (!strcmp(str, command_name[i]))
-				if (i == command_number - 1) {puts("BYE"); return 0;}
+				if (i == command_number - 1) {cout << "BYE\n"; return 0;}
 				else command[i]();
 	}
 	return 0;

@@ -55,7 +55,7 @@ public:
 	}
 	bool modify_privilege(int id1, int id2, short privilege) {
 		if (id1 > cur || id2 > cur || id1 < 2019 || id2 < 2019) return false;
-		if (privilege < 0 || privilege > 2) return false;
+		if (privilege < 0 || privilege >= 2) return false;
 		info_user u1 = data[id1 - 2019], u2 = data[id2 - 2019];
 		if (!u1.privilege) return false;
 		if (u2.privilege && !privilege) return false;
