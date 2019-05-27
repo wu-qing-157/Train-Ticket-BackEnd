@@ -156,7 +156,7 @@ void train_query_train()
 		{
 			cout << ans.data[i].name << ' ' << ans.data[i].arriv << ' ' << ans.data[i].start << ' ' << ans.data[i].stopover;
 			for (int j = 0; j < ans.num_price; ++j)
-				cout << " $" << ans.data[i].price[j];
+				cout << " ￥" << ans.data[i].price[j];
 			cout << '\n';
 		}
 	} catch(...) {cout << "0\n";}
@@ -199,6 +199,7 @@ void system_exit() {return ;}
 // ======= System END =======
 int main()
 {
+	user_system.init();
 	while (1)
 	{
 		const int command_number = 17;
@@ -230,7 +231,7 @@ int main()
 		char str[30]; scanf("%s", str);
 		for (int i = 0; i < command_number; ++i)
 			if (!strcmp(str, command_name[i]))
-				if (i == command_number - 1) return 0;
+				if (i == command_number - 1) {puts("BYE"); return 0;}
 				else command[i]();
 	}
 	return 0;

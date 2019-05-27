@@ -27,6 +27,7 @@ public:
 	}
 	~vector()
 	{
+		f = fopen(filename, "rb+");
 		if (f)
 		{
 			fseek(f, 0, SEEK_SET);
@@ -53,8 +54,8 @@ public:
 	}
 	void clean()
 	{
-		fclose(f);
-		char opt[20];
+		fclose(f); f = NULL;
+		char opt[30];
 		sprintf(opt, "rm %s", filename);
 		system(opt);
 	}
