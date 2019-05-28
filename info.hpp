@@ -2,7 +2,10 @@
 #define INFO
 #include <cstring>
 #include <iostream>
+#include "ct_vector.hpp"
 #include "structs.hpp"
+
+const char fname_ticket_number[] = "ticket_quantity_data";
 
 struct info_user {
 	char name[40];
@@ -66,17 +69,28 @@ struct info_station {
 	}
 };
 
+struct ticket_number_t
+{
+	short quan[30][5][60];
+	ticket_number_t() = default;
+	ticket_number_t(short _quan[30][5][60])
+	{
+		memcpy(quan, _quan, sizeof (quan));
+	}
+	short &at(short date, short type, short id) {return quan[date][type][id];}
+};
+
 struct info_train {
 	str<char, 20> train_id;
 	short num_station, num_price;
 	char name[20], name_price[5][20];
 	char catalog[10];
 	info_station data[60];
-	short quan_ticket[5][60][30];  //5 means type of tickets, 60 means station number, 30 means days
-	bool on_sale;
+	int on_sale;
 
 	info_train() {
 		num_station = -1;	//for convenience of judging wrong visit
+		on_sale = -1;
 	}
 	info_train(const info_train& other) {
 		train_id = other.train_id;
@@ -87,11 +101,6 @@ struct info_train {
 		memcpy(data, other.data, num_station * sizeof(info_station));
 		for (int i = 0; i < num_price; ++i) {
 			memcpy(name_price[i], other.name_price[i], 20 * sizeof(char));
-		}
-		for (int i = 0; i < 5; ++i) {
-			for (int j = 0; j < 60; ++j) {
-				memcpy(quan_ticket[i][j], other.quan_ticket[i][j], 30 * sizeof(short));
-			}
 		}
 		on_sale = other.on_sale;
 	}
@@ -105,22 +114,25 @@ struct info_train {
 		for (int i = 0; i < num_price; ++i) {
 			memcpy(name_price[i], _name_price[i], 20 * sizeof (char));
 		}
-		memset(quan_ticket, 0, sizeof (quan_ticket));
 		memcpy(catalog, _catalog, 10);
 		memcpy(data, _data, num_station * sizeof (info_station));
 		settime();   //NOTE HERE: I have changed trains that cross the days with new time(eg. 25:12).
-		on_sale = false;
+		on_sale = -1;
 	}
 	bool sell() {
-		if (on_sale) return false;
-		on_sale = true;
-		for (int i = 0; i < num_price; ++i) {
-			for (int j = 0; i < num_station; ++j) {
-				for (int k = 0; k < 30; ++k) {
+		if (on_sale >= 0) return false;
+		short quan_ticket[30][5][60];  //5 means type of tickets, 60 means station number, 30 means days
+		for (int i = 0; i < 30; ++i) {
+			for (int j = 0; j < num_price; ++j) {
+				for (int k = 0; k < num_station; ++k) {
 					quan_ticket[i][j][k] = 2000;
 				}
 			}
 		}
+		ticket_number_t nnn = ticket_number_t(quan_ticket);
+		ct::vector<ticket_number_t, fname_ticket_number> vec;
+		on_sale = vec.size();
+		vec.push_back(nnn);
 		return true;
 	}
 	void settime() {

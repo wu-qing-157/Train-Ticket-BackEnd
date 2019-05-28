@@ -38,7 +38,7 @@ public:
 	}
 	info_train query_train(char train_id[]) const {
 		str<char, 20> queryId(train_id);
-		if (data.count(t.train_id)) throw 1;
+		if (!data.count(queryId)) return info_train();
 		info_train x = data.at(queryId);
 		return data.at(queryId);
 	}
@@ -53,14 +53,14 @@ public:
 		str<char, 20> queryId(train_id);
 		if (!data.count(queryId)) return false;
 		info_train x = data.at(queryId);
-		if (x.on_sale == true) return false;
+		if (x.on_sale >= 0) return false;
 		data.modify(queryId, t);
 		return true;
 	}
 	bool sale_train(char train_id[]) {
 		str<char, 20> queryId(train_id);
+		if (!data.count(queryId)) return false;
 		info_train x = data.at(queryId);
-		if (x.num_station == -1) return false;
 
 		for (int i = 0; i < x.num_station; ++i) {
 			llist.insert(x.data[i].name, x.data[i].name);
@@ -99,6 +99,8 @@ public:
 typedef sjtu::vector<info_ticket> ctn_ticket;
 
 const char fnametic[] = "ticket_bought_data";
+//const char fname_ticket_number[] = "ticket_quantity_data";
+
 class ticket {
 private:
 	train* tra;
@@ -144,6 +146,8 @@ public:
 			if (cA.first == cB.first) {
 				if (cA.second >= cB.second) {
 					info_train info = tra->data.at(cA.first);
+					ct::vector<ticket_number_t, fname_ticket_number> vv;
+					ticket_number_t quan = vv[info.on_sale];
 					info_ticket tic;
 					memcpy(tic.train_id, cA.first.data, 20);
 					tic.date = date;
@@ -158,8 +162,8 @@ public:
 						int cnt = 2000;
 						float price = 0;
 						for (int j = cA.second; j < cB.second; ++j) {
-							if (cnt > info.quan_ticket[i][j][date]) cnt = info.quan_ticket[i][j][date];
-							price += info.data[j].price[i];
+							if (cnt > quan.at(date, i, j)) cnt = quan.at(date, i, j);
+							price += info.data[j + 1].price[i];
 						}
 						tic.ticket_quantity[i] = cnt;
 						tic.price[i] = price;
@@ -216,6 +220,9 @@ public:
 		if (id > use->cur || id < 2019) return false;
 		if (!strcmp(_loc1, _loc2)) return false;
 		info_train info = tra->data.at(train_id);
+		if (info.on_sale == -1) return false;
+		ct::vector<ticket_number_t, fname_ticket_number> vv;
+		ticket_number_t quan = vv[info.on_sale];
 		//NOTE HERE: there is a convertion of char[20] to str<char, 20> above, and I'm not sure it's correct.
 		int i = 0, j = 0;
 		int a, b, k;
@@ -239,13 +246,14 @@ public:
 				b = j;
 				break;
 			}
-			if (info.quan_ticket[i][j][date] < num) return false;
+			if (quan.at(date, i, j) < num) return false;
 		}
 		if (j == info.num_station) return false;
 
 		for (j = a; j < b; ++j) {
-			tra->data.at(train_id).quan_ticket[i][j][date] -= num;
+			quan.at(date, i, j) -= num;
 		}
+		vv.modify(info.on_sale, ticket_number_t(quan));
 
 		//below is how I can stroage user's ticket_ordered data.
 
@@ -262,7 +270,7 @@ public:
 		for (i = 0; i < info.num_price; ++i) {
 			memcpy(tic.ticket_kind[i], info.name_price[i], 20 * sizeof(char));
 			float price = 0;
-			for (j = a; j < b; ++j) {
+			for (j = a + 1; j <= b; ++j) {
 				price += info.data[j].price[i];
 			}
 			tic.price[i] = price;
@@ -303,22 +311,24 @@ public:
 	bool refund_ticket(int id, short num, char train_id[20],char loc_from[20],
 		char loc_to[20], my_date date, char ticket_kind[20]) {
 		if (id > use->cur || id < 2019) return false;
+		info_train info = tra->data.at(train_id);
+		if (info.on_sale == -1) return false;
 		short cnt = num;
 		for (int i = 0; i < data.size(); ++i){
 			if (data[i].id == id && data[i].date == date && !strcmp(data[i].train_id, train_id)) {
 				int k = 0;
 				for (; k < data[i].num_price; ++k) {
-					if (!strcmp(data[i].ticket_kind[k], data[i].ticket_kind[k])) {
+					if (!strcmp(ticket_kind, data[i].ticket_kind[k])) {
 						break;
 					}
 				}
+				if (k == data[i].num_price) return false;
 				cnt -= data[i].ticket_quantity[k];
-				if (cnt < 0) return false;
 			}
 		}
+		if (cnt > 0) return false;
 
 		if (!strcmp(loc_from, loc_to)) return false;
-		info_train info = tra->data.at(train_id);
 		//NOTE HERE: there is a convertion of char[20] to str<char, 20> above, and I'm not sure it's correct.
 		int i = 0, j = 0;
 		int a, b, k;
@@ -345,20 +355,23 @@ public:
 		}
 		if (j == info.num_station) return false;
 
+		ct::vector<ticket_number_t, fname_ticket_number> vv;
+		ticket_number_t quan = vv[info.on_sale];
 		for (j = a; j < b; ++j) {
-			tra->data.at(train_id).quan_ticket[i][j][date] += num;
+			quan.at(date, i, j) += num;
 		}
+		vv.modify(info.on_sale, ticket_number_t(quan));
 
 		cnt = num;
-		for (int i = 0; i < data.size(); ++i) {
+		for (i = 0; i < data.size(); ++i) {
 			if (data[i].id == id && data[i].date == date && !strcmp(data[i].train_id, train_id)) {
-				int k = 0;
+				k = 0;
 				for (; k < data[i].num_price; ++k) {
-					if (!strcmp(data[i].ticket_kind[k], data[i].ticket_kind[k])) {
+					if (!strcmp(ticket_kind, data[i].ticket_kind[k])) {
 						break;
 					}
 				}
-				if (cnt >= data[i].ticket_quantity[k]) {
+				if (cnt > data[i].ticket_quantity[k]) {
 					cnt -= data[i].ticket_quantity[k];
 					info_ticket_user tmp = data[i];
 					tmp.ticket_quantity[k] = 0;
@@ -368,6 +381,7 @@ public:
 					info_ticket_user tmp = data[i];
 					tmp.ticket_quantity[k] -= cnt;
 					data.modify(i, tmp);
+					return true;
 				}
 			}
 		}

@@ -150,21 +150,19 @@ void train_sale_train()
 }
 void train_query_train()
 {
-	try
+	train_id_t tid; cin >> tid;
+	info_train ans = train_system.query_train(tid);
+	if (ans.num_station == -1) {cout << "0\n"; return ;}
+	cout << tid << ' ' << ans.name << ' ' << ans.catalog << ' ' << ans.num_station << ' ' << ans.num_price;
+	for (int i = 0; i < ans.num_price; ++i) cout << ' ' << ans.name_price[i];
+	cout << '\n';
+	for (int i = 0; i < ans.num_station; ++i)
 	{
-		train_id_t tid; cin >> tid;
-		info_train ans = train_system.query_train(tid);
-		cout << tid << ' ' << ans.name << ' ' << ans.catalog << ' ' << ans.num_station << ' ' << ans.num_price;
-		for (int i = 0; i < ans.num_price; ++i) cout << ' ' << ans.name_price[i];
+		cout << ans.data[i].name << ' ' << ans.data[i].arriv << ' ' << ans.data[i].start << ' ' << ans.data[i].stopover;
+		for (int j = 0; j < ans.num_price; ++j)
+			cout << " ￥" << ans.data[i].price[j];
 		cout << '\n';
-		for (int i = 0; i < ans.num_station; ++i)
-		{
-			cout << ans.data[i].name << ' ' << ans.data[i].arriv << ' ' << ans.data[i].start << ' ' << ans.data[i].stopover;
-			for (int j = 0; j < ans.num_price; ++j)
-				cout << " ￥" << ans.data[i].price[j];
-			cout << '\n';
-		}
-	} catch(...) {cout << "0\n";}
+	}
 }
 void train_delete_train()
 {
@@ -211,7 +209,7 @@ void system_exit() {return ;}
 int main()
 {
 	user_system.init();
-		system_clean();
+		// system_clean();
 	while (1)
 	{
 		const int command_number = 17;

@@ -7,8 +7,8 @@
 #include <iostream>
 #include <cstring>
 #include "utility.hpp"
-//#include "./vector/exceptions.hpp"
-#include "exceptions.hpp"
+#include "./vector/exceptions.hpp"
+//#include "exceptions.hpp"
 #include "find_blank.hpp"
 
 using namespace std;
@@ -934,7 +934,7 @@ namespace sjtu {
             return root == invalid_off;
         }
 
-        int count(const Key &key, node &x){
+        int count(const Key &key, node &x) const {
             if(comp(key, x.mainKey))
                 return 0;
             if(x.isLeaf){
@@ -955,7 +955,7 @@ namespace sjtu {
             return count(key, y);
         }
 
-        int count(const Key &key) {
+        int count(const Key &key) const {
             if(empty())
                 return 0;
             node x = get_node(root);
@@ -1027,7 +1027,7 @@ namespace sjtu {
         }
 
         value_t at(const Key &key) {
-            if(empty()) throw "at";
+            if(empty()) return value_t();
             node x = get_node(root);
             return at(key, x);
         }
@@ -1058,7 +1058,7 @@ namespace sjtu {
         }
 
         const value_t at(const Key& key) const{
-            if (empty()) throw "at";
+            if (empty()) return value_t();
             node x = get_node(root);
             return at(key, x);
         }
