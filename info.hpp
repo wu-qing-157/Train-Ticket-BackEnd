@@ -105,6 +105,7 @@ struct info_train {
 		for (int i = 0; i < num_price; ++i) {
 			memcpy(name_price[i], _name_price[i], 20 * sizeof (char));
 		}
+		memset(quan_ticket, 0, sizeof (quan_ticket));
 		memcpy(catalog, _catalog, 10);
 		memcpy(data, _data, num_station * sizeof (info_station));
 		settime();   //NOTE HERE: I have changed trains that cross the days with new time(eg. 25:12).

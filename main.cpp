@@ -132,6 +132,7 @@ void train_add_train()
 	{
 		loc_t loc;
 		my_timer_t arr, start, stopover; float price[5];
+		memset(price, 0, sizeof (price));
 		char price_s[10];
 		cin >> loc >> arr >> start >> stopover;
 		cout << loc << ' ' << arr << ' ' << start << ' ' << stopover << '\n';
@@ -203,6 +204,7 @@ void system_clean()
 {
 	user_system.clean();
 	ticket_system.clean();
+	train_system.clean();
 	is_it_clean = 1;
 	cout << "1\n";
 }
@@ -211,6 +213,7 @@ void system_exit() {return ;}
 int main()
 {
 	user_system.init();
+		system_clean();
 	while (1)
 	{
 		const int command_number = 17;

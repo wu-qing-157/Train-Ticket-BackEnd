@@ -207,8 +207,10 @@ namespace sjtu {
             return new_leaf;
         }
 
-        node insert(node &x, Key key, value_t value, bool &is_change){
+        node insert(node &x, Key key, value_t value, bool is_change){
+            //key.print(); value.print();
             if(x.isLeaf){
+                puts("OK");
                 buffer b;
                 buffer_load_leaf(b, x);
                 node new_node = buffer_insert_leaf(b, x, key, value, is_change);
@@ -733,12 +735,11 @@ namespace sjtu {
         private:
             node leaf;
             size_t pos;
-            bptree *tree;
-
+            const bptree *tree;
         public:
             iterator():leaf(invalid_off, invalid_off, invalid_off, true), pos(0), tree(nullptr){}
 
-            iterator(node _leaf, size_t p, bptree *_tree):leaf(_leaf){
+            iterator(node _leaf, size_t p, const bptree *_tree):leaf(_leaf){
                 pos  = p;
                 tree = _tree;
             }
@@ -823,12 +824,12 @@ namespace sjtu {
         private:
             node leaf;
             size_t pos;
-            bptree *tree;
+            const bptree *tree;
 
         public:
             const_iterator():leaf(invalid_off, invalid_off, invalid_off, true), pos(0), tree(nullptr){}
 
-            const_iterator(node _leaf, size_t p, bptree *_tree):leaf(_leaf){
+            const_iterator(node _leaf, size_t p, const bptree *_tree):leaf(_leaf){
                     pos  = p;
                     tree = _tree;
             }
@@ -959,6 +960,7 @@ namespace sjtu {
         void insert(const Key &key, const value_t &value) {
             bool is_change;
             if(empty()) {
+                puts("empty is ok!");
                 node x(finder._alloc(), invalid_off, invalid_off, true);
                 buffer b;
                 buffer_insert_leaf(b, x, key, value, is_change);

@@ -16,6 +16,7 @@ struct str {
 	str(T _data[]) {
 		memcpy(data, _data, N * sizeof(T));
 	}
+	str(const str &that) {memcpy(data, that.data, N * sizeof (T));}
 	void cpy(T _data[]) {
 		memcpy(data, _data, N * sizeof(T));
 	}
