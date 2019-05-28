@@ -125,7 +125,6 @@ void train_add_train()
 	train_id_t tid; name_t _name; catalog_t _cata; int num_station, num_price;
 	ticket_kind_t price_name[5];
 	cin >> tid >> _name >> _cata >> num_station >> num_price;
-	cout << tid << _name << _cata << num_station << num_price << '\n';
 	for (int i = 0; i < num_price; ++i) cin >> price_name[i];
 	info_station st_info[60];
 	for (int i = 0; i < num_station; ++i)
@@ -135,7 +134,6 @@ void train_add_train()
 		memset(price, 0, sizeof (price));
 		char price_s[10];
 		cin >> loc >> arr >> start >> stopover;
-		cout << loc << ' ' << arr << ' ' << start << ' ' << stopover << '\n';
 		for (int j = 0; j < num_price; ++j)
 		{
 			cin >> price_s; sscanf(price_s + 1, "%f", price + j);
