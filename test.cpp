@@ -1,5 +1,6 @@
 #include <cstdio>
 #include "bptree.hpp"
+#include "structs.hpp"
 
 struct KKey
 {
@@ -19,10 +20,16 @@ struct VVal {
 
 int main()
 {
-	sjtu::bptree<KKey, VVal> tr("fuck", "fuckk");
-	for (int i = 1; i < 7; ++i)
-		tr.insert(KKey(i * i % 7, i), VVal(i * i * i));
-	for (auto it = tr.cbegin(); it != tr.cend(); ++it) printf("%d\n", (*it).p );
+	sjtu::bptree<str<char, 20>, VVal> tr("fuck", "fuckk");
+	str<char, 20> pp; char mmp[20];
+	cin >> mmp;
+
+	pp = mmp;
+	tr.insert(pp, 100);
+	printf("%d\n", tr.count(pp) );
+	//for (int i = 1; i < 7; ++i)
+	//	tr.insert(KKey(i * i % 7, i), VVal(i * i * i));
+//	for (int i = 0; i < 10; ++i) printf("%d\n", tr.count(KKey(i * i % 7, i)) );
 	tr.clear();
 	return 0;
 }

@@ -965,7 +965,7 @@ namespace sjtu {
         void insert(const Key &key, const value_t &value) {
             bool is_change;
             if(empty()) {
-                puts("empty is ok!");
+               // puts("empty is ok!");
                 node x(finder._alloc(), invalid_off, invalid_off, true);
                 buffer b;
                 buffer_insert_leaf(b, x, key, value, is_change);

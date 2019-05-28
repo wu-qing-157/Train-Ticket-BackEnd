@@ -33,12 +33,14 @@ public:
 	train() {}
 	bool add(info_train& t) {   //Maybe there needs to be some changes here.
 		if (data.count(t.train_id)) return false;
+//		cout << t.train_id << ' add_train_id\n';
 		data.insert(t.train_id, t);
 		return true;	//I need jyq to change bptree.hpp to enable return false(try{} is too slow)
 	}
 	info_train query_train(char train_id[]) const {
 		str<char, 20> queryId(train_id);
-		if (!data.count(queryId)) return info_train();
+		// cout << train_id << " query_train_id\n";
+		// if (!data.count(queryId)) return info_train();
 		info_train x = data.at(queryId);
 		return data.at(queryId);
 	}

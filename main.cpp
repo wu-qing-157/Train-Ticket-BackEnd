@@ -27,6 +27,8 @@ typedef char ticket_kind_t[20];
 typedef char train_id_t[20];
 typedef char my_timer_t[10];
 
+#define cls(_arr) memset(_arr, 0, sizeof (_arr))
+
 // ======= User BEGIN =======
 user user_system;
 void user_register()
@@ -35,12 +37,13 @@ void user_register()
 	password_t pwd;
 	email_t _email;
 	phone_t _phone;
+	cls(pwd);
 	cin >> _name >> pwd >> _email >> _phone;
 	cout << user_system.regist(_name, pwd, _email, _phone) << "\n";
 }
 void user_login()
 {
-	int id; password_t pwd;
+	int id; password_t pwd; cls(pwd);
 	cin >> id >> pwd;
 	cout << user_system.login(id, pwd) << "\n";
 }
@@ -72,6 +75,7 @@ ticket ticket_system{&train_system, &user_system};
 void ticket_query_ticket()
 {
 	loc_t loc1, loc2; date_t _date; catalog_t _catalog;
+	cls(loc1); cls(loc2); cls(_date); cls(_catalog);
 	cin >> loc1 >> loc2 >> _date >> _catalog;
 	auto ret = ticket_system.query_ticket(loc1, loc2, my_date(_date), _catalog);
 	cout << ret.size() << "\n";
@@ -79,26 +83,23 @@ void ticket_query_ticket()
 }
 void ticket_query_transfer()
 {
-	loc_t loc1, loc2;
-	date_t _date;
-	catalog_t _catalog;
+	loc_t loc1, loc2; date_t _date; catalog_t _catalog;
+	cls(loc1); cls(loc2); cls(_date); cls(_catalog);
 	cin >> loc1 >> loc2 >> _date >> _catalog;
 	auto ret = ticket_system.query_transfer(loc1, loc2, my_date(_date), _catalog);
 	cout << ret.first << ret.second;
 }
 void ticket_buy_ticket()
 {
-	int uid, num;
-	train_id_t t_id;
-	loc_t loc1, loc2;
-	date_t _date;
-	ticket_kind_t _kind;
+	int uid, num; train_id_t t_id; loc_t loc1, loc2; date_t _date; ticket_kind_t _kind;
+	cls(t_id); cls(loc1); cls(loc2); cls(_date); cls(_kind);
 	cin >> uid >> num >> t_id >> loc1 >> loc2 >> _date >> _kind;
 	cout << ticket_system.buy_ticket(uid, num, t_id, loc1, loc2, my_date(_date), _kind) << '\n';
 }
 void ticket_query_order()
 {
 	int uid; date_t _date; catalog_t _catalog;
+	cls(_date); cls(_catalog);
 	cin >> uid >> _date >> _catalog;
 	auto ret = ticket_system.query_order(uid, my_date(_date), _catalog);
 	if (ret.success)
@@ -113,6 +114,7 @@ void ticket_query_order()
 void ticket_refund_ticket()
 {
 	int uid, num; train_id_t tid; loc_t loc1, loc2; date_t _date; ticket_kind_t _kind;
+	cls(tid); cls(loc1); cls(loc2); cls(_date); cls(_kind);
 	cin >> uid >> num >> tid >> loc1 >> loc2 >> _date >> _kind;
 	cout << ticket_system.refund_ticket(uid, num, tid, loc1, loc2, my_date(_date), _kind);
 	// ...
@@ -124,6 +126,7 @@ void train_add_train()
 {
 	train_id_t tid; name_t _name; catalog_t _cata; int num_station, num_price;
 	ticket_kind_t price_name[5];
+	cls(tid); cls(_name); cls(_cata); cls(price_name);
 	cin >> tid >> _name >> _cata >> num_station >> num_price;
 	for (int i = 0; i < num_price; ++i) cin >> price_name[i];
 	info_station st_info[60];
@@ -133,6 +136,7 @@ void train_add_train()
 		my_timer_t arr, start, stopover; float price[5];
 		memset(price, 0, sizeof (price));
 		char price_s[10];
+		cls(loc); cls(arr); cls(start); cls(stopover);
 		cin >> loc >> arr >> start >> stopover;
 		for (int j = 0; j < num_price; ++j)
 		{
@@ -145,12 +149,12 @@ void train_add_train()
 }
 void train_sale_train()
 {
-	train_id_t tid; cin >> tid;
+	train_id_t tid; cls(tid); cin >> tid;
 	cout << train_system.sale_train(tid) << '\n';
 }
 void train_query_train()
 {
-	train_id_t tid; cin >> tid;
+	train_id_t tid; cls(tid); cin >> tid;
 	info_train ans = train_system.query_train(tid);
 	if (ans.num_station == -1) {cout << "0\n"; return ;}
 	cout << tid << ' ' << ans.name << ' ' << ans.catalog << ' ' << ans.num_station << ' ' << ans.num_price;
@@ -166,13 +170,14 @@ void train_query_train()
 }
 void train_delete_train()
 {
-	train_id_t tid; cin >> tid;
+	train_id_t tid; cls(tid); cin >> tid;
 	cout << train_system.delete_train(tid) << '\n';
 }
 void train_modify_train()
 {
 	train_id_t tid; name_t _name; catalog_t _cata; int num_station, num_price;
 	ticket_kind_t price_name[5];
+	cls(tid); cls(_name); cls(_cata); cls(price_name);
 	cin >> tid >> _name >> _cata >> num_station >> num_price;
 	for (int i = 0; i < num_price; ++i) cin >> price_name[i];
 	info_station st_info[60];
@@ -181,6 +186,7 @@ void train_modify_train()
 		loc_t loc;
 		my_timer_t arr, start, stopover; float price[5];
 		char price_s[10];
+		cls(loc); cls(arr); cls(start); cls(stopover);
 		cin >> loc >> arr >> start >> stopover;
 		for (int j = 0; j < num_price; ++j)
 		{
