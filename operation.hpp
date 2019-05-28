@@ -32,26 +32,27 @@ public:
 
 	train() {}
 	bool add(info_train& t) {   //Maybe there needs to be some changes here.
+		if (data.count(t.train_id)) return false;
 		data.insert(t.train_id, t);
 		return true;	//I need jyq to change bptree.hpp to enable return false(try{} is too slow)
 	}
 	info_train query_train(char train_id[]) const {
 		str<char, 20> queryId(train_id);
+		if (data.count(t.train_id)) throw 1;
 		info_train x = data.at(queryId);
-		if (x.num_station == -1) throw 1;    //if no information queried£¬num_station will be set as -1
 		return data.at(queryId);
 	}
 	bool delete_train(char train_id[]) {
 		str<char, 20> queryId(train_id);
+		if (!data.count(queryId)) return false;
 		info_train x = data.at(queryId);
-		if (x.num_station == -1) return false;
 		data.erase(queryId);
 		return true;
 	}
 	bool modify_train(char train_id[], const info_train& t) {
 		str<char, 20> queryId(train_id);
+		if (!data.count(queryId)) return false;
 		info_train x = data.at(queryId);
-		if (x.num_station == -1) return false;
 		if (x.on_sale == true) return false;
 		data.modify(queryId, t);
 		return true;
