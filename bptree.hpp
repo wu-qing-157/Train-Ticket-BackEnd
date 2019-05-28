@@ -7,7 +7,8 @@
 #include <iostream>
 #include <cstring>
 #include "utility.hpp"
-#include "./vector/exceptions.hpp"
+//#include "./vector/exceptions.hpp"
+#include "exceptions.hpp"
 #include "find_blank.hpp"
 
 using namespace std;
@@ -66,7 +67,7 @@ namespace sjtu {
         inline void save_node(const node &x){
             fseek(file, x.pos, SEEK_SET);
             fwrite(&x, sizeof(node), 1, file);
-            fflush(file);
+            if(file) fflush(file);
         }
 
         inline void delete_node(const node &x){
@@ -78,7 +79,7 @@ namespace sjtu {
             fwrite(&head, sizeof(off_t), 1, file);
             fwrite(&rear, sizeof(off_t), 1, file);
             fwrite(&root, sizeof(off_t), 1, file);
-            fflush(file);
+            if(file) fflush(file);
         }
 
         void init(){
@@ -102,13 +103,13 @@ namespace sjtu {
         inline void buffer_save_node(_buffer b, const node &x){
             fseek(file, x.pos+sizeof(node), SEEK_SET);
             fwrite(b, 1, x.curSize*(sizeof(off_t)+sizeof(Key)), file);
-            fflush(file);
+            if(file) fflush(file);
         }
 
         inline void buffer_save_leaf(_buffer b, const node &x){
             fseek(file, x.pos+sizeof(node), SEEK_SET);
             fwrite(b, 1, x.curSize*(sizeof(value_t)+sizeof(Key)), file);
-            fflush(file);
+            if(file) fflush(file);
         }
 
         //================get info from node==================
@@ -207,10 +208,10 @@ namespace sjtu {
             return new_leaf;
         }
 
-        node insert(node &x, Key key, value_t value, bool is_change){
+        node insert(node &x, Key key, value_t value, bool &is_change){
             //key.print(); value.print();
             if(x.isLeaf){
-                puts("OK");
+                //puts("OK");
                 buffer b;
                 buffer_load_leaf(b, x);
                 node new_node = buffer_insert_leaf(b, x, key, value, is_change);
@@ -265,6 +266,8 @@ namespace sjtu {
             if(t<x.curSize&&compare(key, *get_key_leaf(t, b))) {
                 *get_value_leaf(t, b) = value;
                 is_change = true;
+                save_node(x);
+                buffer_save_node(b,x);
                 return x;
             }
             //if(!compare(key, *get_key_leaf(t, b))&&t>0) t--;
@@ -691,16 +694,17 @@ namespace sjtu {
 
     public:
         bptree(const char *fname, const char *in_file)://leaf_size(5),node_size(5)
-        leaf_size((K - sizeof(node))/(sizeof(Key)+sizeof(value_t))-1),
-        node_size((K - sizeof(node))/(sizeof(Key)+sizeof(off_t))-1)
+                leaf_size((K - sizeof(node))/(sizeof(Key)+sizeof(value_t))-1),
+                node_size((K - sizeof(node))/(sizeof(Key)+sizeof(off_t))-1)
         {
             filename = new char[strlen(fname)+1];
             strcpy(filename, fname);
             index_file = new char[strlen(in_file)+1];
             strcpy(index_file, in_file);
             file = fopen(filename, "rb+");
-            //finder.load(index_file);
             finder.init(in_file);
+            //finder.load_info();
+
             if(!file) {
                 file = fopen(fname, "wb+");
                 init();
@@ -714,6 +718,7 @@ namespace sjtu {
         }
 
         ~bptree(){
+            finder.save_info();
             save_info();
             if(file) fclose(file);
             delete filename;
@@ -830,8 +835,8 @@ namespace sjtu {
             const_iterator():leaf(invalid_off, invalid_off, invalid_off, true), pos(0), tree(nullptr){}
 
             const_iterator(node _leaf, size_t p, const bptree *_tree):leaf(_leaf){
-                    pos  = p;
-                    tree = _tree;
+                pos  = p;
+                tree = _tree;
             }
 
             const_iterator(const iterator &other):leaf(other.leaf){
@@ -1027,38 +1032,38 @@ namespace sjtu {
             return at(key, x);
         }
 
-		const value_t at(const Key& key, node& x) const {
-			if (comp(key, x.mainKey)) {
-				value_t value = value_t();
-				return value;
-			}
-			if (x.isLeaf) {
-				buffer b;
-				buffer_load_leaf(b, x);
-				size_t tmp = leaf_find_pos(b, key, x.curSize);
-				if (tmp < x.curSize && compare(key, *get_key_leaf(tmp, b)))
-					return *get_value_leaf(tmp, b);
-				else {
-					value_t value = value_t();
-					return value;
-				}
-			}
-			buffer b;
-			buffer_load_node(b, x);
-			size_t tmp = node_find_pos(b, key, x.curSize);
-			if (tmp > 0 && !compare(key, *get_key_node(tmp, b))) tmp--;
-			if (tmp == x.curSize) tmp--;
-			node y = get_node(*get_son_node(tmp, b));
-			return at(key, y);
-		}
-		
-		const value_t at(const Key& key) const{
-			if (empty()) throw "at";
-			node x = get_node(root);
-			return at(key, x);
-		}
+        const value_t at(const Key& key, node& x) const {
+            if (comp(key, x.mainKey)) {
+                value_t value = value_t();
+                return value;
+            }
+            if (x.isLeaf) {
+                buffer b;
+                buffer_load_leaf(b, x);
+                size_t tmp = leaf_find_pos(b, key, x.curSize);
+                if (tmp < x.curSize && compare(key, *get_key_leaf(tmp, b)))
+                    return *get_value_leaf(tmp, b);
+                else {
+                    value_t value = value_t();
+                    return value;
+                }
+            }
+            buffer b;
+            buffer_load_node(b, x);
+            size_t tmp = node_find_pos(b, key, x.curSize);
+            if (tmp > 0 && !compare(key, *get_key_node(tmp, b))) tmp--;
+            if (tmp == x.curSize) tmp--;
+            node y = get_node(*get_son_node(tmp, b));
+            return at(key, y);
+        }
 
-        void traverse(void *fun(Key *key, value_t *value)) {
+        const value_t at(const Key& key) const{
+            if (empty()) throw "at";
+            node x = get_node(root);
+            return at(key, x);
+        }
+
+        void traverse() {
             node x = get_node(head);
             buffer b;
             while(true){
@@ -1143,4 +1148,3 @@ namespace sjtu {
 }
 
 #endif //BPTREE_BPTREE_HPP
-
