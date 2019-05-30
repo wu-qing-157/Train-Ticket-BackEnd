@@ -135,7 +135,7 @@ void train_add_train()
 		loc_t loc;
 		my_timer_t arr, start, stopover; float price[5];
 		memset(price, 0, sizeof (price));
-		char price_s[10];
+		char price_s[20];
 		cls(loc); cls(arr); cls(start); cls(stopover);
 		cin >> loc >> arr >> start >> stopover;
 		for (int j = 0; j < num_price; ++j)
@@ -156,7 +156,7 @@ void train_query_train()
 {
 	train_id_t tid; cls(tid); cin >> tid;
 	info_train ans = train_system.query_train(tid);
-	if (ans.num_station == -1) {cout << "0\n"; return ;}
+	if (ans.num_station == 0) {cout << "0\n"; return ;}
 	cout << tid << ' ' << ans.name << ' ' << ans.catalog << ' ' << ans.num_station << ' ' << ans.num_price;
 	for (int i = 0; i < ans.num_price; ++i) cout << ' ' << ans.name_price[i];
 	cout << '\n';

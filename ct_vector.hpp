@@ -59,14 +59,14 @@ public:
 		sprintf(opt, "rm %s", filename);
 		system(opt);
 	}
-	const T operator [] (const size_t &index) const
+	T operator [] (const size_t &index) const
 	{
 		if (index < 0 || index >= cur_cnt) throw index_out_of_bound();
 		fseek(f, sizeof(size_t) + index * sizeof (T), SEEK_SET);
 		T temp; fread(&temp, sizeof(T), 1, f);
 		return temp;
 	}
-	const T at(const size_t &index) const
+	T at(const size_t &index) const
 	{
 		if (index < 0 || index >= cur_cnt) throw index_out_of_bound();
 		fseek(f, sizeof(size_t) + index * sizeof (T), SEEK_SET);

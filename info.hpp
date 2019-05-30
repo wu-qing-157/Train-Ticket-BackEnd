@@ -83,39 +83,39 @@ struct ticket_number_t
 struct info_train {
 	str<char, 20> train_id;
 	short num_station, num_price;
-	char name[20], name_price[5][20];
+	char name[40], name_price[5][20];
 	char catalog[10];
 	info_station data[60];
 	int on_sale;
 
 	info_train() {
-		num_station = -1;	//for convenience of judging wrong visit
+		num_station = 0;	//for convenience of judging wrong visit
 		on_sale = -1;
 	}
 	info_train(const info_train& other) {
 		train_id = other.train_id;
 		num_station = other.num_station;
 		num_price = other.num_price;
-		memcpy(name, other.name, 20 * sizeof(char));
+		memcpy(name, other.name, 40 * sizeof(char));
 		memcpy(catalog, other.catalog, 10 * sizeof(char));
-		memcpy(data, other.data, num_station * sizeof(info_station));
+		memcpy(data, other.data, 60 * sizeof(info_station));
 		for (int i = 0; i < num_price; ++i) {
 			memcpy(name_price[i], other.name_price[i], 20 * sizeof(char));
 		}
 		on_sale = other.on_sale;
 	}
-	info_train(char _name[20], char _name_price[5][20],
+	info_train(char _name[40], char _name_price[5][20],
 		char _train_id[20], char _catalog[10], short _num_station,
 		short _num_price, info_station _data[60]) {
 		train_id.cpy(_train_id);  //NOTE HERE: I'm using char[] to construct train_id, but it's stored as str.
 		num_price = _num_price;
 		num_station = _num_station;
-		memcpy(name, _name, 20 * sizeof (char));
+		memcpy(name, _name, 40 * sizeof (char));
 		for (int i = 0; i < num_price; ++i) {
 			memcpy(name_price[i], _name_price[i], 20 * sizeof (char));
 		}
 		memcpy(catalog, _catalog, 10);
-		memcpy(data, _data, num_station * sizeof (info_station));
+		memcpy(data, _data, 60 * sizeof (info_station));
 		settime();   //NOTE HERE: I have changed trains that cross the days with new time(eg. 25:12).
 		on_sale = -1;
 	}
@@ -173,8 +173,8 @@ struct info_ticket {
 			memcpy(ticket_kind[i], _ticket_kind[i], 20 * sizeof(char));
 		}
 		num_price = _num_price;
-		memcpy(ticket_quantity, _ticket_quantity, sizeof(short));
-		memcpy(price, _price, 5 * sizeof(short));
+		memcpy(ticket_quantity, _ticket_quantity, 5 * sizeof(short));
+		memcpy(price, _price, 5 * sizeof(float));
 	}
 	info_ticket operator= (const info_ticket& other) {
 		memcpy(train_id, other.train_id, 20);
@@ -189,8 +189,8 @@ struct info_ticket {
 			memcpy(ticket_kind[i], other.ticket_kind[i], 20 * sizeof(char));
 		}
 		num_price = other.num_price;
-		memcpy(ticket_quantity, other.ticket_quantity, sizeof(short));
-		memcpy(price, other.price, 5 * sizeof(short));
+		memcpy(ticket_quantity, other.ticket_quantity, 5 * sizeof(short));
+		memcpy(price, other.price, 5 * sizeof(float));
 		return *this;
 	}
 	void setnormal() {

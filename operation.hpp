@@ -21,10 +21,17 @@ typedef char catalog_t[10];
 typedef char ticket_kind_t[20];
 typedef char train_id_t[20];
 
+const char train_info_name[] = "train_info_name";
 class train {
 	friend class ticket;
 private:
-	sjtu::bptree<str<char, 20>, info_train> data{ "trainData", "trainIndex" };  
+	sjtu::bptree<str<char, 20>, int> data{ "trainData", "trainIndex" };  
+	ct::vector<info_train, train_info_name> tr_info;
+const info_train IDquery(str<char, 20> queryId) const
+{
+	int x = data.at(queryId);
+	return tr_info[x];
+}
 
 public:
 	sjtu::bptree<str<char, 20>, str<char, 20>> llist{"llistData", "llistIndex"};
@@ -33,36 +40,41 @@ public:
 	train() {}
 	bool add(info_train& t) {   //Maybe there needs to be some changes here.
 		if (data.count(t.train_id)) return false;
+		for (int i = 0; i < 20; ++i) printf("%d%c", t.train_id.data[i], " \n"[i == 19]);
 //		cout << t.train_id << ' add_train_id\n';
-		data.insert(t.train_id, t);
+		data.insert(t.train_id, tr_info.size());
+		tr_info.push_back(t);
+		printf("%d\n", data.count(t.train_id) );
 		return true;	//I need jyq to change bptree.hpp to enable return false(try{} is too slow)
 	}
-	info_train query_train(char train_id[]) const {
+	const info_train query_train(char train_id[]) const {
 		str<char, 20> queryId(train_id);
-		// cout << train_id << " query_train_id\n";
-		// if (!data.count(queryId)) return info_train();
-		info_train x = data.at(queryId);
-		return data.at(queryId);
+		for (int i = 0; i < 20; ++i) printf("%d%c", queryId.data[i], " \n"[i == 19]);
+		if (!data.count(queryId)) return info_train();
+//		puts("FUCK");
+		info_train x = IDquery(queryId);
+		return x;
 	}
 	bool delete_train(char train_id[]) {
 		str<char, 20> queryId(train_id);
 		if (!data.count(queryId)) return false;
-		info_train x = data.at(queryId);
 		data.erase(queryId);
 		return true;
 	}
 	bool modify_train(char train_id[], const info_train& t) {
 		str<char, 20> queryId(train_id);
 		if (!data.count(queryId)) return false;
-		info_train x = data.at(queryId);
+		int pos = data.at(queryId);
+		info_train x = tr_info[pos];
 		if (x.on_sale >= 0) return false;
-		data.modify(queryId, t);
+		tr_info.modify(pos, t);
 		return true;
 	}
 	bool sale_train(char train_id[]) {
 		str<char, 20> queryId(train_id);
 		if (!data.count(queryId)) return false;
-		info_train x = data.at(queryId);
+		info_train x = IDquery(queryId);
+		if (x.on_sale >= 0) return false;
 
 		for (int i = 0; i < x.num_station; ++i) {
 			llist.insert(x.data[i].name, x.data[i].name);
@@ -89,7 +101,7 @@ public:
 		}
 		//above: traverse all the station and push them into bptree
 
-		return data.at(queryId).sell();    // huge problems may have happened when return wrong.
+		return x.sell();    // huge problems may have happened when return wrong.
 	}
 	void clean() {
 		data.clear();
@@ -147,7 +159,7 @@ public:
 		while (iA != treeA.end() && iB != treeB.end()) {
 			if (cA.first == cB.first) {
 				if (cA.second >= cB.second) {
-					info_train info = tra->data.at(cA.first);
+					info_train info = tra->IDquery(cA.first);
 					ct::vector<ticket_number_t, fname_ticket_number> vv;
 					ticket_number_t quan = vv[info.on_sale];
 					info_ticket tic;
@@ -221,7 +233,7 @@ public:
 
 		if (id > use->cur || id < 2019) return false;
 		if (!strcmp(_loc1, _loc2)) return false;
-		info_train info = tra->data.at(train_id);
+		info_train info = tra->IDquery(train_id);
 		if (info.on_sale == -1) return false;
 		ct::vector<ticket_number_t, fname_ticket_number> vv;
 		ticket_number_t quan = vv[info.on_sale];
@@ -313,7 +325,7 @@ public:
 	bool refund_ticket(int id, short num, char train_id[20],char loc_from[20],
 		char loc_to[20], my_date date, char ticket_kind[20]) {
 		if (id > use->cur || id < 2019) return false;
-		info_train info = tra->data.at(train_id);
+		info_train info = tra->IDquery(train_id);
 		if (info.on_sale == -1) return false;
 		short cnt = num;
 		for (int i = 0; i < data.size(); ++i){

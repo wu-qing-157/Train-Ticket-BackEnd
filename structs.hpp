@@ -59,7 +59,7 @@ struct my_time {
 	my_time() :data(0) {}
 	my_time(char s[]) {
 		if (s[0] == 'x') data = -1;
-		else data = (((s[0] - '0') * 10 + s[1] - '0') * 100 + s[3] - '0') * 10 + s[4] - '0';
+		else data = (((s[0] - '0') * 10 + s[1] - '0') * 10 + s[3] - '0') * 10 + s[4] - '0';
 	}
 
 	short hour() const { return (data / 100); }

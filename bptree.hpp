@@ -16,7 +16,7 @@ using namespace std;
 #define BPTREE_BPTREE_HPP
 
 namespace sjtu {
-    template<class Key, class value_t, size_t K = 4096, class Compare = std::less<Key>>
+    template<class Key, class value_t, size_t K = 8192, class Compare = std::less<Key>>
     class bptree {
         //friend class iterator;
         //friend class const_iterator;
