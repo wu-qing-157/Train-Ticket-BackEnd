@@ -40,19 +40,20 @@ public:
 	train() {}
 	bool add(info_train& t) {   //Maybe there needs to be some changes here.
 		if (data.count(t.train_id)) return false;
-		for (int i = 0; i < 20; ++i) printf("%d%c", t.train_id.data[i], " \n"[i == 19]);
+		// for (int i = 0; i < 20; ++i) printf("%d%c", t.train_id.data[i], " \n"[i == 19]);
 //		cout << t.train_id << ' add_train_id\n';
 		data.insert(t.train_id, tr_info.size());
 		tr_info.push_back(t);
-		printf("%d\n", data.count(t.train_id) );
+		// printf("%d\n", data.count(t.train_id) );
 		return true;	//I need jyq to change bptree.hpp to enable return false(try{} is too slow)
 	}
 	const info_train query_train(char train_id[]) const {
 		str<char, 20> queryId(train_id);
-		for (int i = 0; i < 20; ++i) printf("%d%c", queryId.data[i], " \n"[i == 19]);
+		// for (int i = 0; i < 20; ++i) printf("%d%c", queryId.data[i], " \n"[i == 19]);
 		if (!data.count(queryId)) return info_train();
 //		puts("FUCK");
 		info_train x = IDquery(queryId);
+		if (x.on_sale < 0) return info_train();
 		return x;
 	}
 	bool delete_train(char train_id[]) {
@@ -73,7 +74,8 @@ public:
 	bool sale_train(char train_id[]) {
 		str<char, 20> queryId(train_id);
 		if (!data.count(queryId)) return false;
-		info_train x = IDquery(queryId);
+		int pos = data.at(queryId);
+		info_train x = tr_info[pos];
 		if (x.on_sale >= 0) return false;
 
 		for (int i = 0; i < x.num_station; ++i) {
@@ -100,13 +102,14 @@ public:
 			tree.insert(tid, pr);
 		}
 		//above: traverse all the station and push them into bptree
-
-		return x.sell();    // huge problems may have happened when return wrong.
+		x.sell(); tr_info.modify(pos, x);
+		return true;    // huge problems may have happened when return wrong.
 	}
 	void clean() {
 		data.clear();
 		llist.clear();
 		lclist.clear();
+		tr_info.clean();
 	}
 };
 
@@ -446,6 +449,8 @@ public:
 			sjtu::bptree<str<char, 20>, value_t> tree(s1, s2);
 			tree.clear();
 		}
+		ct::vector<ticket_number_t, fname_ticket_number> vv;
+		vv.clean();
 	}
 };
 

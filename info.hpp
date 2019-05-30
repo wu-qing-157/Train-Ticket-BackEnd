@@ -119,8 +119,7 @@ struct info_train {
 		settime();   //NOTE HERE: I have changed trains that cross the days with new time(eg. 25:12).
 		on_sale = -1;
 	}
-	bool sell() {
-		if (on_sale >= 0) return false;
+	void sell() {
 		short quan_ticket[30][5][60];  //5 means type of tickets, 60 means station number, 30 means days
 		for (int i = 0; i < 30; ++i) {
 			for (int j = 0; j < num_price; ++j) {
@@ -133,7 +132,7 @@ struct info_train {
 		ct::vector<ticket_number_t, fname_ticket_number> vec;
 		on_sale = vec.size();
 		vec.push_back(nnn);
-		return true;
+		return ;
 	}
 	void settime() {
 		data[0].checkday();
