@@ -35,7 +35,6 @@ const info_train IDquery(str<char, 20> queryId) const
 
 public:
 	sjtu::bptree<str<char, 20>, str<char, 20>> llist{"llistData", "llistIndex"};
-	sjtu::bptree<str<char, 31>, str<char, 31>> lclist{"lclistData", "lclistIndex"};
 
 	train() {}
 	bool add(info_train& t) {   //Maybe there needs to be some changes here.
@@ -78,24 +77,18 @@ public:
 		info_train x = tr_info[pos];
 		if (x.on_sale >= 0) return false;
 
-		for (int i = 0; i < x.num_station; ++i) {
+		for (int i = 0; i < x.num_station; ++i)
 			llist.insert(x.data[i].name, x.data[i].name);
-			char s[31];
-			sprintf(s, "%s_%s", x.data[i].name, x.catalog);
-			lclist.insert(s, s);
-		}
 
 		for (short i = 0; i < x.num_station; ++i) {
 			loc_t a;
-			catalog_t catalog;
 			str<char, 20> tid(x.train_id);
 			pair<str<char, 20>, short> pr;
 			pr = std::make_pair(tid, i);
 			memcpy(a, x.data[i].name, 20 * sizeof(char));
-			memcpy(catalog, x.catalog, 10 * sizeof(char));
-			char filename[36], ffname[37];
-			sprintf(filename, "data_%s_%s", a, catalog);
-			sprintf(ffname, "index_%s_%s", a, catalog);
+			char filename[25], ffname[26];
+			sprintf(filename, "data_%s", a);
+			sprintf(ffname, "index_%s", a);
 
 			sjtu::bptree<str<char, 20>, pair<str<char, 20>, short>>
 				tree(filename, ffname);
@@ -108,7 +101,6 @@ public:
 	void clean() {
 		data.clear();
 		llist.clear();
-		lclist.clear();
 		tr_info.clean();
 	}
 };
@@ -131,67 +123,70 @@ public:
 	sjtu::vector<info_ticket> query_ticket(loc_t a, loc_t b, my_date date, catalog_t catalog) {
 		
 		typedef pair<str<char, 20>, short> value_t;
-		typedef sjtu::bptree<str<char, 20>, pair<str<char, 20>, short>>::iterator bpt_itr;
+		typedef sjtu::bptree<str<char, 20>, value_t>::iterator bpt_itr;
 
 		sjtu::vector<info_ticket> ans;
 
-		char filename1[36], filename2[36];
-		sprintf(filename1, "data_%s_%s", a, catalog);
-		sprintf(filename2, "data_%s_%s", b, catalog);
-		FILE *f = fopen(filename1, "rw+");
+		char filename1[25], filename2[25];
+		sprintf(filename1, "data_%s", a);
+		sprintf(filename2, "data_%s", b);
+		FILE *f = fopen(filename1, "rb+");
 		if (!f) return ans;  //NOTE HERE: this ans cannot be used directedly
-		f = fopen(filename2, "rw+");
+		f = fopen(filename2, "rb+");
 		if (!f) return ans;  //NOTE HERE: this ans cannot be used directedly
 
-		char ffname1[37], ffname2[37];
-		sprintf(ffname1, "index_%s_%s", a, catalog);
-		sprintf(ffname2, "index_%s_%s", b, catalog);
+		char ffname1[26], ffname2[26];
+		sprintf(ffname1, "index_%s", a);
+		sprintf(ffname2, "index_%s", b);
 
 		sjtu::bptree<str<char, 20>, value_t> treeA(filename1, ffname1);
 		sjtu::bptree<str<char, 20>, value_t> treeB(filename2, ffname2);
-
-
-		typedef pair<str<char, 20>, short> value_t;
-		typedef sjtu::bptree<str<char, 20>, pair<str<char, 20>, short>>::iterator bpt_itr;
 
 		bpt_itr iA = treeA.begin();
 		bpt_itr iB = treeB.begin();
 		value_t cA = *iA;
 		value_t cB = *iB;
 
+		int cata_len = strlen(catalog);
 		while (iA != treeA.end() && iB != treeB.end()) {
 			if (cA.first == cB.first) {
-				if (cA.second >= cB.second) {
+				if (cA.second < cB.second) {
 					info_train info = tra->IDquery(cA.first);
-					ct::vector<ticket_number_t, fname_ticket_number> vv;
-					ticket_number_t quan = vv[info.on_sale];
-					info_ticket tic;
-					memcpy(tic.train_id, cA.first.data, 20);
-					tic.date = date;
-					tic.time_from = info.data[cA.second].arriv;
-					tic.time_to = info.data[cB.second].start;
-					//I'm not sure whether above two sentencces are what's suppposed to be.
-					memcpy(tic.loc_from, info.data[cA.second].name, 20 * sizeof(char));
-					memcpy(tic.loc_to, info.data[cB.second].name, 20 * sizeof(char));
-					tic.num_price = info.num_price;
-					for (int i = 0; i < info.num_price; ++i) {
-						memcpy(tic.ticket_kind[i], info.name_price[i], 20 * sizeof(char));
-						int cnt = 2000;
-						float price = 0;
-						for (int j = cA.second; j < cB.second; ++j) {
-							if (cnt > quan.at(date, i, j)) cnt = quan.at(date, i, j);
-							price += info.data[j + 1].price[i];
+					bool find = 0;
+					for (int i = 0; i < cata_len && !find; ++i)
+						if (catalog[i] == info.catalog) find = 1;
+					if (find)
+					{
+						ct::vector<ticket_number_t, fname_ticket_number> vv;
+						ticket_number_t quan = vv[info.on_sale];
+						info_ticket tic;
+						memcpy(tic.train_id, cA.first.data, 20);
+						tic.date = date;
+						tic.time_from = info.data[cA.second].arriv;
+						tic.time_to = info.data[cB.second].start;
+						//I'm not sure whether above two sentencces are what's suppposed to be.
+						memcpy(tic.loc_from, info.data[cA.second].name, 20 * sizeof(char));
+						memcpy(tic.loc_to, info.data[cB.second].name, 20 * sizeof(char));
+						tic.num_price = info.num_price;
+						for (int i = 0; i < info.num_price; ++i) {
+							memcpy(tic.ticket_kind[i], info.name_price[i], 20 * sizeof(char));
+							int cnt = 2000;
+							float price = 0;
+							for (int j = cA.second; j < cB.second; ++j) {
+								if (cnt > quan.at(date, i, j)) cnt = quan.at(date, i, j);
+								price += info.data[j + 1].price[i];
+							}
+							tic.ticket_quantity[i] = cnt;
+							tic.price[i] = price;
 						}
-						tic.ticket_quantity[i] = cnt;
-						tic.price[i] = price;
+						bool jdg = false;
+						for (int i = 0; i < tic.num_price; ++i) {
+							if (tic.ticket_quantity[i] != 0) jdg = true;
+							break;
+						}
+						tic.setnormal();
+						if (jdg) ans.push_back(tic);
 					}
-					bool jdg = false;
-					for (int i = 0; i < tic.num_price; ++i) {
-						if (tic.ticket_quantity[i] != 0) jdg = true;
-						break;
-					}
-					tic.setnormal();
-					if (jdg) ans.push_back(tic);
 				}
 				iA++; iB++;
 				cA = *iA; cB = *iB;
@@ -299,12 +294,14 @@ public:
 
 	query_order_return query_order(int id, my_date date, char catalog[]) {
 		query_order_return ans;
-		
+		int cata_len = strlen(catalog);
 		if (id > use->cur || id < 2019) return ans;
 		for (int i = 0; i < data.size(); ++i) {
-			if (data[i].id == id && data[i].date == date && !strcmp(data[i].catalog, catalog)) {
-				bool jdg = true;
-				for (int j = 0; j < ans.data.size(); ++j) {
+			if (data[i].id == id && data[i].date == date) {
+				bool jdg = false;
+				for (int j = 0; !jdg && j < cata_len; ++j)
+					if (catalog[j] == data[i].catalog) jdg = true;
+				for (int j = 0; jdg && j < ans.data.size(); ++j) {
 					if (!strcmp(ans.data[j].train_id, data[i].train_id)) {
 						int k = 0;
 						for (; k < ans.data[j].num_price; ++k) {
@@ -314,6 +311,7 @@ public:
 							ans.data[j].ticket_quantity[k] += data[i].ticket_quantity[k];
 						}
 						if (k == ans.data[j].num_price) throw 1;
+						jdg = false;
 					}
 				}
 				if (jdg) {
@@ -438,11 +436,11 @@ public:
 	}*/
 	void clean() {
 		data.clean();
-		sjtu::bptree<str<char, 31>, str<char, 31>>::iterator it = tra->lclist.begin();
-		for (; it != tra->lclist.end(); ++it) {
-			char ct[31];
-			memcpy(ct, (*it).data, 31);
-			char s1[36], s2[37];
+		sjtu::bptree<str<char, 20>, str<char, 20>>::iterator it = tra->llist.begin();
+		for (; it != tra->llist.end(); ++it) {
+			char ct[20];
+			memcpy(ct, (*it).data, 20);
+			char s1[25] = {0}, s2[26] = {0};
 			sprintf(s1, "data_%s", ct);
 			sprintf(s2, "index_%s", ct);
 			typedef pair<str<char, 20>, short> value_t;

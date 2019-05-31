@@ -84,7 +84,7 @@ struct info_train {
 	str<char, 20> train_id;
 	short num_station, num_price;
 	char name[40], name_price[5][20];
-	char catalog[10];
+	char catalog;
 	info_station data[60];
 	int on_sale;
 
@@ -97,7 +97,7 @@ struct info_train {
 		num_station = other.num_station;
 		num_price = other.num_price;
 		memcpy(name, other.name, 40 * sizeof(char));
-		memcpy(catalog, other.catalog, 10 * sizeof(char));
+		catalog = other.catalog;
 		memcpy(data, other.data, 60 * sizeof(info_station));
 		for (int i = 0; i < num_price; ++i) {
 			memcpy(name_price[i], other.name_price[i], 20 * sizeof(char));
@@ -105,7 +105,7 @@ struct info_train {
 		on_sale = other.on_sale;
 	}
 	info_train(char _name[40], char _name_price[5][20],
-		char _train_id[20], char _catalog[10], short _num_station,
+		char _train_id[20], char _catalog, short _num_station,
 		short _num_price, info_station _data[60]) {
 		train_id.cpy(_train_id);  //NOTE HERE: I'm using char[] to construct train_id, but it's stored as str.
 		num_price = _num_price;
@@ -114,7 +114,7 @@ struct info_train {
 		for (int i = 0; i < num_price; ++i) {
 			memcpy(name_price[i], _name_price[i], 20 * sizeof (char));
 		}
-		memcpy(catalog, _catalog, 10);
+		catalog = _catalog;
 		memcpy(data, _data, 60 * sizeof (info_station));
 		settime();   //NOTE HERE: I have changed trains that cross the days with new time(eg. 25:12).
 		on_sale = -1;
@@ -213,7 +213,7 @@ ostream &operator << (ostream &os, const info_ticket &obj)
 struct info_ticket_user{
 	int id;
 	char train_id[20];
-	char catalog[10];
+	char catalog;
 	my_date date;
 	my_date date_from, date_to;
 	my_time time_from, time_to;
@@ -225,7 +225,7 @@ struct info_ticket_user{
 	info_ticket_user(const info_ticket_user& other) {
 		id = other.id;
 		memcpy(train_id, other.train_id, 20);
-		memcpy(catalog, other.catalog, 10);
+		catalog = other.catalog;
 		date = other.date;
 		date_from = other.date_from;
 		date_to = other.date_to;
@@ -240,10 +240,10 @@ struct info_ticket_user{
 		memcpy(ticket_quantity, other.ticket_quantity, sizeof(short));
 		memcpy(price, other.price, 5 * sizeof(short));
 	}
-	info_ticket_user(int _id, char _train_id[20], char _catalog[10], const info_ticket other) {
+	info_ticket_user(int _id, char _train_id[20], char _catalog, const info_ticket other) {
 		id = _id;
 		memcpy(train_id, _train_id, 20);
-		memcpy(catalog, _catalog, 10);
+		catalog  = _catalog;
 		date = other.date;
 		date_from = other.date_from;
 		date_to = other.date_to;
@@ -261,7 +261,7 @@ struct info_ticket_user{
 	info_ticket_user operator= (const info_ticket_user& other) {
 		id = other.id;
 		memcpy(train_id, other.train_id, 20);
-		memcpy(catalog, other.catalog, 10);
+		catalog = other.catalog;
 		date = other.date;
 		time_from = other.time_from;
 		time_to = other.time_to;

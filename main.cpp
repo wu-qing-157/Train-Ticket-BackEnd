@@ -116,7 +116,7 @@ void ticket_refund_ticket()
 	int uid, num; train_id_t tid; loc_t loc1, loc2; date_t _date; ticket_kind_t _kind;
 	cls(tid); cls(loc1); cls(loc2); cls(_date); cls(_kind);
 	cin >> uid >> num >> tid >> loc1 >> loc2 >> _date >> _kind;
-	cout << ticket_system.refund_ticket(uid, num, tid, loc1, loc2, my_date(_date), _kind);
+	cout << ticket_system.refund_ticket(uid, num, tid, loc1, loc2, my_date(_date), _kind) << '\n';
 	// ...
 }
 // ======= Ticket END =======
@@ -144,7 +144,7 @@ void train_add_train()
 		}
 		st_info[i] = info_station(loc, my_time(arr), my_time(start), my_time(stopover), price);
 	}
-	info_train now = info_train(_name, price_name, tid, _cata, num_station, num_price, st_info);
+	info_train now = info_train(_name, price_name, tid, _cata[0], num_station, num_price, st_info);
 	cout << train_system.add(now) << '\n';
 }
 void train_sale_train()
@@ -175,8 +175,8 @@ void train_delete_train()
 }
 void train_modify_train()
 {
-	train_id_t tid; name_t _name; catalog_t _cata; int num_station, num_price;
-	ticket_kind_t price_name[5];
+    ticket_kind_t price_name[5];
+    train_id_t tid; name_t _name; catalog_t _cata; int num_station, num_price;
 	cls(tid); cls(_name); cls(_cata); cls(price_name);
 	cin >> tid >> _name >> _cata >> num_station >> num_price;
 	for (int i = 0; i < num_price; ++i) cin >> price_name[i];
@@ -194,7 +194,7 @@ void train_modify_train()
 		}
 		st_info[i] = info_station(loc, my_time(arr), my_time(start), my_time(stopover), price);
 	}
-	info_train now = info_train(_name, price_name, tid, _cata, num_station, num_price, st_info);
+	info_train now = info_train(_name, price_name, tid, _cata[0], num_station, num_price, st_info);
 	cout << train_system.modify_train(tid, now) << '\n';
 	return ;
 }
