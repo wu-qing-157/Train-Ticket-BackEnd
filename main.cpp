@@ -5,6 +5,8 @@
 
 //int top, maxx;
 
+#define float double
+
 #ifndef CT
 	#include "return.hpp"
 	#include "operation.hpp"
@@ -143,7 +145,7 @@ void train_add_train()
 		cin >> loc >> arr >> start >> stopover;
 		for (int j = 0; j < num_price; ++j)
 		{
-			cin >> price_s; sscanf(price_s + 3, "%f", price + j);
+			cin >> price_s; sscanf(price_s + 3, "%lf", price + j);
 		}
 		st_info[i] = info_station(loc, my_time(arr), my_time(start), my_time(stopover), price);
 	}
@@ -193,7 +195,7 @@ void train_modify_train()
 		cin >> loc >> arr >> start >> stopover;
 		for (int j = 0; j < num_price; ++j)
 		{
-			cin >> price_s; sscanf(price_s + 1, "%f", price + j);
+			cin >> price_s; sscanf(price_s + 1, "%lf", price + j);
 		}
 		st_info[i] = info_station(loc, my_time(arr), my_time(start), my_time(stopover), price);
 	}

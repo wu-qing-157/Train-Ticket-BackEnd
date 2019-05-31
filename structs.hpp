@@ -128,6 +128,7 @@ struct my_date {
 	my_date(char s[]) {  //this function read in string like "2019-06-21"
 		day = (s[8] - '0') * 10 + s[9] - '0';
 	}
+	my_date(short x) : day(x) {}
 	operator short() const {
 		return day - 1;
 	}
@@ -135,11 +136,13 @@ struct my_date {
 		day += i;
 		return *this;
 	}
+	my_date plus2(short i) const {return my_date(day + i);}
 	friend ostream& operator << (ostream &os, const my_date &obj);
 };
 ostream& operator << (ostream &os, const my_date &obj)
 {
-	os << "2019-06-" << setw(2) << setfill('0') << obj.day;
+	if (obj.day > 30) os << "2019-07-" << setw(2) << setfill('0') << obj.day - 30;
+	else os << "2019-06-" << setw(2) << setfill('0') << obj.day;
 	return os;
 }
 

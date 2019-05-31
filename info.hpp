@@ -138,7 +138,7 @@ struct info_train {
 		data[0].checkday();
 		for (int i = 1; i < num_station; ++i) {
 			data[i].checkday();
-			if (data[i].arriv < data[i - 1].start) data[i].dayplus();
+			while (data[i].arriv < data[i - 1].start) data[i].dayplus();
 		}
 	}
 };
@@ -193,8 +193,8 @@ struct info_ticket {
 		return *this;
 	}
 	void setnormal() {
-		date_from = date.plus(time_from.day_added());
-		date_to = date.plus(time_to.day_added());
+		date_from = date.plus2(time_from.day_added());
+		date_to = date.plus2(time_to.day_added());
 		time_from.normalize();
 		time_to.normalize();
 	}
