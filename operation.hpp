@@ -402,39 +402,7 @@ public:
 			}
 		}
 	}
-	
-	/*
-	query_order_return query_order(int id, my_date date, char catalog[]) {
-		if (id > use->cur || id < 2019) return query_order_return(false);
-		ctn_ticket ans = use->data[id - 2019].user_ticket[date];
-		info_ticket* ticket_return = new info_ticket [ans.size()];
-		return query_order_return(true, ans.size(), ticket_return);
-	}
-	bool refund_ticket(int id, short num, my_date date, char loc_from[], char loc_to[], char catalog[]) {
-		if (id > use->cur || id < 2019) return false;
-		int cnt = 0;
-		for (int i = use->data[id - 2019].user_ticket[date].size() - 1; i > 0; --i) {
-			if (use->data[id - 2019].user_ticket[date][i].loc_from == loc_from &&
-				use->data[id - 2019].user_ticket[date][i].loc_to == loc_to) {
-				//I want to change ALL the char[] and char[] into str<> (There's a huge bug above)
-				cnt++;
-				if (cnt >= num) break;
-				//Is the counting process is too time-consuming?
-			}		
-		}
-		if (cnt < num) return false;
-		cnt = 0;
-		for (int i = use->data[id - 2019].user_ticket[date].size() - 1; i > 0; --i) {
-			if (use->data[id - 2019].user_ticket[date][i].loc_from == loc_from &&
-				use->data[id - 2019].user_ticket[date][i].loc_to == loc_to) {
-				//(There's a huge bug above)
-				cnt++;
-				use->data[id - 2019].user_ticket[date].erase((size_t)i);
-				if (cnt >= num) break;
-			}
-		}
-		
-	}*/
+
 	void clean() {
 		data.clean();
 		sjtu::bptree<str<char, 20>, str<char, 20>>::iterator it = tra->llist.begin();
