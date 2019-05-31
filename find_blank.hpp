@@ -26,6 +26,7 @@ public:
             file = fopen(index_file, "wb+");
             save_info();
         }
+        else load_info();
     }
 
     ~find_blank() {
@@ -45,6 +46,7 @@ public:
             file = fopen(index_file, "wb+");
             save_info();
         }
+        else load_info();
     }
 
     void save_info() {
@@ -67,6 +69,7 @@ public:
             for (int i = 0; i < num; ++i)
                 fread(&blank[i], sizeof(off_t), 1, file);
         }
+        else blank = nullptr;
     }
 
     off_t _alloc() {
