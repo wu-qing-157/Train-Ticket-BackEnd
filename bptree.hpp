@@ -718,12 +718,9 @@ namespace sjtu {
         }
 
         ~bptree(){
-            if(file)
-            {
-                finder.save_info();
-                save_info();
-                fclose(file);
-            }
+            finder.save_info();
+            save_info();
+            if(file) fclose(file);
             delete filename;
             delete index_file;
         }

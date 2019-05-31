@@ -437,7 +437,7 @@ public:
 	void clean() {
 		data.clean();
 		sjtu::bptree<str<char, 20>, str<char, 20>>::iterator it = tra->llist.begin();
-		for (; it != tra->llist.end(); ++it) {
+		for (int i = 0; it != tra->llist.end(); ++it, ++i) {
 			char ct[20];
 			memcpy(ct, (*it).data, 20);
 			char s1[25] = {0}, s2[26] = {0};
