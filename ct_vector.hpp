@@ -19,15 +19,18 @@ public:
 		if (!f)
 		{
 			f = fopen(filename, "wb+");
+			if (f == nullptr)
+			    fprintf(stderr, "Error: %d\n", errno);
 		}
 		else
 		{
+		    fseek(f, 0, SEEK_SET);
 			fread(&cur_cnt, sizeof (size_t), 1, f);
 		}
 	}
 	~vector()
 	{
-		f = fopen(filename, "rb+");
+//		f = fopen(filename, "rb+");
 		if (f)
 		{
 			fseek(f, 0, SEEK_SET);
@@ -42,13 +45,14 @@ public:
 	}
 	void init()
 	{
-		f = fopen(filename, "rb+");
+//		f = fopen(filename, "rb+");
 		if (!f)
 		{
 			f = fopen(filename, "wb+");
 		}
 		else
 		{
+            fseek(f, 0, SEEK_SET);
 			fread(&cur_cnt, sizeof (size_t), 1, f);
 		}
 	}

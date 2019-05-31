@@ -953,7 +953,7 @@ namespace sjtu {
                 else
                     return 0;
             }
-            buffer b;
+            buffer b; memset(b, 0, sizeof (b));
             buffer_load_node(b ,x);
             size_t tmp = node_find_pos(b, key, x.curSize);
             if(tmp>0 && !compare(key, *get_key_node(tmp, b))) tmp--;

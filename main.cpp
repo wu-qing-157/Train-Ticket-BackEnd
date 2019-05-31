@@ -215,8 +215,8 @@ void system_exit() {return ;}
 // ======= System END =======
 int main()
 {
-    freopen("temp.in", "r", stdin);
-    freopen("temp.out", "w", stdout);
+//    freopen("temp.in", "r", stdin);
+//    freopen("temp.out", "w", stdout);
 	user_system.init();
 		// system_clean();
 	while (1)

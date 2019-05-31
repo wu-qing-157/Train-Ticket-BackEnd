@@ -405,17 +405,11 @@ public:
 
 	void clean() {
 		data.clean();
-		sjtu::bptree<str<char, 20>, str<char, 20>>::iterator it = tra->llist.begin();
-		for (int i = 0; it != tra->llist.end(); ++it, ++i) {
-			char ct[20];
-			memcpy(ct, (*it).data, 20);
-			char s1[25] = {0}, s2[26] = {0};
-			sprintf(s1, "data_%s", ct);
-			sprintf(s2, "index_%s", ct);
-			typedef pair<str<char, 20>, short> value_t;
-			sjtu::bptree<str<char, 20>, value_t> tree(s1, s2);
-			tree.clear();
-		}
+		if (!tra -> llist.empty())
+        {
+            system("rm data_*");
+            system("rm index_*");
+        }
 		ct::vector<ticket_number_t, fname_ticket_number> vv;
 		vv.clean();
 	}
