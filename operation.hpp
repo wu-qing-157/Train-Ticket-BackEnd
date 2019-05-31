@@ -131,9 +131,9 @@ public:
 		sprintf(filename1, "data_%s", a);
 		sprintf(filename2, "data_%s", b);
 		FILE *f = fopen(filename1, "rb+");
-		if (!f) return ans;  //NOTE HERE: this ans cannot be used directedly
+		if (!f) return ans;  //NOTE HERE: this ans cannot be used directly
 		f = fopen(filename2, "rb+");
-		if (!f) return ans;  //NOTE HERE: this ans cannot be used directedly
+		if (!f) return ans;  //NOTE HERE: this ans cannot be used directly
 
 		char ffname1[26], ffname2[26];
 		sprintf(ffname1, "index_%s", a);
@@ -162,9 +162,9 @@ public:
 						info_ticket tic;
 						memcpy(tic.train_id, cA.first.data, 20);
 						tic.date = date;
-						tic.time_from = info.data[cA.second].arriv;
-						tic.time_to = info.data[cB.second].start;
-						//I'm not sure whether above two sentencces are what's suppposed to be.
+						tic.time_from = info.data[cA.second].start;
+						tic.time_to = info.data[cB.second].arriv;
+						//I'm not sure whether above two sentences are what's supposed to be.
 						memcpy(tic.loc_from, info.data[cA.second].name, 20 * sizeof(char));
 						memcpy(tic.loc_to, info.data[cB.second].name, 20 * sizeof(char));
 						tic.num_price = info.num_price;
@@ -227,7 +227,7 @@ public:
 
 	bool buy_ticket(int id, short num, char train_id[20], char _loc1[],
 		char _loc2[], my_date date, char ticket_kind[]) {
-		//the time-comsuming constant of this function can be better
+		//the time-consuming constant of this function can be better
 
 		if (id > use->cur || id < 2019) return false;
 		if (!strcmp(_loc1, _loc2)) return false;
@@ -248,13 +248,13 @@ public:
 		if (i == info.num_price) return false;
 
 		for (; j < info.num_station; ++j) {
-			if (!strcmp(info.data->name, _loc1)) {
+			if (!strcmp(info.data[j].name, _loc1)) {
 				a = j;
 				break;
 			}
 		}
 		for (; j < info.num_station; ++j) {
-			if (!strcmp(info.data->name, _loc2)) {
+			if (!strcmp(info.data[j].name, _loc2)) {
 				b = j;
 				break;
 			}
@@ -267,14 +267,14 @@ public:
 		}
 		vv.modify(info.on_sale, ticket_number_t(quan));
 
-		//below is how I can stroage user's ticket_ordered data.
+		//below is how I can storage user's ticket_ordered data.
 
 		info_ticket tic;
 		memcpy(tic.train_id, train_id, 20);
 		tic.date = date;
-		tic.time_from = info.data[a].arriv;
-		tic.time_to = info.data[b].start;
-		//I'm not sure whether above two sentencces are what's suppposed to be.
+		tic.time_from = info.data[a].start;
+		tic.time_to = info.data[b].arriv;
+		//I'm not sure whether above two sentences are what's supposed to be.
 		memcpy(tic.loc_from, info.data[a].name, 20 * sizeof(char));
 		memcpy(tic.loc_to, info.data[b].name, 20 * sizeof(char));
 		tic.num_price = info.num_price;
@@ -290,6 +290,7 @@ public:
 		tic.setnormal();
 		info_ticket_user ans(id, train_id, info.catalog, tic);
 		data.push_back(ans);
+		return true;
 	}
 
 	query_order_return query_order(int id, my_date date, char catalog[]) {
