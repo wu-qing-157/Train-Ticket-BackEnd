@@ -7,8 +7,8 @@
 #include <iostream>
 #include <cstring>
 #include "utility.hpp"
-#include "./vector/exceptions.hpp"
-//#include "exceptions.hpp"
+//#include "./vector/exceptions.hpp"
+#include "exceptions.hpp"
 #include "find_blank.hpp"
 
 using namespace std;
@@ -16,7 +16,7 @@ using namespace std;
 #define BPTREE_BPTREE_HPP
 
 namespace sjtu {
-    template<class Key, class value_t, size_t K = 8192, class Compare = std::less<Key>>
+    template<class Key, class value_t, size_t K = 4096, class Compare = std::less<Key>>
     class bptree {
         //friend class iterator;
         //friend class const_iterator;
@@ -86,6 +86,9 @@ namespace sjtu {
             head = rear = root = invalid_off;
             fseek(file, 0, SEEK_SET);
             save_info();
+
+            finder.save_info();
+
         }
 
         inline void buffer_load_node(_buffer b, const node &x) const{
@@ -215,6 +218,7 @@ namespace sjtu {
                 buffer b;
                 buffer_load_leaf(b, x);
                 node new_node = buffer_insert_leaf(b, x, key, value, is_change);
+                //if(is_change) return node(invalid_off+12,false);
                 return new_node;
             }
             else{
@@ -222,19 +226,22 @@ namespace sjtu {
                 buffer_load_node(b, x);
                 size_t pos = node_find_pos(b, key, x.curSize);
                 if(!compare(key,*get_key_node(pos, b))&&pos > 0) pos--;
+                if(pos == x.curSize) pos--;
                 off_t pre_son = *get_son_node(pos, b);
                 node pre_son_node = get_node(pre_son);
                 node new_node = insert(pre_son_node, key, value, is_change);
+                if(is_change) return x;
                 if(new_node.pos != pre_son_node.pos){
                     //*get_key_node(pos, b) = pre_son_node.mainKey;
                     node n_node = buffer_insert_node(b, x, new_node.mainKey, new_node.pos, pos+1);
                     return n_node;
                 }
                 else{
-                    *get_key_node(pos, b) = pre_son_node.mainKey;
-                    x.mainKey = *get_key_node(0, b);
-                    save_node(x);
-                    buffer_save_node(b, x);
+                    //if(new_node.pos==invalid_off+12) return node(invalid_off+12,false);
+                        *get_key_node(pos, b) = pre_son_node.mainKey;
+                        x.mainKey = *get_key_node(0, b);
+                        save_node(x);
+                        buffer_save_node(b, x);
                     return x;
                 }
 
@@ -266,8 +273,8 @@ namespace sjtu {
             if(t<x.curSize&&compare(key, *get_key_leaf(t, b))) {
                 *get_value_leaf(t, b) = value;
                 is_change = true;
-                save_node(x);
-                buffer_save_node(b,x);
+                //save_node(x);
+                buffer_save_leaf(b,x);
                 return x;
             }
             //if(!compare(key, *get_key_leaf(t, b))&&t>0) t--;
@@ -693,7 +700,7 @@ namespace sjtu {
 //=====================================================================================================================================================
 
     public:
-        bptree(const char *fname, const char *in_file)://leaf_size(5),node_size(5)
+        bptree(const char *fname, const char *in_file)://leaf_size(50),node_size(50)
                 leaf_size((K - sizeof(node))/(sizeof(Key)+sizeof(value_t))-1),
                 node_size((K - sizeof(node))/(sizeof(Key)+sizeof(off_t))-1)
         {
@@ -721,8 +728,8 @@ namespace sjtu {
             finder.save_info();
             save_info();
             if(file) fclose(file);
-            delete filename;
-            delete index_file;
+            if(filename) delete filename;
+            if(index_file) delete index_file;
         }
 
         void clear(){
@@ -934,7 +941,7 @@ namespace sjtu {
             return root == invalid_off;
         }
 
-        int count(const Key &key, node &x) const {
+        int count(const Key &key, node &x){
             if(comp(key, x.mainKey))
                 return 0;
             if(x.isLeaf){
@@ -955,7 +962,7 @@ namespace sjtu {
             return count(key, y);
         }
 
-        int count(const Key &key) const {
+        int count(const Key &key) {
             if(empty())
                 return 0;
             node x = get_node(root);
@@ -965,7 +972,7 @@ namespace sjtu {
         void insert(const Key &key, const value_t &value) {
             bool is_change;
             if(empty()) {
-               // puts("empty is ok!");
+                puts("empty is ok!");
                 node x(finder._alloc(), invalid_off, invalid_off, true);
                 buffer b;
                 buffer_insert_leaf(b, x, key, value, is_change);
@@ -1027,7 +1034,7 @@ namespace sjtu {
         }
 
         value_t at(const Key &key) {
-            if(empty()) return value_t();
+            if(empty()) throw "at";
             node x = get_node(root);
             return at(key, x);
         }
@@ -1058,7 +1065,7 @@ namespace sjtu {
         }
 
         const value_t at(const Key& key) const{
-            if (empty()) return value_t();
+            if (empty()) throw "at";
             node x = get_node(root);
             return at(key, x);
         }
