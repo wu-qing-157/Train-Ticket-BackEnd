@@ -120,7 +120,7 @@ public:
 	ticket(train *_tr, user *_us) : tra(_tr), use(_us) {}
 
 	sjtu::vector<info_ticket> query_ticket(loc_t a, loc_t b, my_date date, catalog_t catalog) {
-		
+// query_ticket 延吉西 安图西 2019-06-01 CDG
 		typedef pair<str<char, 20>, short> value_t;
 		typedef sjtu::bptree<str<char, 20>, value_t>::iterator bpt_itr;
 
@@ -187,12 +187,12 @@ public:
 						if (jdg) ans.push_back(tic);
 					}
 				}
-				iA++; iB++;
+				++iA; ++iB;
 				cA = *iA; cB = *iB;
 
 			}
-			else if ((*iA).first < (*iB).first) { iA++; cA = *iA; }
-			else { iB++; cB = *iB; }
+			else if (cA.first < cB.first) { ++iA; cA = *iA; }
+			else { ++iB; cB = *iB; }
 		}
 
 		return ans;
@@ -206,7 +206,7 @@ public:
 		for (; it != tra->llist.end(); ++it) {
 			char ct[20];
 			memcpy(ct, (*it).data, 20);
-			std::cout << ct << '\n';
+			//std::cout << ct << '\n';
 			sjtu::vector<info_ticket> bfr = query_ticket(_loc1, ct, date, catalog);
 			sjtu::vector<info_ticket> aft = query_ticket(ct, _loc2, date, catalog);
 			

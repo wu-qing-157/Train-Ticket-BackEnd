@@ -87,7 +87,8 @@ void ticket_query_transfer()
 	cls(loc1); cls(loc2); cls(_date); cls(_catalog);
 	cin >> loc1 >> loc2 >> _date >> _catalog;
 	auto ret = ticket_system.query_transfer(loc1, loc2, my_date(_date), _catalog);
-	cout << ret.first << ret.second;
+	if (ret.first.num_price == -1) cout << "-1\n";
+	else cout << ret.first << ret.second;
 }
 void ticket_buy_ticket()
 {
