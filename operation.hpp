@@ -40,7 +40,7 @@ public:
 	bool add(info_train& t) {   //Maybe there needs to be some changes here.
 		if (data.count(t.train_id)) return false;
 		// for (int i = 0; i < 20; ++i) printf("%d%c", t.train_id.data[i], " \n"[i == 19]);
-//		cout << t.train_id << ' add_train_id\n';
+        //cout << t.train_id << ' add_train_id\n';
 		data.insert(t.train_id, tr_info.size());
 		tr_info.push_back(t);
 		// printf("%d\n", data.count(t.train_id) );
@@ -50,7 +50,6 @@ public:
 		str<char, 20> queryId(train_id);
 		// for (int i = 0; i < 20; ++i) printf("%d%c", queryId.data[i], " \n"[i == 19]);
 		if (!data.count(queryId)) return info_train();
-//		puts("FUCK");
 		info_train x = IDquery(queryId);
 		if (x.on_sale < 0) return info_train();
 		return x;
@@ -327,24 +326,24 @@ public:
 	bool refund_ticket(int id, short num, char train_id[20],char loc_from[20],
 		char loc_to[20], my_date date, char ticket_kind[20]) {
 		if (id > use->cur || id < 2019) return false;
-		info_train info = tra->IDquery(train_id);
-		if (info.on_sale == -1) return false;
-		short cnt = num;
-		for (int i = 0; i < data.size(); ++i){
-			if (data[i].id == id && data[i].date == date && !strcmp(data[i].train_id, train_id)) {
-				int k = 0;
-				for (; k < data[i].num_price; ++k) {
-					if (!strcmp(ticket_kind, data[i].ticket_kind[k])) {
-						break;
-					}
-				}
-				if (k == data[i].num_price) return false;
-				cnt -= data[i].ticket_quantity[k];
-			}
-		}
-		if (cnt > 0) return false;
+        if (!strcmp(loc_from, loc_to)) return false;
+        info_train info = tra->IDquery(train_id);
+        if (info.on_sale == -1) return false;
+        short cnt = num;
+        for (int i = 0; i < data.size(); ++i){
+            if (data[i].id == id && data[i].date == date && !strcmp(data[i].train_id, train_id)) {
+                int k = 0;
+                for (; k < data[i].num_price; ++k) {
+                    if (!strcmp(ticket_kind, data[i].ticket_kind[k])) {
+                        break;
+                    }
+                }
+                if (k == data[i].num_price) return false;
+                cnt -= data[i].ticket_quantity[k];
+            }
+        }
+        if (cnt > 0) return false;
 
-		if (!strcmp(loc_from, loc_to)) return false;
 		//NOTE HERE: there is a convertion of char[20] to str<char, 20> above, and I'm not sure it's correct.
 		int i = 0, j = 0;
 		int a, b, k;
@@ -358,13 +357,13 @@ public:
 		if (i == info.num_price) return false;
 
 		for (; j < info.num_station; ++j) {
-			if (!strcmp(info.data->name, loc_from)) {
+			if (!strcmp(info.data[j].name, loc_from)) {
 				a = j;
 				break;
 			}
 		}
 		for (; j < info.num_station; ++j) {
-			if (!strcmp(info.data->name, loc_to)) {
+			if (!strcmp(info.data[j].name, loc_to)) {
 				b = j;
 				break;
 			}
@@ -379,7 +378,7 @@ public:
 		vv.modify(info.on_sale, ticket_number_t(quan));
 
 		cnt = num;
-		for (i = 0; i < data.size(); ++i) {
+		for (i = 0; i < data.size(); ++i) {   //can be written better
 			if (data[i].id == id && data[i].date == date && !strcmp(data[i].train_id, train_id)) {
 				k = 0;
 				for (; k < data[i].num_price; ++k) {
