@@ -3,6 +3,8 @@
 #include <cstring>
 #include <iostream>
 
+//int top, maxx;
+
 #ifndef CT
 	#include "return.hpp"
 	#include "operation.hpp"
@@ -71,7 +73,7 @@ void user_modify_privilege()
 
 // ======= Ticket BEGIN =======
 train train_system;
-ticket ticket_system{&train_system, &user_system};
+ticket ticket_system(&train_system, &user_system);
 void ticket_query_ticket()
 {
 	loc_t loc1, loc2; date_t _date; catalog_t _catalog;
@@ -211,13 +213,13 @@ void system_clean()
 	is_it_clean = 1;
 	cout << "1\n";
 }
-void system_exit() {return ;}
+void system_exit() { return ;}
 // ======= System END =======
 int main()
 {
-//    freopen("temp.in", "r", stdin);
+//	freopen("temp.in", "r", stdin);
 //    freopen("temp.out", "w", stdout);
-	user_system.init();
+//	user_system.init();
 		// system_clean();
 	while (1)
 	{

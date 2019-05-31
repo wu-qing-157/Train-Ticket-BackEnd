@@ -131,8 +131,10 @@ public:
 		sprintf(filename2, "data_%s", b);
 		FILE *f = fopen(filename1, "rb+");
 		if (!f) return ans;  //NOTE HERE: this ans cannot be used directly
+		fclose(f);
 		f = fopen(filename2, "rb+");
 		if (!f) return ans;  //NOTE HERE: this ans cannot be used directly
+		fclose(f);
 
 		char ffname1[26] = {0}, ffname2[26] = {0};
 		sprintf(ffname1, "index_%s", a);
@@ -180,8 +182,11 @@ public:
 						}
 						bool jdg = false;
 						for (int i = 0; i < tic.num_price; ++i) {
-							if (tic.ticket_quantity[i] != 0) jdg = true;
-							break;
+							if (tic.ticket_quantity[i] != 0)
+							{
+								jdg = true;
+								break;
+							}
 						}
 						tic.setnormal();
 						if (jdg) ans.push_back(tic);

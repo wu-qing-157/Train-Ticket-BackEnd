@@ -708,6 +708,11 @@ namespace sjtu {
             strcpy(filename, fname);
             index_file = new char[strlen(in_file)+1];
             strcpy(index_file, in_file);
+
+			FILE *fff = fopen("bptree1", "a");
+			fprintf(fff, "open %s\n", filename);// ++top; top > maxx ? maxx = top : 0;
+			fclose(fff);
+
             file = fopen(filename, "rb+");
             finder.init(in_file);
             //finder.load_info();
@@ -727,6 +732,11 @@ namespace sjtu {
         ~bptree(){
             finder.save_info();
             save_info();
+
+			FILE *fff = fopen("bptree1", "a");
+			fprintf(fff, "close %s\n", filename);// --top;
+			fclose(fff);
+
             if(file) fclose(file);
             if(filename) delete filename;
             if(index_file) delete index_file;

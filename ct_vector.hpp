@@ -5,17 +5,23 @@
 
 #include <climits>
 #include <cstddef>
+#include "debuger_counter.hpp"
 
 namespace ct {
 template<typename T, const char *filename>
 class vector {
 private:
 	FILE *f;
-	size_t cur_cnt;
+	size_t cur_cnt{0};
 public:
 	vector()
 	{
 		f = fopen(filename, "rb+");
+
+		FILE *fff = fopen("vec", "a");
+		fprintf(fff, "open %s\n", filename);// ++top; top > maxx ? maxx = top : 0;
+		fclose(fff);
+
 		if (!f)
 		{
 			f = fopen(filename, "wb+");
@@ -31,6 +37,9 @@ public:
 	~vector()
 	{
 //		f = fopen(filename, "rb+");
+		FILE *fff = fopen("vec", "a");
+		fprintf(fff, "delete %s\n", filename);// --top;
+		fclose(fff);
 		if (f)
 		{
 			fseek(f, 0, SEEK_SET);

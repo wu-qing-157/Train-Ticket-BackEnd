@@ -17,6 +17,7 @@ private:
 
 public:
 	int counter() const { return cur; }
+	user() {cur = 2018 + data.size();}
 	void init()
 	{
 		data.init();

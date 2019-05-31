@@ -19,6 +19,11 @@ public:
         index_file = new char[strlen(in_file) + 1];
         strcpy(index_file, in_file);
         file = fopen(index_file, "rb+");
+
+		FILE *fff = fopen("bptree2", "a");
+		fprintf(fff, "open %s\n", index_file);// ++top; top > maxx ? maxx = top : 0;
+		fclose(fff);
+
         if (!file) {
             num = 0;
             size = 3 * sizeof(off_t);
@@ -30,8 +35,13 @@ public:
     }
 
     ~find_blank() {
-        if (file) fclose(file);
-        if (index_file) delete index_file;
+
+		FILE *fff = fopen("bptree2", "a");
+		fprintf(fff, "close %s\n", index_file);// --top;
+		fclose(fff);
+
+		if (file) fclose(file);
+		if (index_file) delete index_file;
         if (blank) delete blank;
     }
 
@@ -39,6 +49,11 @@ public:
         index_file = new char[strlen(in_file) + 1];
         strcpy(index_file, in_file);
         file = fopen(index_file, "rb+");
+
+		FILE *fff = fopen("bptree2", "a");
+		fprintf(fff, "open %s\n", index_file);// ++top; top > maxx ? maxx = top : 0;
+		fclose(fff);
+
         if (!file) {
             num = 0;
             size = 3 * sizeof(off_t);
