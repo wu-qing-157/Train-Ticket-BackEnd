@@ -85,7 +85,7 @@ public:
 			pair<str<char, 20>, short> pr;
 			pr = std::make_pair(tid, i);
 			memcpy(a, x.data[i].name, 20 * sizeof(char));
-			char filename[25], ffname[26];
+			char filename[25] = {0}, ffname[26] = {0};
 			sprintf(filename, "data_%s", a);
 			sprintf(ffname, "index_%s", a);
 
@@ -126,7 +126,7 @@ public:
 
 		sjtu::vector<info_ticket> ans;
 
-		char filename1[25], filename2[25];
+		char filename1[25] = {0}, filename2[25] = {0};
 		sprintf(filename1, "data_%s", a);
 		sprintf(filename2, "data_%s", b);
 		FILE *f = fopen(filename1, "rb+");
@@ -134,7 +134,7 @@ public:
 		f = fopen(filename2, "rb+");
 		if (!f) return ans;  //NOTE HERE: this ans cannot be used directly
 
-		char ffname1[26], ffname2[26];
+		char ffname1[26] = {0}, ffname2[26] = {0};
 		sprintf(ffname1, "index_%s", a);
 		sprintf(ffname2, "index_%s", b);
 
@@ -206,6 +206,7 @@ public:
 		for (; it != tra->llist.end(); ++it) {
 			char ct[20];
 			memcpy(ct, (*it).data, 20);
+			std::cout << ct << '\n';
 			sjtu::vector<info_ticket> bfr = query_ticket(_loc1, ct, date, catalog);
 			sjtu::vector<info_ticket> aft = query_ticket(ct, _loc2, date, catalog);
 			
@@ -215,7 +216,7 @@ public:
 					if (ans.first.num_price = -1 ||
 						((aft[j].time_to - bfr[i].time_from) < (ans.second.time_to - ans.first.time_from))) {
 						ans.first = bfr[i];
-						ans.first = aft[j];
+						ans.second = aft[j];
 					}
 				}
 			}
