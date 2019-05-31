@@ -168,10 +168,10 @@ struct info_ticket {
 		time_to = _time_to;
 		memcpy(loc_from, _loc_from, 20 * sizeof(char));
 		memcpy(loc_to, _loc_to, 20 * sizeof(char));
-		for (int i = 0; i < num_price; ++i) {
-			memcpy(ticket_kind[i], _ticket_kind[i], 20 * sizeof(char));
-		}
-		num_price = _num_price;
+        num_price = _num_price;
+        for (int i = 0; i < num_price; ++i) {
+            memcpy(ticket_kind[i], _ticket_kind[i], 20 * sizeof(char));
+        }
 		memcpy(ticket_quantity, _ticket_quantity, 5 * sizeof(short));
 		memcpy(price, _price, 5 * sizeof(float));
 	}
@@ -184,10 +184,10 @@ struct info_ticket {
 		time_to = other.time_to;
 		memcpy(loc_from, other.loc_from, 20 * sizeof(char));
 		memcpy(loc_to, other.loc_to, 20 * sizeof(char));
-		for (int i = 0; i < num_price; ++i) {
-			memcpy(ticket_kind[i], other.ticket_kind[i], 20 * sizeof(char));
-		}
-		num_price = other.num_price;
+        num_price = other.num_price;
+        for (int i = 0; i < num_price; ++i) {
+            memcpy(ticket_kind[i], other.ticket_kind[i], 20 * sizeof(char));
+        }
 		memcpy(ticket_quantity, other.ticket_quantity, 5 * sizeof(short));
 		memcpy(price, other.price, 5 * sizeof(float));
 		return *this;
@@ -233,14 +233,14 @@ struct info_ticket_user{
 		time_to = other.time_to;
 		memcpy(loc_from, other.loc_from, 20 * sizeof(char));
 		memcpy(loc_to, other.loc_to, 20 * sizeof(char));
-		for (int i = 0; i < num_price; ++i) {
-			memcpy(ticket_kind[i], other.ticket_kind[i], 20 * sizeof(char));
-		}
-		num_price = other.num_price;
-		memcpy(ticket_quantity, other.ticket_quantity, sizeof(short));
+        num_price = other.num_price;
+        for (int i = 0; i < num_price; ++i) {
+            memcpy(ticket_kind[i], other.ticket_kind[i], 20 * sizeof(char));
+        }
+		memcpy(ticket_quantity, other.ticket_quantity, 5 * sizeof(short));
 		memcpy(price, other.price, 5 * sizeof(short));
 	}
-	info_ticket_user(int _id, char _train_id[20], char _catalog, const info_ticket other) {
+	info_ticket_user(int _id, char _train_id[20], char _catalog, const info_ticket &other) {
 		id = _id;
 		memcpy(train_id, _train_id, 20);
 		catalog  = _catalog;
@@ -251,11 +251,11 @@ struct info_ticket_user{
 		time_to = other.time_to;
 		memcpy(loc_from, other.loc_from, 20 * sizeof(char));
 		memcpy(loc_to, other.loc_to, 20 * sizeof(char));
-		for (int i = 0; i < num_price; ++i) {
-			memcpy(ticket_kind[i], other.ticket_kind[i], 20 * sizeof(char));
-		}
-		num_price = other.num_price;
-		memcpy(ticket_quantity, other.ticket_quantity, sizeof(short));
+        num_price = other.num_price;
+        for (int i = 0; i < num_price; ++i) {
+            memcpy(ticket_kind[i], other.ticket_kind[i], 20 * sizeof(char));
+        }
+		memcpy(ticket_quantity, other.ticket_quantity, 5 * sizeof(short));
 		memcpy(price, other.price, 5 * sizeof(short));
 	}
 	info_ticket_user operator= (const info_ticket_user& other) {
@@ -267,27 +267,30 @@ struct info_ticket_user{
 		time_to = other.time_to;
 		memcpy(loc_from, other.loc_from, 20 * sizeof(char));
 		memcpy(loc_to, other.loc_to, 20 * sizeof(char));
-		for (int i = 0; i < num_price; ++i) {
-			memcpy(ticket_kind[i], other.ticket_kind[i], 20 * sizeof(char));
-		}
-		num_price = other.num_price;
-		memcpy(ticket_quantity, other.ticket_quantity, sizeof(short));
+        num_price = other.num_price;
+        for (int i = 0; i < num_price; ++i) {
+            memcpy(ticket_kind[i], other.ticket_kind[i], 20 * sizeof(char));
+        }
+		memcpy(ticket_quantity, other.ticket_quantity, 5 * sizeof(short));
 		memcpy(price, other.price, 5 * sizeof(short));
 		return *this;
 	}
 
 	info_ticket ticket() const {
 		info_ticket ans;
+		memcpy(ans.train_id, train_id, 20);
 		ans.date = date;
+		ans.date_from = date_from;
+		ans.date_to = date_to;
 		ans.time_from = time_from;
 		ans.time_to = time_to;
 		memcpy(ans.loc_from, loc_from, 20 * sizeof(char));
 		memcpy(ans.loc_to, loc_to, 20 * sizeof(char));
-		for (int i = 0; i < num_price; ++i) {
-			memcpy(ans.ticket_kind[i], ticket_kind[i], 20 * sizeof(char));
-		}
-		ans.num_price = num_price;
-		memcpy(ans.ticket_quantity, ticket_quantity, sizeof(short));
+        ans.num_price = num_price;
+        for (int i = 0; i < num_price; ++i) {
+            memcpy(ans.ticket_kind[i], ticket_kind[i], 20 * sizeof(char));
+        }
+		memcpy(ans.ticket_quantity, ticket_quantity, 5 * sizeof(short));
 		memcpy(ans.price, price, 5 * sizeof(short));
 		return ans;
 	}
