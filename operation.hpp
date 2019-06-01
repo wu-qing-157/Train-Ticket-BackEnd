@@ -164,7 +164,7 @@ public:
 		value_t cB = *iB;
 
 		int cata_len = strlen(catalog);
-		while (iA != treeA.end() && iB != treeB.end() && dA.first == a && dB.first == b) {
+		while (iA != tree.end() && iB != tree.end() && dA.first == a && dB.first == b) {
 			if (dA.second == dB.second) {
 				if (cA < cB) {
 					info_train info = tra->IDquery(dA.second);

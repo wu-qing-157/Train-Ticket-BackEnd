@@ -1092,7 +1092,7 @@ namespace sjtu {
             return at(key, x);
         }
 
-        const_iterator lowerbound(const Key &key, node &x) const{
+        iterator lowerbound(const Key &key, node &x) const{
             /*if (comp(key, x.mainKey)) {
                 //return iterator(leaf,pos,this);
             }*/
@@ -1101,13 +1101,13 @@ namespace sjtu {
                 buffer_load_leaf(b, x);
                 size_t tmp = leaf_find_pos(b, key, x.curSize);
                 if (tmp < x.curSize && compare(key, *get_key_leaf(tmp, b)))
-                    return const_iterator(x, tmp, this);
+                    return iterator(x, tmp, this);
                 else {
                     if(tmp == x.curSize) {
                         if(x.pos != rear) return ++iterator(x,tmp-1,this);
-                        else return const_iterator(node(invalid_off, invalid_off, invalid_off, true), 0, this);
+                        else return iterator(node(invalid_off, invalid_off, invalid_off, true), 0, this);
                     }
-                    else return const_iterator(x, tmp, this);
+                    else return iterator(x, tmp, this);
                 }
             }
             buffer b;
@@ -1119,9 +1119,9 @@ namespace sjtu {
             return lowerbound(key, y);
         }
 
-        const_iterator lowerbound(const Key &key) const{
+        iterator lowerbound(const Key &key) const{
             if(empty())
-                return const_iterator(node(invalid_off, invalid_off, invalid_off, true), 0, this);
+                return iterator(node(invalid_off, invalid_off, invalid_off, true), 0, this);
             node x= get_node(root);
             return lowerbound(key, x);
         }
