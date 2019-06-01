@@ -154,6 +154,7 @@ struct info_ticket {
 	double price[5];
 
 	info_ticket() {
+		for (int i = 0; i < 5; ++i) ticket_quantity[i] = 0;
 		num_price = -1;  //for convenience of judging wrong info_ticket
 	}
 	info_ticket(const info_ticket& other) = default;
