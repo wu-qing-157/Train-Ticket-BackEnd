@@ -20,6 +20,29 @@ public:
 	pair(const pair<U1, U2> &other) : first(other.first), second(other.second) {}
 	template<class U1, class U2>
 	pair(pair<U1, U2> &&other) : first(other.first), second(other.second) {}
+
+	bool operator< (const pair& other) const {
+	    if (first < other.first) return true;
+	    else if (first > other.first) return false;
+	    else {
+	        if (second < other.second) return true;
+	        else return false;
+	    }
+	}
+
+	bool operator> (const pair& other) const {
+        if (first > other.first) return true;
+        else if (first < other.first) return false;
+        else {
+            if (second > other.second) return true;
+            else return false;
+        }
+	}
+
+	bool operator== (const pair& other) const {
+	    if (first == other.first && second == other.second) return true;
+	    return false;
+	}
 };
 
 }
