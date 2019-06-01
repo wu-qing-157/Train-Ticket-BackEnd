@@ -824,6 +824,12 @@ namespace sjtu {
                 return *tree->get_value_leaf(pos, b);
             }
 
+            Key &get_key(){
+                buffer b;
+                tree->buffer_load_leaf(b, leaf);
+                return *tree->get_key_leaf(pos, b);
+            }
+
             bool operator==(const iterator &rhs)const{
                 return (leaf.pos == rhs.leaf.pos&&pos == rhs.pos);
             }
@@ -912,6 +918,12 @@ namespace sjtu {
                 buffer b;
                 tree->buffer_load_leaf(b, leaf);
                 return *tree->get_value_leaf(pos, b);
+            }
+
+            Key &get_key(){
+                buffer b;
+                tree->buffer_load_leaf(b, leaf);
+                return *tree->get_key_leaf(pos, b);
             }
 
             bool operator==(const iterator &rhs)const{
