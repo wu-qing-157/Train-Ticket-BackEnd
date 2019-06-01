@@ -6,6 +6,7 @@
 #include "structs.hpp"
 
 constexpr char fname_ticket_number[] = "ticket_quantity_data";
+#define float double
 
 struct info_user {
 	char name[40];
@@ -51,13 +52,13 @@ struct info_query_profile {  //It's very similar with info_user, except that it 
 struct info_station {
 	char name[20];
 	my_time arriv, start, stopover;
-	float price[5];
+	double price[5];
 
 	info_station() = default;
-	info_station(char _name[20], my_time _arriv, my_time _start, my_time _stopover, float _price[5]) :
+	info_station(char _name[20], my_time _arriv, my_time _start, my_time _stopover, double _price[5]) :
 		arriv(_arriv), start(_start), stopover(_stopover){
 		memcpy(name, _name, 20);
-		memcpy(price, _price, 5 * sizeof(float));
+		memcpy(price, _price, 5 * sizeof(double));
 	}
 
 	void checkday() {
@@ -150,7 +151,7 @@ struct info_ticket {
 	my_time time_from, time_to;
 	char loc_from[20], loc_to[20], ticket_kind[5][20];
 	short num_price, ticket_quantity[5];
-	float price[5];
+	double price[5];
 
 	info_ticket() {
 		num_price = -1;  //for convenience of judging wrong info_ticket
@@ -159,7 +160,7 @@ struct info_ticket {
 	info_ticket(char _train_id[], my_date _date, my_date _date_from, 
 		my_date _date_to, my_time _time_from, my_time _time_to,
 		char _loc_from[], char _loc_to[], char _ticket_kind[][20],
-		short _num_price, short _ticket_quantity[], float _price[5]) {
+		short _num_price, short _ticket_quantity[], double _price[5]) {
 		memcpy(train_id, _train_id, 20);
 		date = _date;
 		date_from = _date_from;
@@ -173,7 +174,7 @@ struct info_ticket {
             memcpy(ticket_kind[i], _ticket_kind[i], 20 * sizeof(char));
         }
 		memcpy(ticket_quantity, _ticket_quantity, 5 * sizeof(short));
-		memcpy(price, _price, 5 * sizeof(float));
+		memcpy(price, _price, 5 * sizeof(double));
 	}
 	info_ticket operator= (const info_ticket& other) {
 		memcpy(train_id, other.train_id, 20);
@@ -189,7 +190,7 @@ struct info_ticket {
             memcpy(ticket_kind[i], other.ticket_kind[i], 20 * sizeof(char));
         }
 		memcpy(ticket_quantity, other.ticket_quantity, 5 * sizeof(short));
-		memcpy(price, other.price, 5 * sizeof(float));
+		memcpy(price, other.price, 5 * sizeof(double));
 		return *this;
 	}
 	void setnormal() {
@@ -219,7 +220,7 @@ struct info_ticket_user{
 	my_time time_from, time_to;
 	char loc_from[20], loc_to[20], ticket_kind[5][20];
 	short num_price, ticket_quantity[5];
-	float price[5];
+	double price[5];
 
 	info_ticket_user() = default;
 	info_ticket_user(const info_ticket_user& other) {
@@ -238,7 +239,7 @@ struct info_ticket_user{
             memcpy(ticket_kind[i], other.ticket_kind[i], 20 * sizeof(char));
         }
 		memcpy(ticket_quantity, other.ticket_quantity, 5 * sizeof(short));
-		memcpy(price, other.price, 5 * sizeof(short));
+		memcpy(price, other.price, 5 * sizeof(double));
 	}
 	info_ticket_user(int _id, char _train_id[20], char _catalog, const info_ticket &other) {
 		id = _id;
@@ -256,7 +257,7 @@ struct info_ticket_user{
             memcpy(ticket_kind[i], other.ticket_kind[i], 20 * sizeof(char));
         }
 		memcpy(ticket_quantity, other.ticket_quantity, 5 * sizeof(short));
-		memcpy(price, other.price, 5 * sizeof(short));
+		memcpy(price, other.price, 5 * sizeof(double));
 	}
 	info_ticket_user operator= (const info_ticket_user& other) {
 		id = other.id;
@@ -272,7 +273,7 @@ struct info_ticket_user{
             memcpy(ticket_kind[i], other.ticket_kind[i], 20 * sizeof(char));
         }
 		memcpy(ticket_quantity, other.ticket_quantity, 5 * sizeof(short));
-		memcpy(price, other.price, 5 * sizeof(short));
+		memcpy(price, other.price, 5 * sizeof(double));
 		return *this;
 	}
 
@@ -291,7 +292,7 @@ struct info_ticket_user{
             memcpy(ans.ticket_kind[i], ticket_kind[i], 20 * sizeof(char));
         }
 		memcpy(ans.ticket_quantity, ticket_quantity, 5 * sizeof(short));
-		memcpy(ans.price, price, 5 * sizeof(short));
+		memcpy(ans.price, price, 5 * sizeof(double));
 		return ans;
 	}
 };

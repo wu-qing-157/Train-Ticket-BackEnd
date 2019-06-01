@@ -13,6 +13,10 @@ struct str {
 	T data[N];
 
 	str() = default;
+	str(int x){
+	    if (x != 0) throw 1;
+	    for(int i = 0; i < N; ++i) data[i] = 0;
+	}
 	str(T _data[]) {
 		memcpy(data, _data, N * sizeof(T));
 	}

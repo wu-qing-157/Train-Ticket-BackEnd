@@ -25,7 +25,7 @@ struct query_order_return{
 /*struct info_station{
     char name[20];
     time arriv, start, stopover;
-    float price[5];
+    double price[5];
 };*/
 
 #endif // CT

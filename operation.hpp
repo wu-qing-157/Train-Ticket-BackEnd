@@ -187,7 +187,7 @@ public:
 						for (int i = 0; i < info.num_price; ++i) {
 							memcpy(tic.ticket_kind[i], info.name_price[i], 20 * sizeof(char));
 							int cnt = 2000;
-							float price = 0;
+							double price = 0;
 							for (int j = cA; j < cB; ++j) {
 								if (cnt > quan.at(date, i, j)) cnt = quan.at(date, i, j);
 								price += info.data[j + 1].price[i];
@@ -256,7 +256,7 @@ public:
 		if (info.on_sale == -1) return false;
 		ct::vector<ticket_number_t, fname_ticket_number> vv;
 		ticket_number_t quan = vv[info.on_sale];
-		//NOTE HERE: there is a convertion of char[20] to str<char, 20> above, and I'm not sure it's correct.
+		//NOTE HERE: there is a conversion of char[20] to str<char, 20> above, and I'm not sure it's correct.
 		int i = 0, j = 0;
 		int a, b, k;
 
@@ -302,7 +302,7 @@ public:
 		tic.ticket_quantity[k] = num;
 		for (i = 0; i < info.num_price; ++i) {
 			memcpy(tic.ticket_kind[i], info.name_price[i], 20 * sizeof(char));
-			float price = 0;
+			double price = 0;
 			for (j = a + 1; j <= b; ++j) {
 				price += info.data[j].price[i];
 			}
