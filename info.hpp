@@ -5,7 +5,7 @@
 #include "ct_vector.hpp"
 #include "structs.hpp"
 
-const char fname_ticket_number[] = "ticket_quantity_data";
+constexpr char fname_ticket_number[] = "ticket_quantity_data";
 
 struct info_user {
 	char name[40];

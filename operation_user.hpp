@@ -8,7 +8,7 @@
 #include "ct_exceptions.hpp"
 #include "ct_vector.hpp"
 
-const char filename[] = "user_data";
+constexpr char filename[] = "user_data";
 class user {
 	friend class ticket;
 private:

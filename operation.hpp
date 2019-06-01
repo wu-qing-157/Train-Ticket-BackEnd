@@ -21,7 +21,7 @@ typedef char catalog_t[10];
 typedef char ticket_kind_t[20];
 typedef char train_id_t[20];
 
-const char train_info_name[] = "train_info_name";
+constexpr char train_info_name[] = "train_info_name";
 class train {
 	friend class ticket;
 private:
@@ -106,7 +106,7 @@ public:
 
 typedef sjtu::vector<info_ticket> ctn_ticket;
 
-const char fnametic[] = "ticket_bought_data";
+constexpr char fnametic[] = "ticket_bought_data";
 //const char fname_ticket_number[] = "ticket_quantity_data";
 
 class ticket {
