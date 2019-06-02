@@ -182,7 +182,7 @@ struct info_ticket {
 	info_ticket operator= (const info_ticket& other) {
 		memcpy(train_id, other.train_id, 20);
 		memcpy(name, other.name, 40);
-		cata = _cata;
+		cata = other.cata;
 		date = other.date;
 		date_from = other.date_from;
 		date_to = other.date_to;
