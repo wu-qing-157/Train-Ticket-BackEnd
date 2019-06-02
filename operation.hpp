@@ -129,7 +129,7 @@ public:
 		sjtu::vector<info_ticket> ans;
 
 		char filename1[25] = {0}, filename2[25] = {0};
-		sprintf(filename1, "data_loctid", a);
+		sprintf(filename1, "data_loctid");
 		//sprintf(filename2, "data_%s", b);
 
 		FILE *f = fopen(filename1, "rb+");

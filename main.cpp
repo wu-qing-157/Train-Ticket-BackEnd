@@ -4,9 +4,9 @@
 #include <iostream>
 
 //int top, maxx;
-
+bool cleaned;
 #define float double
-
+#include "mem-pool.hpp"
 #ifndef CT
 	#include "return.hpp"
 	#include "operation.hpp"
@@ -206,20 +206,20 @@ void train_modify_train()
 // ======= Train END =======
 
 // ======= System BEGIN =======
-bool is_it_clean;
 void system_clean()
 {
+	cleaned = 1;
+	mem_pool.clean();
 	user_system.clean();
 	ticket_system.clean();
 	train_system.clean();
-	is_it_clean = 1;
 	cout << "1\n";
 }
 void system_exit() { return ;}
 // ======= System END =======
 int main()
 {
-//	freopen("temp.in", "r", stdin);
+//	freopen("3.in", "r", stdin);
 //    freopen("temp.out", "w", stdout);
 //	user_system.init();
 		// system_clean();
