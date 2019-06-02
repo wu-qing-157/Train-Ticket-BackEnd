@@ -298,6 +298,8 @@ public:
 		//I'm not sure whether above two sentences are what's supposed to be.
 		memcpy(tic.loc_from, info.data[a].name, 20 * sizeof(char));
 		memcpy(tic.loc_to, info.data[b].name, 20 * sizeof(char));
+		memcpy(tic.name, info.name, 40);
+		tic.cata = info.catalog;
 		tic.num_price = info.num_price;
 		tic.ticket_quantity[k] = num;
 		for (i = 0; i < info.num_price; ++i) {

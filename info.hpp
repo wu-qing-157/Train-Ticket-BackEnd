@@ -145,7 +145,7 @@ struct info_train {
 };
 
 struct info_ticket {
-	char train_id[20];
+	char train_id[20], name[40], cata;
 	my_date date;
 	my_date date_from, date_to;
 	my_time time_from, time_to;
@@ -158,11 +158,13 @@ struct info_ticket {
 		num_price = -1;  //for convenience of judging wrong info_ticket
 	}
 	info_ticket(const info_ticket& other) = default;
-	info_ticket(char _train_id[], my_date _date, my_date _date_from, 
+	info_ticket(char _train_id[], char _name[], char _cata, my_date _date, my_date _date_from,
 		my_date _date_to, my_time _time_from, my_time _time_to,
 		char _loc_from[], char _loc_to[], char _ticket_kind[][20],
 		short _num_price, short _ticket_quantity[], double _price[5]) {
 		memcpy(train_id, _train_id, 20);
+		memcpy(name, _name, 40);
+		cata = _cata;
 		date = _date;
 		date_from = _date_from;
 		date_to = _date_to;
@@ -179,6 +181,8 @@ struct info_ticket {
 	}
 	info_ticket operator= (const info_ticket& other) {
 		memcpy(train_id, other.train_id, 20);
+		memcpy(name, other.name, 40);
+		cata = _cata;
 		date = other.date;
 		date_from = other.date_from;
 		date_to = other.date_to;
@@ -204,11 +208,11 @@ struct info_ticket {
 };
 ostream &operator << (ostream &os, const info_ticket &obj)
 {
-	os << obj.train_id << ' ' << obj.loc_from << ' ' << obj.date_from << ' ' << obj.time_from << ' '
-									<< obj.loc_to << ' ' << obj.date_to << ' ' << obj.time_to;
-		for (int j = 0; j < obj.num_price; ++j)
-			os << ' ' << obj.ticket_kind[j] << ' ' << obj.ticket_quantity[j] << ' ' << obj.price[j];
-		os << '\n';
+	os << obj.train_id << "   " << obj.name << "   " << obj.cata << "   " << obj.loc_from << "   " << obj.date_from << "   " << obj.time_from << "   "
+									<< obj.loc_to << "   " << obj.date_to << "   " << obj.time_to << "   ";
+	for (int j = 0; j < obj.num_price; ++j)
+		os <<  obj.ticket_kind[j] << ' ' << obj.ticket_quantity[j] << ' ' << obj.price[j] << "  ";
+	os << "  ";
 	return os;
 }
 

@@ -82,8 +82,8 @@ void ticket_query_ticket()
 	cls(loc1); cls(loc2); cls(_date); cls(_catalog);
 	cin >> loc1 >> loc2 >> _date >> _catalog;
 	auto ret = ticket_system.query_ticket(loc1, loc2, my_date(_date), _catalog);
-	cout << ret.size() << "\n";
 	for (int i = 0; i < ret.size(); ++i) cout << ret[i];
+	cout << '\n';
 }
 void ticket_query_transfer()
 {
@@ -93,6 +93,7 @@ void ticket_query_transfer()
 	auto ret = ticket_system.query_transfer(loc1, loc2, my_date(_date), _catalog);
 	if (ret.first.num_price == -1) cout << "-1\n";
 	else cout << ret.first << ret.second;
+	cout << '\n';
 }
 void ticket_buy_ticket()
 {
@@ -109,9 +110,9 @@ void ticket_query_order()
 	auto ret = ticket_system.query_order(uid, my_date(_date), _catalog);
 	if (ret.success)
 	{
-		cout << ret.data.size() << '\n';
 		for (int i = 0; i < ret.data.size(); ++i)
 			cout << ret.data[i];
+		cout << '\n';
 	}
 	else cout << "-1\n";
 	// ...
@@ -162,16 +163,17 @@ void train_query_train()
 	train_id_t tid; cls(tid); cin >> tid;
 	info_train ans = train_system.query_train(tid);
 	if (ans.num_station == 0) {cout << "0\n"; return ;}
-	cout << tid << ' ' << ans.name << ' ' << ans.catalog << ' ' << ans.num_station << ' ' << ans.num_price;
-	for (int i = 0; i < ans.num_price; ++i) cout << ' ' << ans.name_price[i];
-	cout << '\n';
+	cout << (ans.on_sale != -1) << "  " << tid << "  " << ans.name << "  " << ans.catalog << "  ";
+	for (int i = 0; i < ans.num_price; ++i) cout << ans.name_price[i] << " ";
+	cout << "   ";
 	for (int i = 0; i < ans.num_station; ++i)
 	{
-		cout << ans.data[i].name << ' ' << ans.data[i].arriv << ' ' << ans.data[i].start << ' ' << ans.data[i].stopover;
+		cout << ans.data[i].name << "  " << ans.data[i].arriv << "  " << ans.data[i].start << "  " << ans.data[i].stopover << "  ";
 		for (int j = 0; j < ans.num_price; ++j)
-			cout << " ￥" << ans.data[i].price[j];
-		cout << '\n';
+			cout << "￥" << ans.data[i].price[j] << ' ';
+		cout << "  ";
 	}
+	cout << '\n';
 }
 void train_delete_train()
 {
@@ -200,7 +202,7 @@ void train_modify_train()
 		st_info[i] = info_station(loc, my_time(arr), my_time(start), my_time(stopover), price);
 	}
 	info_train now = info_train(_name, price_name, tid, _cata[0], num_station, num_price, st_info);
-	cout << train_system.modify_train(tid, now) << '\n';
+	cout << train_system.modify_train(tid, now) << ' ';
 	return ;
 }
 // ======= Train END =======
