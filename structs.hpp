@@ -17,7 +17,7 @@ struct str {
 	    if (x != 0) throw 1;
 	    for(int i = 0; i < N; ++i) data[i] = 0;
 	}
-	str(T _data[]) {
+	str(const T* _data) {
 		memcpy(data, _data, N * sizeof(T));
 	}
 	str(const str &that) {memcpy(data, that.data, N * sizeof (T));}

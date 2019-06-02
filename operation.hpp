@@ -46,7 +46,7 @@ public:
 		// printf("%d\n", data.count(t.train_id) );
 		return true;	//I need jyq to change bptree.hpp to enable return false(try{} is too slow)
 	}
-	const info_train query_train(char train_id[]) const {
+	const info_train query_train(const char *train_id) const {
 		str<char, 20> queryId(train_id);
 		// for (int i = 0; i < 20; ++i) printf("%d%c", queryId.data[i], " \n"[i == 19]);
 		if (!data.count(queryId)) return info_train();
@@ -298,8 +298,6 @@ public:
 		//I'm not sure whether above two sentences are what's supposed to be.
 		memcpy(tic.loc_from, info.data[a].name, 20 * sizeof(char));
 		memcpy(tic.loc_to, info.data[b].name, 20 * sizeof(char));
-		memcpy(tic.name, info.name, 40);
-		tic.cata = info.catalog;
 		tic.num_price = info.num_price;
 		tic.ticket_quantity[k] = num;
 		for (i = 0; i < info.num_price; ++i) {

@@ -76,6 +76,16 @@ void user_modify_privilege()
 // ======= Ticket BEGIN =======
 train train_system;
 ticket ticket_system(&train_system, &user_system);
+ostream &operator << (ostream &os, const info_ticket &obj)
+{
+	info_train info = train_system.query_train(obj.train_id);
+	os << obj.train_id << "  " << info.name << "  " << info.catalog << "  " << obj.loc_from << "   " << obj.date_from << "   " << obj.time_from << "   "
+	   << obj.loc_to << "   " << obj.date_to << "   " << obj.time_to << "   ";
+	for (int j = 0; j < obj.num_price; ++j)
+		os <<  obj.ticket_kind[j] << ' ' << obj.ticket_quantity[j] << ' ' << obj.price[j] << "  ";
+	os << "  ";
+	return os;
+}
 void ticket_query_ticket()
 {
 	loc_t loc1, loc2; date_t _date; catalog_t _catalog;
@@ -170,7 +180,7 @@ void train_query_train()
 	{
 		cout << ans.data[i].name << "  " << ans.data[i].arriv << "  " << ans.data[i].start << "  " << ans.data[i].stopover << "  ";
 		for (int j = 0; j < ans.num_price; ++j)
-			cout << "￥" << ans.data[i].price[j] << ' ';
+			cout << ans.data[i].price[j] << ' ';
 		cout << "  ";
 	}
 	cout << '\n';
