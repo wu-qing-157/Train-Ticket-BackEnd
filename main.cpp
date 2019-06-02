@@ -44,12 +44,14 @@ void user_register()
 	cls(pwd);
 	cin >> _name >> pwd >> _email >> _phone;
 	cout << user_system.regist(_name, pwd, _email, _phone) << "\n";
+	fflush(stdout);
 }
 void user_login()
 {
 	int id; password_t pwd; cls(pwd);
 	cin >> id >> pwd;
 	cout << user_system.login(id, pwd) << "\n";
+	fflush(stdout);
 }
 void user_query_profile()
 {
@@ -57,6 +59,7 @@ void user_query_profile()
 	if (id < 2019 || id > user_system.counter()) {cout << "0\n"; return ;}
 	info_query_profile ans = user_system.query_profile(id);
 	cout << ans.name << ' ' << ans.email << ' ' << ans.phone << ' ' << ans.privilege + 1 << '\n';
+	fflush(stdout);
 }
 void user_modify_profile()
 {
@@ -64,12 +67,13 @@ void user_modify_profile()
 	name_t _name; password_t pwd; email_t _email; phone_t _phone;
 	cin >> _name >> pwd >> _email >> _phone;
 	cout << user_system.modify_profile(id, _name, pwd, _email, _phone) << '\n';
+	fflush(stdout);
 }
 void user_modify_privilege()
 {
 	int id1, id2; short privilege;
 	cin >> id1 >> id2 >> privilege; --privilege;
-	cout << user_system.modify_privilege(id1, id2, privilege) << '\n';
+	cout << user_system.modify_privilege(id1, id2, privilege) << '\n';fflush(stdout);
 }
 // ======= User END =======
 
@@ -93,7 +97,7 @@ void ticket_query_ticket()
 	cin >> loc1 >> loc2 >> _date >> _catalog;
 	auto ret = ticket_system.query_ticket(loc1, loc2, my_date(_date), _catalog);
 	for (int i = 0; i < ret.size(); ++i) cout << ret[i];
-	cout << '\n';
+	cout << '\n';fflush(stdout);
 }
 void ticket_query_transfer()
 {
@@ -103,7 +107,7 @@ void ticket_query_transfer()
 	auto ret = ticket_system.query_transfer(loc1, loc2, my_date(_date), _catalog);
 	if (ret.first.num_price == -1) cout << "-1\n";
 	else cout << ret.first << ret.second;
-	cout << '\n';
+	cout << '\n';fflush(stdout);
 }
 void ticket_buy_ticket()
 {
@@ -111,6 +115,7 @@ void ticket_buy_ticket()
 	cls(t_id); cls(loc1); cls(loc2); cls(_date); cls(_kind);
 	cin >> uid >> num >> t_id >> loc1 >> loc2 >> _date >> _kind;
 	cout << ticket_system.buy_ticket(uid, num, t_id, loc1, loc2, my_date(_date), _kind) << '\n';
+	fflush(stdout);
 }
 void ticket_query_order()
 {
@@ -125,7 +130,7 @@ void ticket_query_order()
 		cout << '\n';
 	}
 	else cout << "-1\n";
-	// ...
+	fflush(stdout);
 }
 void ticket_refund_ticket()
 {
@@ -133,7 +138,7 @@ void ticket_refund_ticket()
 	cls(tid); cls(loc1); cls(loc2); cls(_date); cls(_kind);
 	cin >> uid >> num >> tid >> loc1 >> loc2 >> _date >> _kind;
 	cout << ticket_system.refund_ticket(uid, num, tid, loc1, loc2, my_date(_date), _kind) << '\n';
-	// ...
+	fflush(stdout);
 }
 // ======= Ticket END =======
 
@@ -161,12 +166,12 @@ void train_add_train()
 		st_info[i] = info_station(loc, my_time(arr), my_time(start), my_time(stopover), price);
 	}
 	info_train now = info_train(_name, price_name, tid, _cata[0], num_station, num_price, st_info);
-	cout << train_system.add(now) << '\n';
+	cout << train_system.add(now) << '\n';fflush(stdout);
 }
 void train_sale_train()
 {
 	train_id_t tid; cls(tid); cin >> tid;
-	cout << train_system.sale_train(tid) << '\n';
+	cout << train_system.sale_train(tid) << '\n';fflush(stdout);
 }
 void train_query_train()
 {
@@ -183,12 +188,12 @@ void train_query_train()
 			cout << ans.data[i].price[j] << ' ';
 		cout << "  ";
 	}
-	cout << '\n';
+	cout << '\n';fflush(stdout);
 }
 void train_delete_train()
 {
 	train_id_t tid; cls(tid); cin >> tid;
-	cout << train_system.delete_train(tid) << '\n';
+	cout << train_system.delete_train(tid) << '\n';fflush(stdout);
 }
 void train_modify_train()
 {
@@ -212,7 +217,7 @@ void train_modify_train()
 		st_info[i] = info_station(loc, my_time(arr), my_time(start), my_time(stopover), price);
 	}
 	info_train now = info_train(_name, price_name, tid, _cata[0], num_station, num_price, st_info);
-	cout << train_system.modify_train(tid, now) << ' ';
+	cout << train_system.modify_train(tid, now) << ' ';fflush(stdout);
 	return ;
 }
 // ======= Train END =======
@@ -225,7 +230,7 @@ void system_clean()
 	user_system.clean();
 	ticket_system.clean();
 	train_system.clean();
-	cout << "1\n";
+	cout << "1\n"; fflush(stdout);
 }
 void system_exit() { return ;}
 // ======= System END =======
@@ -266,7 +271,7 @@ int main()
 		char str[30]; scanf("%s", str);
 		for (int i = 0; i < command_number; ++i)
 			if (!strcmp(str, command_name[i]))
-				if (i == command_number - 1) {cout << "BYE\n"; return 0;}
+				if (i == command_number - 1) {cout << "BYE\n"; fflush(stdout);return 0;}
 				else command[i]();
 	}
 	return 0;
