@@ -293,15 +293,9 @@ public:
 			if (data[i].id == id) {
 				bool jdg = true;
 				for (int j = 0; jdg && j < ans.data.size(); ++j) {
-					if (!strcmp(ans.data[j].train_id, data[i].train_id)) {
-						int k = 0;
-						for (; k < ans.data[j].num_price; ++k) {
-							if (!strcmp(ans.data[j].ticket_kind[k], data[i].ticket_kind[k])) {
-								break;
-							}
+					if (!strcmp(ans.data[j].train_id, data[i].train_id) && ans.data[j].date == data[i].date) {
+						for (int k = 0; k < ans.data[j].num_price; ++k)
 							ans.data[j].ticket_quantity[k] += data[i].ticket_quantity[k];
-						}
-						if (k == ans.data[j].num_price) throw 1;
 						jdg = false;
 					}
 				}
