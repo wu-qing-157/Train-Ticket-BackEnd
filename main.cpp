@@ -56,7 +56,7 @@ void user_login()
 void user_query_profile()
 {
 	int id; cin >> id;
-	if (id < 2019 || id > user_system.counter()) {cout << "0\n"; return ;}
+	if (id < 2019 || id > user_system.counter()) {cout << "0\n"; fflush(stdout); return ;}
 	info_query_profile ans = user_system.query_profile(id);
 	cout << ans.name << ' ' << ans.email << ' ' << ans.phone << ' ' << ans.privilege + 1 << '\n';
 	fflush(stdout);
@@ -83,7 +83,7 @@ ticket ticket_system(&train_system, &user_system);
 ostream &operator << (ostream &os, const info_ticket &obj)
 {
 	info_train info = train_system.query_train(obj.train_id);
-	os << obj.train_id << "  " << info.name << "  " << info.catalog << "  " << obj.loc_from << "   " << obj.date_from << "   " << obj.time_from << "   "
+	os << obj.train_id << "   " << info.name << "   " << info.catalog << "   " << obj.loc_from << "   " << obj.date_from << "   " << obj.time_from << "   "
 	   << obj.loc_to << "   " << obj.date_to << "   " << obj.time_to << "   ";
 	for (int j = 0; j < obj.num_price; ++j)
 		os <<  obj.ticket_kind[j] << ' ' << obj.ticket_quantity[j] << ' ' << obj.price[j] << "  ";
@@ -105,7 +105,7 @@ void ticket_query_transfer()
 	cls(loc1); cls(loc2); cls(_date); cls(_catalog);
 	cin >> loc1 >> loc2 >> _date >> _catalog;
 	auto ret = ticket_system.query_transfer(loc1, loc2, my_date(_date), _catalog);
-	if (ret.first.num_price == -1) cout << "-1\n";
+	if (ret.first.num_price == -1) cout << "-1";
 	else cout << ret.first << ret.second;
 	cout << '\n';fflush(stdout);
 }
@@ -177,7 +177,7 @@ void train_query_train()
 {
 	train_id_t tid; cls(tid); cin >> tid;
 	info_train ans = train_system.query_train(tid);
-	if (ans.num_station == 0) {cout << "0\n"; return ;}
+	if (ans.num_station == 0) {cout << "0\n"; fflush(stdout); return ;}
 	cout << (ans.on_sale != -1) << "  " << tid << "  " << ans.name << "  " << ans.catalog << "  ";
 	for (int i = 0; i < ans.num_price; ++i) cout << ans.name_price[i] << " ";
 	cout << "   ";
@@ -269,10 +269,14 @@ int main()
 			system_exit
 		};
 		char str[30]; scanf("%s", str);
-		for (int i = 0; i < command_number; ++i)
-			if (!strcmp(str, command_name[i]))
+        bool flag = true;
+		for (int i = 0; i < command_number && flag; ++i)
+			if (!strcmp(str, command_name[i])) {
 				if (i == command_number - 1) {cout << "BYE\n"; fflush(stdout);return 0;}
 				else command[i]();
+                flag = false;
+            }
+        if (flag) { cout << "unknown\n"; fflush(stdout); return 0; }
 	}
 	return 0;
 }
