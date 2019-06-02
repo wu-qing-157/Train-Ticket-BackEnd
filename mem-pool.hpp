@@ -5,7 +5,7 @@
 
 
 typedef unsigned long long ull;
-const int BLK = 4096;
+const int BLK = 8192;
 struct FILE_KEY {
 	char *filename;
 	int block_pos, len;
@@ -63,7 +63,7 @@ struct mem_unit {
 	}
 };
 const int Moha = 33331;
-const int K = 3331;
+const int K = 1526;
 class buffer_pool {
 private:
 	mem_unit *head, *tail;

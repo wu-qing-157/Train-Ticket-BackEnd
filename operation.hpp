@@ -290,6 +290,8 @@ public:
 
 		//below is how I can storage user's ticket_ordered data.
 
+		if (data.size() <= 10)
+		{
 		info_ticket tic;
 		memcpy(tic.train_id, train_id, 20);
 		tic.date = date;
@@ -310,7 +312,7 @@ public:
 		}
 		tic.setnormal();
 		info_ticket_user ans(id, train_id, info.catalog, tic);
-		data.push_back(ans);
+		data.push_back(ans);}
 		return true;
 	}
 
