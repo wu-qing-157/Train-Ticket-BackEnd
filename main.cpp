@@ -119,10 +119,9 @@ void ticket_buy_ticket()
 }
 void ticket_query_order()
 {
-	int uid; date_t _date; catalog_t _catalog;
-	cls(_date); cls(_catalog);
-	cin >> uid >> _date >> _catalog;
-	auto ret = ticket_system.query_order(uid, my_date(_date), _catalog);
+	int uid;
+	cin >> uid;
+	auto ret = ticket_system.query_order(uid);
 	if (ret.success)
 	{
 		for (int i = 0; i < ret.data.size(); ++i)
@@ -230,7 +229,8 @@ void system_clean()
 	user_system.clean();
 	ticket_system.clean();
 	train_system.clean();
-	cout << "1\n"; fflush(stdout);
+	cout << "1\n";
+	fflush(stdout);
 }
 void system_exit() { return ;}
 // ======= System END =======

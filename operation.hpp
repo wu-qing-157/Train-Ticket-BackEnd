@@ -37,21 +37,16 @@ public:
 	sjtu::bptree<str<char, 20>, str<char, 20>> llist{"llistData", "llistIndex"};
 
 	train() {}
-	bool add(info_train& t) {   //Maybe there needs to be some changes here.
+	bool add(info_train& t) {
 		if (data.count(t.train_id)) return false;
-		// for (int i = 0; i < 20; ++i) printf("%d%c", t.train_id.data[i], " \n"[i == 19]);
-        //cout << t.train_id << ' add_train_id\n';
 		data.insert(t.train_id, tr_info.size());
 		tr_info.push_back(t);
-		// printf("%d\n", data.count(t.train_id) );
-		return true;	//I need jyq to change bptree.hpp to enable return false(try{} is too slow)
+		return true;
 	}
 	const info_train query_train(const char *train_id) const {
 		str<char, 20> queryId(train_id);
-		// for (int i = 0; i < 20; ++i) printf("%d%c", queryId.data[i], " \n"[i == 19]);
 		if (!data.count(queryId)) return info_train();
 		info_train x = IDquery(queryId);
-		if (x.on_sale < 0) return info_train();
 		return x;
 	}
 	bool delete_train(char train_id[]) {
@@ -80,16 +75,12 @@ public:
 			llist.insert(x.data[i].name, x.data[i].name);
 
 		for (short i = 0; i < x.num_station; ++i) {
-			//loc_t a;
-			//str<char, 20> tid(x.train_id);
 
             typedef sjtu::pair<str<char, 20>, str<char, 20>> index_t;
             typedef short value_t;
 
 			index_t ind(x.data[i].name, x.train_id);
 			value_t val = i;
-			//pr = std::make_pair(tid, i);
-			//memcpy(a, x.data[i].name, 20 * sizeof(char));
 			char filename[25] = {0}, ffname[26] = {0};
 			sprintf(filename, "data_loctid");
 			sprintf(ffname, "index_loctid");
@@ -98,9 +89,8 @@ public:
 				tree(filename, ffname);
 			tree.insert(ind, val);
 		}
-		//above: traverse all the station and push them into bptree
 		x.sell(); tr_info.modify(pos, x);
-		return true;    // huge problems may have happened when return wrong.
+		return true;
 	}
 	void clean() {
 		data.clear();
@@ -125,37 +115,26 @@ public:
 	ticket(train *_tr, user *_us) : tra(_tr), use(_us) {}
 
 	sjtu::vector<info_ticket> query_ticket(loc_t a, loc_t b, my_date date, catalog_t catalog) {
-// query_ticket 延吉西 安图西 2019-06-01 CDG
 		sjtu::vector<info_ticket> ans;
 
 		char filename1[25] = {0}, filename2[25] = {0};
 		sprintf(filename1, "data_loctid");
-		//sprintf(filename2, "data_%s", b);
 
 		FILE *f = fopen(filename1, "rb+");
-		if (!f) return ans;  //NOTE HERE: this ans cannot be used directly
+		if (!f) return ans;
 		fclose(f);
-		//I REALLY DON'T KNOW WHAT IT IS ABOVE.
-
-		//f = fopen(filename2, "rb+");
-		//if (!f) return ans;  //NOTE HERE: this ans cannot be used directly
-		//fclose(f);
 
 		char ffname1[26] = {0}, ffname2[26] = {0};
 		sprintf(ffname1, "index_loctid");
-		//sprintf(ffname2, "index_loctid", b);
 
 		typedef sjtu::pair<str<char, 20>, str<char, 20>> index_t;
-        //typedef sjtu::pair<str<char, 20>, short> value_t;
         typedef short value_t;
         typedef sjtu::bptree<index_t, value_t>::iterator bpt_itr;
 
 		sjtu::bptree<index_t, value_t> tree(filename1, ffname1);
-		//sjtu::bptree<index_t, value_t> treeB(filename2, ffname2);
 
-        //bpt_itr iA = tree.begin();
-        index_t indA(a, 0); //NOTE HERE: the latter 0 may cause HUGE RE problems.
-        index_t indB(b, 0); //NOTE HERE: the latter 0 may cause HUGE RE problems.
+        index_t indA(a, 0);
+        index_t indB(b, 0);
         bpt_itr iA = tree.lowerbound(indA);
 		bpt_itr iB = tree.lowerbound(indB);
 		index_t dA = iA.get_key();
@@ -177,10 +156,9 @@ public:
 						ticket_number_t quan = vv[info.on_sale];
 						info_ticket tic;
 						memcpy(tic.train_id, dA.second.data, 20);
-						tic.date = date;
 						tic.time_from = info.data[cA].start;
 						tic.time_to = info.data[cB].arriv;
-						//I'm not sure whether above two sentences are what's supposed to be.
+						tic.date = date.plus2(-(tic.time_from.hour() / 24));
 						memcpy(tic.loc_from, info.data[cA].name, 20 * sizeof(char));
 						memcpy(tic.loc_to, info.data[cB].name, 20 * sizeof(char));
 						tic.num_price = info.num_price;
@@ -227,7 +205,6 @@ public:
 		for (; it != tra->llist.end(); ++it) {
 			char ct[20];
 			memcpy(ct, (*it).data, 20);
-			//std::cout << ct << '\n';
 			sjtu::vector<info_ticket> bfr = query_ticket(_loc1, ct, date, catalog);
 			sjtu::vector<info_ticket> aft = query_ticket(ct, _loc2, date, catalog);
 			
@@ -248,7 +225,6 @@ public:
 
 	bool buy_ticket(int id, short num, char train_id[20], char _loc1[],
 		char _loc2[], my_date date, char ticket_kind[]) {
-		//the time-consuming constant of this function can be better
 
 		if (id > use->cur || id < 2019) return false;
 		if (!strcmp(_loc1, _loc2)) return false;
@@ -256,7 +232,6 @@ public:
 		if (info.on_sale == -1) return false;
 		ct::vector<ticket_number_t, fname_ticket_number> vv;
 		ticket_number_t quan = vv[info.on_sale];
-		//NOTE HERE: there is a conversion of char[20] to str<char, 20> above, and I'm not sure it's correct.
 		int i = 0, j = 0;
 		int a, b, k;
 
@@ -288,14 +263,11 @@ public:
 		}
 		vv.modify(info.on_sale, ticket_number_t(quan));
 
-		//below is how I can storage user's ticket_ordered data.
-
 		info_ticket tic;
 		memcpy(tic.train_id, train_id, 20);
-		tic.date = date;
 		tic.time_from = info.data[a].start;
 		tic.time_to = info.data[b].arriv;
-		//I'm not sure whether above two sentences are what's supposed to be.
+		tic.date = date.plus2(-(tic.time_from.hour() / 24));
 		memcpy(tic.loc_from, info.data[a].name, 20 * sizeof(char));
 		memcpy(tic.loc_to, info.data[b].name, 20 * sizeof(char));
 		tic.num_price = info.num_price;
@@ -314,15 +286,12 @@ public:
 		return true;
 	}
 
-	query_order_return query_order(int id, my_date date, char catalog[]) {
+	query_order_return query_order(int id) {
 		query_order_return ans;
-		int cata_len = strlen(catalog);
 		if (id > use->cur || id < 2019) return ans;
 		for (int i = 0; i < data.size(); ++i) {
-			if (data[i].id == id && data[i].date == date) {
-				bool jdg = false;
-				for (int j = 0; !jdg && j < cata_len; ++j)
-					if (catalog[j] == data[i].catalog) jdg = true;
+			if (data[i].id == id) {
+				bool jdg = true;
 				for (int j = 0; jdg && j < ans.data.size(); ++j) {
 					if (!strcmp(ans.data[j].train_id, data[i].train_id)) {
 						int k = 0;
@@ -366,7 +335,6 @@ public:
         }
         if (cnt > 0) return false;
 
-		//NOTE HERE: there is a convertion of char[20] to str<char, 20> above, and I'm not sure it's correct.
 		int i = 0, j = 0;
 		int a, b, k;
 
